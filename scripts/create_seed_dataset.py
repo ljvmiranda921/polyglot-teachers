@@ -209,13 +209,13 @@ def _process_euroblocks(num_instances: int, seed: int) -> pd.DataFrame:
 
     sampled = euroblocks_ds.shuffle(seed=seed).take(num_instances)
     filtered_df = pd.DataFrame(list(sampled))
-    breakpoint()
 
     euroblocks_df = pd.DataFrame(
         {
             "id": [uuid.uuid4().hex for _ in range(len(filtered_df))],
             "source": "utter-project/EuroBlocks-SFT-Synthetic-1124",
             "language": filtered_df["language"].map(lambda x: LANG_MAPPING[x]).values,
+            "conversations": filtered_df["conversations"].values,
             "strategy": [["generate", "respond"] for _ in range(len(filtered_df))],
         }
     )
@@ -224,6 +224,7 @@ def _process_euroblocks(num_instances: int, seed: int) -> pd.DataFrame:
     euroblocks_df["prompt"] = euroblocks_df.conversations.apply(lambda x: x[0]["value"])
     euroblocks_df["response"] = euroblocks_df.conversations.apply(lambda x: x[1]["value"])
     euroblocks_df["source_id"] = euroblocks_df["prompt"].apply(lambda x: hashlib.md5(x.encode()).hexdigest())
+    euroblocks_df = euroblocks_df.drop(columns=["conversations"])  # No longer needed
     # fmt: on
 
     return euroblocks_df.reset_index(drop=True)
