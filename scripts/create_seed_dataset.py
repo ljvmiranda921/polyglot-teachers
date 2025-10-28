@@ -29,6 +29,7 @@ def get_data_processors():
     return {
         "allenai/WildChat-4.8M": _process_wildchat,
         "openai/gsm8k": _process_gsm8k,
+        "Magpie-Align/Magpie-Pro-300K-Filtered": _process_magpie_pro_300k,
     }
 
 
@@ -100,6 +101,11 @@ def _process_gsm8k() -> pd.DataFrame:
     gsm8k_df["language"] = "en"
     gsm8k_df["strategy"] = [["translate"] for _ in range(len(gsm8k_df))]
     return gsm8k_df
+
+
+def _process_magpie_pro_300k() -> pd.DataFrame:
+    """Process the Magpie-Align/Magpie-Pro-300K-Filtered dataset for general chat text."""
+    pass
 
 
 if __name__ == "__main__":
