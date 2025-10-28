@@ -1,13 +1,12 @@
-import uuid
-import logging
-import sys
 import argparse
 import hashlib
+import logging
 import random
+import sys
+import uuid
 
 import pandas as pd
 from datasets import Dataset, load_dataset
-
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -69,7 +68,11 @@ def main():
 
     seed_dataset_df = pd.concat(all_dfs, ignore_index=True)
     assert seed_dataset_df["id"].is_unique, "IDs are not unique in the final dataset!"
-    breakpoint()
+
+    seed_dataset = Dataset.from_pandas(seed_dataset_df)
+    logging.info(f"Final seed dataset size: {len(seed_dataset)} instances. Uploading to HuggingFace Hub at {args.output_dataset}...")  # fmt: skip
+    logging.info(f"Language distribution: {seed_dataset_df['language'].value_counts()}")
+    seed_dataset.push_to_hub(args.output_dataset, private=True)
 
 
 def _process_wildchat(num_instances: int, seed: int) -> pd.DataFrame:
