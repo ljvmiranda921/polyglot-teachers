@@ -15,11 +15,11 @@ logging.basicConfig(
 )
 
 LANG_MAPPING = {
-    "es": "Spanish",
-    "de": "German",
-    "id": "Indonesian",
-    "cs": "Czech",
-    "ja": "Japanese",
+    "Spanish": "es",
+    "German": "de",
+    "Indonesian": "id",
+    "Czech": "cs",
+    "Japanese": "ja",
 }
 
 
@@ -48,10 +48,10 @@ def main():
 def _process_wildchat() -> pd.DataFrame:
     num_instances = 200_000
     wildchat_4_8m = load_dataset("allenai/WildChat-4.8M", split="train", streaming=True)
-    sampled = wildchat_4_8m.shufle(seed=42).take(num_instances)
+    sampled = wildchat_4_8m.shuffle(seed=42).take(num_instances)
 
     sampled_df = pd.DataFrame(list(sampled))
-    filtered_df = sampled_df[(sampled_df["language"].isin(LANG_MAPPING.values()))]
+    filtered_df = sampled_df[(sampled_df["language"].isin(LANG_MAPPING.keys()))]
 
     # Transform to desired format
     wildchat_df = pd.DataFrame(
@@ -64,6 +64,8 @@ def _process_wildchat() -> pd.DataFrame:
             "source_id": filtered_df["conversation_hash"].values,
         }
     )
+
+    wildchat_df["prompt"] = wildchat_df.apply(lambda x: x[0])
 
     breakpoint()
 
