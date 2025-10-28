@@ -23,6 +23,13 @@ LANG_MAPPING = {
 }
 
 
+def get_data_processors():
+    """Registry of dataset processors."""
+    return {
+        "allenai/WildChat-4.8M": _process_wildchat,
+    }
+
+
 def get_args():
     # fmt: off
     parser = argparse.ArgumentParser(description="Create a seed dataset from a series of datasets.")
@@ -37,7 +44,7 @@ def main():
     args = get_args()
 
     all_dfs = []
-    for dataset_name, processor in DATA_PROCESSORS.items():
+    for dataset_name, processor in get_data_processors().items():
         if dataset_name in args.exclude:
             logging.info(f"Skipping excluded dataset: {dataset_name}")
             continue
@@ -71,8 +78,6 @@ def _process_wildchat() -> pd.DataFrame:
     wildchat_df["response"] = wildchat_df.conversation.apply(lambda x: x[1]["content"])
     return wildchat_df
 
-
-DATA_PROCESSORS = {"allenai/WildChat-4.8M": _process_wildchat}
 
 if __name__ == "__main__":
     main()
