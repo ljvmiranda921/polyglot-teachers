@@ -47,9 +47,16 @@ def main():
 
     all_dfs = []
     for dataset_name, processor in get_data_processors().items():
-        if dataset_name in args.exclude:
+        # If include list is specified, only process datasets in the include list
+        if args.include:
+            if dataset_name not in args.include:
+                logging.info(f"Skipping dataset not in include list: {dataset_name}")
+                continue
+        # Otherwise, check the exclude list
+        elif dataset_name in args.exclude:
             logging.info(f"Skipping excluded dataset: {dataset_name}")
             continue
+
         logging.info(f"Processing dataset: {dataset_name}")
         df = processor()
         all_dfs.append(df)
