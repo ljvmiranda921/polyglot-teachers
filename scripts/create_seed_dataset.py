@@ -117,8 +117,8 @@ def _process_magpie_pro_300k(num_instances: int, seed: int) -> pd.DataFrame:
     magpie_pro_300k_df = pd.DataFrame(
         {
             "id": [uuid.uuid4().hex for _ in range(len(sampled_df))],
-            "source": "allenai/WildChat-4.8M",
-            "conversation": sampled_df["conversation"].values,
+            "source": "Magpie-Align/Magpie-Pro-300K-Filtered",
+            "conversation": sampled_df["conversations"].values,
             "language": "en",
             "strategy": [["translate"] for _ in range(len(sampled_df))],
             "source_id": sampled_df["uuid"].values,
@@ -126,9 +126,9 @@ def _process_magpie_pro_300k(num_instances: int, seed: int) -> pd.DataFrame:
     )
 
     # fmt: off
-    magpie_pro_300k_df["prompt"] = magpie_pro_300k_df.conversation.apply(lambda x: x[0]["value"])
-    magpie_pro_300k_df["response"] = magpie_pro_300k_df.conversation.apply(lambda x: x[1]["value"])
-    magpie_pro_300k_df = magpie_pro_300k_df.drop(columns=["conversation"])  # No longer needed
+    magpie_pro_300k_df["prompt"] = magpie_pro_300k_df.conversations.apply(lambda x: x[0]["value"])
+    magpie_pro_300k_df["response"] = magpie_pro_300k_df.conversations.apply(lambda x: x[1]["value"])
+    magpie_pro_300k_df = magpie_pro_300k_df.drop(columns=["conversations"])  # No longer needed
     # fmt: on
     return magpie_pro_300k_df
 
