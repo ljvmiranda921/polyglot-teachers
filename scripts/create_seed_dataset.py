@@ -26,7 +26,7 @@ LANG_MAPPING = {
 def get_data_processors():
     """Registry of dataset processors."""
     return {
-        # "allenai/WildChat-4.8M": _process_wildchat,
+        "allenai/WildChat-4.8M": _process_wildchat,
         "openai/gsm8k": _process_gsm8k,
     }
 
@@ -36,6 +36,7 @@ def get_args():
     parser = argparse.ArgumentParser(description="Create a seed dataset from a series of datasets.")
     parser.add_argument("--output_dataset", type=str, required=True, help="HuggingFace dataset path to save the seed dataset to.")
     parser.add_argument("--exclude", nargs="+", type=list, default=[], help="List of dataset names to exclude from the seed dataset.")
+    parser.add_argument("--include", nargs="+", type=list, default=[], help="List of dataset names to exclusively include in the seed dataset.")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for sampling.")
     # fmt: on
     return parser.parse_args()
