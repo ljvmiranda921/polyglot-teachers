@@ -43,6 +43,7 @@ def main():
             continue
         logging.info(f"Processing dataset: {dataset_name}")
         df = processor()
+        breakpoint()
 
 
 def _process_wildchat() -> pd.DataFrame:
@@ -65,9 +66,9 @@ def _process_wildchat() -> pd.DataFrame:
         }
     )
 
-    wildchat_df["prompt"] = wildchat_df.apply(lambda x: x[0])
-
-    breakpoint()
+    wildchat_df["prompt"] = wildchat_df.conversation.apply(lambda x: x[0]["content"])
+    wildchat_df["response"] = wildchat_df.conversation.apply(lambda x: x[1]["content"])
+    return wildchat_df
 
 
 DATA_PROCESSORS = {"allenai/WildChat-4.8M": _process_wildchat}
