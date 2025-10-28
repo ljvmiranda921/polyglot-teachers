@@ -141,6 +141,7 @@ def _process_nvidia_helpsteer3(num_instances: int, seed: int) -> pd.DataFrame:
     helpsteer3_ds = load_dataset("nvidia/helpsteer3", "preference", split="train")
     filtered_df = helpsteer3_ds.filter(lambda x: x["domain"] == "multilingual").to_pandas()  # fmt: skip
     filtered_df = filtered_df[filtered_df.language.isin([lang.lower() for lang in LANG_MAPPING.keys()])].reset_index(drop=True)  # fmt: skip
+    filtered_df["prompt"] = filtered_df["context"].apply(lambda x: x[0]["content"])
 
     def _get_preferred_response(row):
         if row["overall_preference"] < 0:
@@ -171,7 +172,6 @@ def _process_nvidia_helpsteer3(num_instances: int, seed: int) -> pd.DataFrame:
     helpsteer3_df["source_id"] = helpsteer3_df["prompt"].apply(
         lambda x: hashlib.md5(x.encode()).hexdigest()
     )
-    breakpoint()
     return helpsteer3_df.reset_index(drop=True)
 
 
