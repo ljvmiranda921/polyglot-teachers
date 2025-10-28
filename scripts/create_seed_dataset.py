@@ -25,7 +25,7 @@ LANG_MAPPING = {
 
 
 def get_data_processors():
-    """Registry of dataset processors."""
+    """Registry of dataset processors. See implementation of each processor below."""
     return {
         "allenai/WildChat-4.8M": _process_wildchat,
         "openai/gsm8k": _process_gsm8k,
