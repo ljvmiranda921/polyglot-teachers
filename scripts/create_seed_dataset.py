@@ -26,7 +26,8 @@ LANG_MAPPING = {
 def get_data_processors():
     """Registry of dataset processors."""
     return {
-        "allenai/WildChat-4.8M": _process_wildchat,
+        # "allenai/WildChat-4.8M": _process_wildchat,
+        "openai/gsm8k": _process_gsm8k,
     }
 
 
@@ -50,6 +51,7 @@ def main():
             continue
         logging.info(f"Processing dataset: {dataset_name}")
         df = processor()
+        all_dfs.append(df)
         breakpoint()
 
 
@@ -76,7 +78,13 @@ def _process_wildchat() -> pd.DataFrame:
 
     wildchat_df["prompt"] = wildchat_df.conversation.apply(lambda x: x[0]["content"])
     wildchat_df["response"] = wildchat_df.conversation.apply(lambda x: x[1]["content"])
+    wildchat_df = wildchat_df.drop(columns=["conversation"])  # No longer needed
     return wildchat_df
+
+
+def _process_gsm8k() -> pd.DataFrame:
+    gsm8k = load_dataset("openai/gsm8k", "main", split="train").to_pandas()
+    breakpoint()
 
 
 if __name__ == "__main__":
