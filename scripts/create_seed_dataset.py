@@ -68,6 +68,7 @@ def main():
         all_dfs.append(df)
 
     seed_dataset_df = pd.concat(all_dfs, ignore_index=True)
+    assert seed_dataset_df["id"].is_unique, "IDs are not unique in the final dataset!"
     breakpoint()
 
 
