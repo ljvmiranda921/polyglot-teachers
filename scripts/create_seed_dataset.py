@@ -40,6 +40,7 @@ def get_args():
     parser.add_argument("--exclude", nargs="+", type=str, default=[], help="List of dataset names to exclude from the seed dataset.")
     parser.add_argument("--include", nargs="+", type=str, default=[], help="List of dataset names to exclusively include in the seed dataset.")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for sampling.")
+    parser.add_argument("--num_instances", type=int, default=200_000, help="Limit the number of instances by sampling to this value. Useful for very large datasets that don't fit to memory.")
     # fmt: on
     return parser.parse_args()
 
@@ -62,9 +63,8 @@ def main():
         breakpoint()
 
 
-def _process_wildchat(seed: int) -> pd.DataFrame:
+def _process_wildchat(num_instances: int, seed: int) -> pd.DataFrame:
     """Process the allenai/WildChat-4.8M dataset that contains multilingual prompt-response pairs."""
-    num_instances = 200_000
     wildchat_4_8m = load_dataset("allenai/WildChat-4.8M", split="train", streaming=True)
     sampled = wildchat_4_8m.shuffle(seed=seed).take(num_instances)
 
@@ -89,7 +89,7 @@ def _process_wildchat(seed: int) -> pd.DataFrame:
     return wildchat_df
 
 
-def _process_gsm8k(seed: int) -> pd.DataFrame:
+def _process_gsm8k(num_instances: int, seed: int) -> pd.DataFrame:
     """Process the openai/gsm8k dataset for math word problems."""
     gsm8k_df = load_dataset("openai/gsm8k", "main", split="train").to_pandas()
     gsm8k_df["source_id"] = gsm8k_df["question"].apply(
@@ -103,9 +103,8 @@ def _process_gsm8k(seed: int) -> pd.DataFrame:
     return gsm8k_df
 
 
-def _process_magpie_pro_300k(seed: int) -> pd.DataFrame:
+def _process_magpie_pro_300k(num_instances: int, seed: int) -> pd.DataFrame:
     """Process the Magpie-Align/Magpie-Pro-300K-Filtered dataset for general chat text."""
-    num_instances = 200_000
     magpie_pro_300k = load_dataset(
         "Magpie-Align/Magpie-Pro-300K-Filtered", split="train", streaming=True
     )
