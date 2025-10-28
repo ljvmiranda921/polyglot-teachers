@@ -47,6 +47,7 @@ def main():
 
 
 def _process_wildchat() -> pd.DataFrame:
+    """Process the allenai/WildChat-4.8M dataset that contains multilingual prompt-response pairs."""
     num_instances = 200_000
     wildchat_4_8m = load_dataset("allenai/WildChat-4.8M", split="train", streaming=True)
     sampled = wildchat_4_8m.shuffle(seed=42).take(num_instances)
