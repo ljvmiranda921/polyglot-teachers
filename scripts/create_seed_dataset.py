@@ -118,7 +118,7 @@ def _process_magpie_pro_300k(num_instances: int, seed: int) -> pd.DataFrame:
         {
             "id": [uuid.uuid4().hex for _ in range(len(sampled_df))],
             "source": "Magpie-Align/Magpie-Pro-300K-Filtered",
-            "conversation": sampled_df["conversations"].values,
+            "conversations": sampled_df["conversations"].values,
             "language": "en",
             "strategy": [["translate"] for _ in range(len(sampled_df))],
             "source_id": sampled_df["uuid"].values,
