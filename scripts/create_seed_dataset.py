@@ -58,9 +58,11 @@ def main():
             continue
 
         logging.info(f"Processing dataset: {dataset_name}")
-        df = processor(args.seed)
+        df = processor(num_instances=args.num_instances, seed=args.seed)
         all_dfs.append(df)
-        breakpoint()
+
+    seed_dataset_df = pd.concat(all_dfs, ignore_index=True)
+    breakpoint()
 
 
 def _process_wildchat(num_instances: int, seed: int) -> pd.DataFrame:
@@ -110,7 +112,25 @@ def _process_magpie_pro_300k(num_instances: int, seed: int) -> pd.DataFrame:
     )
     sampled = magpie_pro_300k.shuffle(seed=seed).take(num_instances)
     sampled_df = pd.DataFrame(list(sampled))
-    breakpoint()
+
+    # Transform to desired format
+    magpie_pro_300k_df = pd.DataFrame(
+        {
+            "id": [uuid.uuid4().hex for _ in range(len(sampled_df))],
+            "source": "allenai/WildChat-4.8M",
+            "conversation": sampled_df["conversation"].values,
+            "language": "en",
+            "strategy": [["translate"] for _ in range(len(sampled_df))],
+            "source_id": sampled_df["uuid"].values,
+        }
+    )
+
+    # fmt: off
+    magpie_pro_300k_df["prompt"] = magpie_pro_300k_df.conversation.apply(lambda x: x[0]["value"])
+    magpie_pro_300k_df["response"] = magpie_pro_300k_df.conversation.apply(lambda x: x[1]["value"])
+    magpie_pro_300k_df = magpie_pro_300k_df.drop(columns=["conversation"])  # No longer needed
+    # fmt: on
+    return magpie_pro_300k_df
 
 
 if __name__ == "__main__":
