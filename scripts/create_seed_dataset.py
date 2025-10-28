@@ -2,6 +2,7 @@ import uuid
 import logging
 import sys
 import argparse
+import hashlib
 
 import pandas as pd
 from datasets import Dataset, load_dataset
@@ -35,8 +36,8 @@ def get_args():
     # fmt: off
     parser = argparse.ArgumentParser(description="Create a seed dataset from a series of datasets.")
     parser.add_argument("--output_dataset", type=str, required=True, help="HuggingFace dataset path to save the seed dataset to.")
-    parser.add_argument("--exclude", nargs="+", type=list, default=[], help="List of dataset names to exclude from the seed dataset.")
-    parser.add_argument("--include", nargs="+", type=list, default=[], help="List of dataset names to exclusively include in the seed dataset.")
+    parser.add_argument("--exclude", nargs="+", type=str, default=[], help="List of dataset names to exclude from the seed dataset.")
+    parser.add_argument("--include", nargs="+", type=str, default=[], help="List of dataset names to exclusively include in the seed dataset.")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for sampling.")
     # fmt: on
     return parser.parse_args()
@@ -47,12 +48,9 @@ def main():
 
     all_dfs = []
     for dataset_name, processor in get_data_processors().items():
-        # If include list is specified, only process datasets in the include list
         if args.include:
             if dataset_name not in args.include:
-                logging.info(f"Skipping dataset not in include list: {dataset_name}")
                 continue
-        # Otherwise, check the exclude list
         elif dataset_name in args.exclude:
             logging.info(f"Skipping excluded dataset: {dataset_name}")
             continue
@@ -91,8 +89,17 @@ def _process_wildchat() -> pd.DataFrame:
 
 
 def _process_gsm8k() -> pd.DataFrame:
-    gsm8k = load_dataset("openai/gsm8k", "main", split="train").to_pandas()
-    breakpoint()
+    """Process the openai/gsm8k dataset for math word problems."""
+    gsm8k_df = load_dataset("openai/gsm8k", "main", split="train").to_pandas()
+    gsm8k_df["source_id"] = gsm8k_df["question"].apply(
+        lambda x: hashlib.md5(x.encode()).hexdigest()
+    )
+    gsm8k_df["id"] = [uuid.uuid4().hex for _ in range(len(gsm8k_df))]
+    gsm8k_df = gsm8k_df.rename(columns={"question": "prompt", "answer": "response"})
+    gsm8k_df["source"] = "openai/gsm8k"
+    gsm8k_df["language"] = "en"
+    gsm8k_df["strategy"] = [["translate"] for _ in range(len(gsm8k_df))]
+    return gsm8k_df
 
 
 if __name__ == "__main__":
