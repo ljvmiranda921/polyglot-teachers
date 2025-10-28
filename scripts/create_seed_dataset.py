@@ -30,6 +30,7 @@ def get_data_processors():
         "allenai/WildChat-4.8M": _process_wildchat,
         "openai/gsm8k": _process_gsm8k,
         "Magpie-Align/Magpie-Pro-300K-Filtered": _process_magpie_pro_300k,
+        "HuggingFaceH4/Multilingual-Thinking": _process_huggingfaceh4,
     }
 
 
@@ -131,6 +132,17 @@ def _process_magpie_pro_300k(num_instances: int, seed: int) -> pd.DataFrame:
     magpie_pro_300k_df = magpie_pro_300k_df.drop(columns=["conversations"])  # No longer needed
     # fmt: on
     return magpie_pro_300k_df
+
+
+def _process_huggingfaceh4(num_instances: int, seed: int) -> pd.DataFrame:
+    """Process the HuggingFaceH4/Multilingual-Thinking dataset for multilingual reasoning tasks.
+
+    We just need the prompts in the 'user' column. We can filter based on the `reasoning_language` column.
+    The reason we're doing this is because from a cursory check, the prompts are culturally-adapted, so might be useful.
+    """
+    multilingual_thinking = load_dataset("HuggingFaceH4/Multilingual-Thinking", split="train")  # fmt: skip
+
+    return multilingual_thinking_df
 
 
 if __name__ == "__main__":
