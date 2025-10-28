@@ -30,7 +30,7 @@ def get_data_processors():
         "allenai/WildChat-4.8M": _process_wildchat,
         "openai/gsm8k": _process_gsm8k,
         "Magpie-Align/Magpie-Pro-300K-Filtered": _process_magpie_pro_300k,
-        "HuggingFaceH4/Multilingual-Thinking": _process_huggingfaceh4,
+        #    "HuggingFaceH4/Multilingual-Thinking": _process_huggingfaceh4,
     }
 
 
@@ -89,7 +89,7 @@ def _process_wildchat(num_instances: int, seed: int) -> pd.DataFrame:
     wildchat_df["prompt"] = wildchat_df.conversation.apply(lambda x: x[0]["content"])
     wildchat_df["response"] = wildchat_df.conversation.apply(lambda x: x[1]["content"])
     wildchat_df = wildchat_df.drop(columns=["conversation"])  # No longer needed
-    return wildchat_df
+    return wildchat_df.reset_index(drop=True)
 
 
 def _process_gsm8k(num_instances: int, seed: int) -> pd.DataFrame:
@@ -103,7 +103,7 @@ def _process_gsm8k(num_instances: int, seed: int) -> pd.DataFrame:
     gsm8k_df["source"] = "openai/gsm8k"
     gsm8k_df["language"] = "en"
     gsm8k_df["strategy"] = [["translate"] for _ in range(len(gsm8k_df))]
-    return gsm8k_df
+    return gsm8k_df.reset_index(drop=True)
 
 
 def _process_magpie_pro_300k(num_instances: int, seed: int) -> pd.DataFrame:
@@ -131,7 +131,7 @@ def _process_magpie_pro_300k(num_instances: int, seed: int) -> pd.DataFrame:
     magpie_pro_300k_df["response"] = magpie_pro_300k_df.conversations.apply(lambda x: x[1]["value"])
     magpie_pro_300k_df = magpie_pro_300k_df.drop(columns=["conversations"])  # No longer needed
     # fmt: on
-    return magpie_pro_300k_df
+    return magpie_pro_300k_df.reset_index(drop=True)
 
 
 def _process_huggingfaceh4(num_instances: int, seed: int) -> pd.DataFrame:
@@ -140,9 +140,21 @@ def _process_huggingfaceh4(num_instances: int, seed: int) -> pd.DataFrame:
     We just need the prompts in the 'user' column. We can filter based on the `reasoning_language` column.
     The reason we're doing this is because from a cursory check, the prompts are culturally-adapted, so might be useful.
     """
-    multilingual_thinking = load_dataset("HuggingFaceH4/Multilingual-Thinking", split="train")  # fmt: skip
+    mt_df = load_dataset("HuggingFaceH4/Multilingual-Thinking", split="train").to_pandas()  # fmt: skip
+    filtered_df = mt_df[mt_df["reasoning_language"].isin(LANG_MAPPING.keys())]
 
-    return multilingual_thinking_df
+    huggingface_h4_df = pd.DataFrame(
+        {
+            "id": [uuid.uuid4().hex for _ in range(len(filtered_df))],
+            "source": "HuggingFaceH4/Multilingual-Thinking",
+            "prompt": filtered_df["user"].values,
+            "response": filtered_df["final"].values,
+            "language": "en",
+            "strategy": [["translate"] for _ in range(len(filtered_df))],
+            "source_id": filtered_df["uuid"].values,
+        }
+    )
+    return huggingface_h4_df.reset_index(drop=True)
 
 
 if __name__ == "__main__":
