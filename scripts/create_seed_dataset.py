@@ -3,6 +3,7 @@ import logging
 import sys
 import argparse
 import hashlib
+import random
 
 import pandas as pd
 from datasets import Dataset, load_dataset
@@ -30,6 +31,7 @@ def get_data_processors():
         "allenai/WildChat-4.8M": _process_wildchat,
         "openai/gsm8k": _process_gsm8k,
         "Magpie-Align/Magpie-Pro-300K-Filtered": _process_magpie_pro_300k,
+        "nvidia/Helpsteer3": _process_nvidia_helpsteer3,
         #    "HuggingFaceH4/Multilingual-Thinking": _process_huggingfaceh4,
     }
 
@@ -132,6 +134,45 @@ def _process_magpie_pro_300k(num_instances: int, seed: int) -> pd.DataFrame:
     magpie_pro_300k_df = magpie_pro_300k_df.drop(columns=["conversations"])  # No longer needed
     # fmt: on
     return magpie_pro_300k_df.reset_index(drop=True)
+
+
+def _process_nvidia_helpsteer3(num_instances: int, seed: int) -> pd.DataFrame:
+    """Process the nvidia/helpsteer3 dataset for `generation` strategy. We get the prompt and preferred response from the dataset."""
+    helpsteer3_ds = load_dataset("nvidia/helpsteer3", "preference", split="train")
+    filtered_df = helpsteer3_ds.filter(lambda x: x["domain"] == "multilingual").to_pandas()  # fmt: skip
+    filtered_df = filtered_df[filtered_df.language.isin([lang.lower() for lang in LANG_MAPPING.keys()])].reset_index(drop=True)  # fmt: skip
+
+    def _get_preferred_response(row):
+        if row["overall_preference"] < 0:
+            pref = "response1"
+        elif row["overall_preference"] == 0:
+            pref = random.choice(["response1", "response2"])
+        elif row["overall_preference"] > 0:
+            pref = "response2"
+        return row[pref]
+
+    filtered_df["response"] = filtered_df.apply(
+        lambda x: _get_preferred_response(x), axis=1
+    )
+
+    helpsteer3_df = pd.DataFrame(
+        {
+            "id": [uuid.uuid4().hex for _ in range(len(filtered_df))],
+            "source": "nvidia/Helpsteer3",
+            "prompt": filtered_df["prompt"].values,
+            "response": filtered_df["response"].values,
+            "language": filtered_df["language"]
+            .map(lambda x: LANG_MAPPING[x.capitalize()])
+            .values,
+            "strategy": [["generate"] for _ in range(len(filtered_df))],
+        }
+    )
+
+    helpsteer3_df["source_id"] = helpsteer3_df["prompt"].apply(
+        lambda x: hashlib.md5(x.encode()).hexdigest()
+    )
+    breakpoint()
+    return helpsteer3_df.reset_index(drop=True)
 
 
 def _process_huggingfaceh4(num_instances: int, seed: int) -> pd.DataFrame:
