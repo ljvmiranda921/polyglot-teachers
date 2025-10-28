@@ -57,16 +57,16 @@ def main():
             continue
 
         logging.info(f"Processing dataset: {dataset_name}")
-        df = processor()
+        df = processor(args.seed)
         all_dfs.append(df)
         breakpoint()
 
 
-def _process_wildchat() -> pd.DataFrame:
+def _process_wildchat(seed: int) -> pd.DataFrame:
     """Process the allenai/WildChat-4.8M dataset that contains multilingual prompt-response pairs."""
     num_instances = 200_000
     wildchat_4_8m = load_dataset("allenai/WildChat-4.8M", split="train", streaming=True)
-    sampled = wildchat_4_8m.shuffle(seed=42).take(num_instances)
+    sampled = wildchat_4_8m.shuffle(seed=seed).take(num_instances)
 
     sampled_df = pd.DataFrame(list(sampled))
     filtered_df = sampled_df[(sampled_df["language"].isin(LANG_MAPPING.keys()))]
@@ -89,7 +89,7 @@ def _process_wildchat() -> pd.DataFrame:
     return wildchat_df
 
 
-def _process_gsm8k() -> pd.DataFrame:
+def _process_gsm8k(seed: int) -> pd.DataFrame:
     """Process the openai/gsm8k dataset for math word problems."""
     gsm8k_df = load_dataset("openai/gsm8k", "main", split="train").to_pandas()
     gsm8k_df["source_id"] = gsm8k_df["question"].apply(
@@ -103,9 +103,15 @@ def _process_gsm8k() -> pd.DataFrame:
     return gsm8k_df
 
 
-def _process_magpie_pro_300k() -> pd.DataFrame:
+def _process_magpie_pro_300k(seed: int) -> pd.DataFrame:
     """Process the Magpie-Align/Magpie-Pro-300K-Filtered dataset for general chat text."""
-    pass
+    num_instances = 200_000
+    magpie_pro_300k = load_dataset(
+        "Magpie-Align/Magpie-Pro-300K-Filtered", split="train", streaming=True
+    )
+    sampled = magpie_pro_300k.shuffle(seed=seed).take(num_instances)
+    sampled_df = pd.DataFrame(list(sampled))
+    breakpoint()
 
 
 if __name__ == "__main__":
