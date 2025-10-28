@@ -169,7 +169,7 @@ def _process_nvidia_helpsteer3(num_instances: int, seed: int) -> pd.DataFrame:
             "language": filtered_df["language"]
             .map(lambda x: LANG_MAPPING[x.capitalize()])
             .values,
-            "strategy": [["generate"] for _ in range(len(filtered_df))],
+            "strategy": [["generate", "respond"] for _ in range(len(filtered_df))],
         }
     )
 
