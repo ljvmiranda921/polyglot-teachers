@@ -32,6 +32,7 @@ def get_data_processors():
         "openai/gsm8k": _process_gsm8k,
         "Magpie-Align/Magpie-Pro-300K-Filtered": _process_magpie_pro_300k,
         "nvidia/Helpsteer3": _process_nvidia_helpsteer3,
+        "OpenAssistant/oasst2": _process_oasst2,
         #    "HuggingFaceH4/Multilingual-Thinking": _process_huggingfaceh4,
     }
 
@@ -65,7 +66,6 @@ def main():
         all_dfs.append(df)
 
     seed_dataset_df = pd.concat(all_dfs, ignore_index=True)
-    breakpoint()
 
 
 def _process_wildchat(num_instances: int, seed: int) -> pd.DataFrame:
@@ -173,6 +173,26 @@ def _process_nvidia_helpsteer3(num_instances: int, seed: int) -> pd.DataFrame:
         lambda x: hashlib.md5(x.encode()).hexdigest()
     )
     return helpsteer3_df.reset_index(drop=True)
+
+
+def _process_oasst2(num_instances: int, seed: int) -> pd.DataFrame:
+    oasst2_ds = load_dataset("OpenAssistant/oasst2", split="train").filter(
+        lambda x: x["role"] == "prompter" and x["lang"] in list(LANG_MAPPING.values())
+    )
+    filtered_df = oasst2_ds.to_pandas()
+
+    oasst2_df = pd.DataFrame(
+        {
+            "id": [uuid.uuid4().hex for _ in range(len(filtered_df))],
+            "source": "OpenAssistant/oasst2",
+            "prompt": filtered_df["text"].values,
+            "response": [""] * len(filtered_df),  # Placeholder
+            "language": filtered_df["lang"].values,
+            "strategy": [["generate"] for _ in range(len(filtered_df))],
+            "source_id": filtered_df["message_id"].values,
+        }
+    )
+    return oasst2_df.reset_index(drop=True)
 
 
 def _process_huggingfaceh4(num_instances: int, seed: int) -> pd.DataFrame:
