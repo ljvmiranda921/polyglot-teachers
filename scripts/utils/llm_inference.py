@@ -1,8 +1,9 @@
 from typing import Callable
+
 import pandas as pd
-from pydantic import BaseModel, Field
 from bespokelabs import curator
 from datasets import Dataset
+from pydantic import BaseModel, Field
 
 from scripts.utils.prompts import GENERATE_TPL, RESPOND_TPL, TRANSLATE_TPL
 

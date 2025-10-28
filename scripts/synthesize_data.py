@@ -54,7 +54,7 @@ def main():
 
     lang_name = Language.make(args.target_lang).display_name()
     if "Unknown language" in lang_name:
-        raise ValueError(f"Unknown language: {args.target_lang}. Please input a two-letter ISO 693-2 code.") # fmt: skip
+        raise ValueError(f"Unknown language: {args.target_lang}. Please input a two-letter ISO 693-2 code.")  # fmt: skip
 
     input_dataset = format_fn(dataset, lang_name=lang_name)
     system_prompt = SYSTEM_PROMPT.format(lang_name=lang_name)
