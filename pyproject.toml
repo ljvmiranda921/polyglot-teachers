@@ -8,8 +8,10 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
+    "bespokelabs-curator>=0.1.26",
     "ctranslate2>=4.6.0",
-    "datasets>=4.2.0",
+    "datasets>=3.0.2,<4.0.0",
+    "langcodes>=3.5.0",
     "matplotlib>=3.10.7",
     "transformers>=4.57.1",
     "wheel>=0.45.1",
