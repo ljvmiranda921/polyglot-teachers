@@ -34,6 +34,7 @@ def get_data_processors():
         "Magpie-Align/Magpie-Pro-300K-Filtered": _process_magpie_pro_300k,
         "nvidia/Helpsteer3": _process_nvidia_helpsteer3,
         "OpenAssistant/oasst2": _process_oasst2,
+        "utter-project/EuroBlocks-SFT-Synthetic-1124": _process_euroblocks,
         #    "HuggingFaceH4/Multilingual-Thinking": _process_huggingfaceh4,
     }
 
@@ -190,11 +191,42 @@ def _process_oasst2(num_instances: int, seed: int) -> pd.DataFrame:
             "prompt": filtered_df["text"].values,
             "response": [""] * len(filtered_df),  # Placeholder
             "language": filtered_df["lang"].values,
-            "strategy": [["generate"] for _ in range(len(filtered_df))],
+            "strategy": [["respond"] for _ in range(len(filtered_df))],
             "source_id": filtered_df["message_id"].values,
         }
     )
     return oasst2_df.reset_index(drop=True)
+
+
+def _process_euroblocks(num_instances: int, seed: int) -> pd.DataFrame:
+    """Process the utter-project/EuroBlocks-SFT-Synthetic-1124 dataset for multilingual tasks. But don't include any of the MagPie dataset to avoid data duplication."""
+    euroblocks_ds = load_dataset(
+        "utter-project/EuroBlocks-SFT-Synthetic-1124", split="train", streaming=True
+    ).filter(
+        lambda x: x["language"] in list(LANG_MAPPING.keys())
+        and "Magpie" not in x["dataset"]
+    )
+
+    sampled = euroblocks_ds.shuffle(seed=seed).take(num_instances)
+    filtered_df = pd.DataFrame(list(sampled))
+    breakpoint()
+
+    euroblocks_df = pd.DataFrame(
+        {
+            "id": [uuid.uuid4().hex for _ in range(len(filtered_df))],
+            "source": "utter-project/EuroBlocks-SFT-Synthetic-1124",
+            "language": filtered_df["language"].map(lambda x: LANG_MAPPING[x]).values,
+            "strategy": [["generate", "respond"] for _ in range(len(filtered_df))],
+        }
+    )
+
+    # fmt: off
+    euroblocks_df["prompt"] = euroblocks_df.conversations.apply(lambda x: x[0]["value"])
+    euroblocks_df["response"] = euroblocks_df.conversations.apply(lambda x: x[1]["value"])
+    euroblocks_df["source_id"] = euroblocks_df["prompt"].apply(lambda x: hashlib.md5(x.encode()).hexdigest())
+    # fmt: on
+
+    return euroblocks_df.reset_index(drop=True)
 
 
 def _process_huggingfaceh4(num_instances: int, seed: int) -> pd.DataFrame:
