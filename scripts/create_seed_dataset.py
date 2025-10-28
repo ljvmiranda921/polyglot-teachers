@@ -20,8 +20,9 @@ LANG_MAPPING = {
     "Spanish": "es",
     "German": "de",
     "Indonesian": "id",
-    "Czech": "cs",
+    "Arabic": "ar",
     "Japanese": "ja",
+    "Czech": "cs",
 }
 
 
@@ -66,6 +67,7 @@ def main():
         all_dfs.append(df)
 
     seed_dataset_df = pd.concat(all_dfs, ignore_index=True)
+    breakpoint()
 
 
 def _process_wildchat(num_instances: int, seed: int) -> pd.DataFrame:
