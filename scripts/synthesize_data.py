@@ -81,17 +81,31 @@ def main():
     )
     curator_response: CuratorResponse = distiller(input_dataset)
     logging.info(f"Data synthesis cost: {curator_response.cost_info.total_cost} USD")
-    synthetic_output_dataset = curator_response.dataset
 
     # Merge input dataset and the synthesized outputs, and format outputs for post-training
-    output_dataset = prepare_output_dataset(input_dataset, synthetic_output_dataset)
-    breakpoint()
+    output_dataset = prepare_output_dataset(
+        curator_response.dataset, input_dataset=input_dataset, strategy=args.strategy
+    )
 
     # Upload output to HuggingFace
+    logging.info(f"Uploading output dataset to HuggingFace: {args.output_dataset}")
+    try:
+        output_dataset.push_to_hub(args.output_dataset, private=False)
+    except Exception:
+        logging.exception(
+            "Failed to push dataset to HuggingFace hub, saving locally as parquet."
+        )
+        data_dir = Path("data")
+        data_dir.mkdir(parents=True, exist_ok=True)
+        safe_name = args.output_dataset.replace("/", "___")
+        out_path = data_dir / f"{safe_name}.parquet"
+        df = output_dataset.to_pandas()
+        df.to_parquet(out_path, index=False)
+        logging.info(f"Saved output dataset to {out_path}")
 
 
 def prepare_output_dataset(
-    input_dataset: Dataset, synth_dataset: Dataset, strategy: str
+    synth_dataset: Dataset, *, input_dataset: Dataset, strategy: str
 ) -> Dataset:
 
     # Merge input dataset and synthesized dataset to keep some metadata
@@ -107,7 +121,7 @@ def prepare_output_dataset(
 
 def to_conversation_format(example):
     return {
-        "conversation": [
+        "messages": [
             {"role": "user", "content": example["prompt"]},
             {"role": "assistant", "content": example["response"]},
         ]
