@@ -18,7 +18,7 @@ class SFTSynthesizerResponseOnly(curator.LLM):
         return input["synth_prompt"]
 
     def parse(self, input: dict, response: str) -> dict:
-        return {"prompt": input["synth_prompt"], "response": response}  # fmt: skip
+        return {"id": input["id"], "prompt": input["synth_prompt"], "response": response}  # fmt: skip
 
 
 class SFTSynthesizerPromptResponse(curator.LLM):
@@ -28,7 +28,7 @@ class SFTSynthesizerPromptResponse(curator.LLM):
         return input["synth_prompt"]
 
     def parse(self, input: dict, response: str) -> dict:
-        return {"prompt": response.prompt, "response": response.response}  # fmt: skip
+        return {"id": input["id"], "prompt": response.prompt, "response": response.response}  # fmt: skip
 
 
 def format_generate(dataset: Dataset, lang_name: str) -> Dataset:
@@ -84,7 +84,7 @@ def format_respond(dataset: Dataset, lang_name: str) -> Dataset:
     return dataset
 
 
-def get_strategy(name: str) -> tuple[Callable, curator.LLM]:
+def get_strategy(name: str) -> tuple[Callable[[Dataset, str], Dataset], curator.LLM]:
     """Returns the formatting function and appropriate distiller class based on the synthesis strategy."""
     formatters = {
         "generate": format_generate,

@@ -18,7 +18,7 @@ New Example:
 """
 
 
-TRANSLATE_TPL = """As a multilingual data generator, your task is to translate the given prompt into {lang_name} and generate a response in the same language.
+TRANSLATE_TPL = """As a multilingual data generator, your task is to translate the given prompt from English into {lang_name} and generate the appropriate response in the same language.
 Ensure that both the translated prompt and the response are coherent, culturally appropriate, and demonstrate a deep understanding of the language nuances.
 
 Do not generate any other text in your response (for example, do not start your message with any greetings, and never ask for clarification or apologize for struggling with the task).
@@ -26,7 +26,7 @@ Here is the prompt you need to translate and respond to: {prompt}
 """
 
 
-RESPOND_TPL = """As a multilingual data generator, your task is to generate a response in {lang_name} for the given prompt.
+RESPOND_TPL = """As a multilingual data generator, you will be presented a user request or instruction in the {lang_name} language. Your task is to generate an appropriate response for the given request.
 Ensure that your response is coherent, culturally appropriate, and demonstrates a deep understanding of the language nuances
 
 Do not generate any other text in your response (for example, do not start your message with any greetings, and never ask for clarification or apologize for struggling with the task).

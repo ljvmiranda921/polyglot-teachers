@@ -1,11 +1,13 @@
 import argparse
 import logging
+import os
 import sys
 from pathlib import Path
 
 import pandas as pd
 from datasets import Dataset, load_dataset
 from langcodes import Language
+from bespokelabs.curator.types.curator_response import CuratorResponse
 
 from scripts.utils.llm_inference import get_strategy
 from scripts.utils.prompts import SYSTEM_PROMPT
@@ -22,16 +24,18 @@ def get_args():
     # fmt: off
     description = "Generate synthetic data given a dataset, strategy (generate, translate, refine), and target language."
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("--input_dataset", type=str, help="Seed HuggingFace dataset for data synthesis.")
-    parser.add_argument("--output_dataset", type=str, help="Name of the HuggingFace dataset to store the outputs.")
-    parser.add_argument("--target_lang", type=str, help="The two-letter code (ISO 639-2) of the target language.")
-    parser.add_argument("--strategy", choices=["generate", "translate", "refine"], help="The synthesis strategy to use.")
+    parser.add_argument("--input_dataset", type=str, required=True, help="Seed HuggingFace dataset for data synthesis.")
+    parser.add_argument("--output_dataset", type=str, required=True, help="Name of the HuggingFace dataset to store the outputs.")
+    parser.add_argument("--target_lang", type=str, required=True, help="The two-letter code (ISO 639-2) of the target language.")
+    parser.add_argument("--strategy", choices=["generate", "translate", "respond"], required=True, help="The synthesis strategy to use.")
     parser.add_argument("--model", type=str, default="gpt-4o-mini-2024-07-18", help="The model to use for model generation. If it's a GPT-4 API-based model, will use batch inference. Be sure to check the values in the --cache_dir option.")
     parser.add_argument("--limit", default=None, help="If set, then will only run the synthesis strategy on the first N instances.")
     parser.add_argument("--shuffle", default=None, help="If set, will shuffle the dataset using the seed provided before synthesizing. If --limit is set, then that command will be run first before shuffling.")
     parser.add_argument("--dry_run", action="store_true", help="If set, will only prepare the dataset and call a single instance to show what a response will look like.")
     parser.add_argument("--batch_mode", action="store_true", help="If set, will use batch inference for LLM calls.")
-    parser.add_argument("--backend", type=str, default="openai", help="The backend to use for LLM inference.")
+    parser.add_argument("--backend", default=None, help="The backend to use for LLM inference.")
+    parser.add_argument("--has_prefilter", action="store_true", help="If set, assumes that the input dataset has a 'strategy' and 'language' fields to pre-filter instances based on the chosen strategy and language.")
+    parser.add_argument("--no_cache", action="store_true", help="If set, will not use any caching for LLM calls.")
     # fmt: on
     return parser.parse_args()
 
@@ -39,8 +43,16 @@ def get_args():
 def main():
     args = get_args()
 
+    if args.no_cache:
+        logging.info("Disabling Curator caching as per --no_cache flag.")
+        os.environ["CURATOR_DISABLE_CACHE"] = "1"
+
     # Prepare dataset for synthesis
-    dataset = load_dataset(args.input_dataset)
+    dataset = load_dataset(args.input_dataset, split="train")
+    if args.has_prefilter:
+        dataset = dataset.filter(lambda ex: args.strategy in (ex.get("strategy")))
+        if args.strategy != "translate":
+            dataset = dataset.filter(lambda ex: args.target_lang == ex.get("language"))
     if args.limit:
         logging.info(f"Getting the first {args.limit} instances")
         dataset = dataset.select(range(int(args.limit)))
@@ -50,15 +62,15 @@ def main():
 
     # Prepare data synthesis prompts
     logging.info(f"Using '{args.strategy}' synthesis strategy")
+    logging.info(f"No. of instances: {len(dataset)}")
     format_fn, distiller_fn = get_strategy(name=args.strategy)
 
     lang_name = Language.make(args.target_lang).display_name()
     if "Unknown language" in lang_name:
         raise ValueError(f"Unknown language: {args.target_lang}. Please input a two-letter ISO 693-2 code.")  # fmt: skip
 
-    input_dataset = format_fn(dataset, lang_name=lang_name)
+    input_dataset: Dataset = format_fn(dataset, lang_name=lang_name)
     system_prompt = SYSTEM_PROMPT.format(lang_name=lang_name)
-    breakpoint()
 
     # Perform data synthesis
     distiller = distiller_fn(
@@ -67,11 +79,53 @@ def main():
         system_prompt=system_prompt,
         backend=args.backend,
     )
-    output_dataset = distiller(input_dataset)
+    curator_response: CuratorResponse = distiller(input_dataset)
+    logging.info(f"Data synthesis cost: {curator_response.cost_info.total_cost} USD")
 
-    # Format dataset for post-training
+    # Merge input dataset and the synthesized outputs, and format outputs for post-training
+    output_dataset = prepare_output_dataset(
+        curator_response.dataset, input_dataset=input_dataset, strategy=args.strategy
+    )
 
     # Upload output to HuggingFace
+    logging.info(f"Uploading output dataset to HuggingFace: {args.output_dataset}")
+    try:
+        output_dataset.push_to_hub(args.output_dataset, private=False)
+    except Exception:
+        logging.exception(
+            "Failed to push dataset to HuggingFace hub, saving locally as parquet."
+        )
+        data_dir = Path("data")
+        data_dir.mkdir(parents=True, exist_ok=True)
+        safe_name = args.output_dataset.replace("/", "___")
+        output_path = data_dir / f"{safe_name}.parquet"
+        df = output_dataset.to_pandas()
+        df.to_parquet(output_path, index=False)
+        logging.info(f"Saved output dataset to {output_path}")
+
+
+def prepare_output_dataset(
+    synth_dataset: Dataset, *, input_dataset: Dataset, strategy: str
+) -> Dataset:
+
+    # Merge input dataset and synthesized dataset to keep some metadata
+    input_df = input_dataset.to_pandas().drop(columns=["prompt", "response"])
+    input_df["strategy"] = strategy  # Keep track of the synthesis strategy used
+    synth_df = synth_dataset.to_pandas()
+    output_df = pd.merge(input_df, synth_df, on="id", how="left")
+
+    ds = Dataset.from_pandas(output_df)
+    final_ds = ds.map(to_conversation_format)
+    return final_ds
+
+
+def to_conversation_format(example):
+    return {
+        "messages": [
+            {"role": "user", "content": example["prompt"]},
+            {"role": "assistant", "content": example["response"]},
+        ]
+    }
 
 
 if __name__ == "__main__":
