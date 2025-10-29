@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 from datasets import Dataset, load_dataset
 from langcodes import Language
+from bespokelabs.curator.types.curator_response import CuratorResponse
 
 from scripts.utils.llm_inference import get_strategy
 from scripts.utils.prompts import SYSTEM_PROMPT
@@ -42,6 +43,10 @@ def main():
 
     # Prepare dataset for synthesis
     dataset = load_dataset(args.input_dataset, split="train")
+    if args.has_prefilter:
+        dataset = dataset.filter(lambda ex: args.strategy in (ex.get("strategy")))
+        if args.strategy != "translate":
+            dataset = dataset.filter(lambda ex: args.target_lang == ex.get("language"))
     if args.limit:
         logging.info(f"Getting the first {args.limit} instances")
         dataset = dataset.select(range(int(args.limit)))
@@ -51,12 +56,7 @@ def main():
 
     # Prepare data synthesis prompts
     logging.info(f"Using '{args.strategy}' synthesis strategy")
-    if args.has_prefilter:
-        dataset = dataset.filter(lambda ex: args.strategy in (ex.get("strategy")))
-        if args.strategy != "translate":
-            dataset = dataset.filter(lambda ex: args.target_lang == ex.get("language"))
     logging.info(f"No. of instances: {len(dataset)}")
-
     format_fn, distiller_fn = get_strategy(name=args.strategy)
 
     lang_name = Language.make(args.target_lang).display_name()
@@ -66,23 +66,31 @@ def main():
     input_dataset = format_fn(dataset, lang_name=lang_name)
     system_prompt = SYSTEM_PROMPT.format(lang_name=lang_name)
 
-    breakpoint()
     # Perform data synthesis
     distiller = distiller_fn(
         model_name=args.model,
         batch=args.batch_mode,
         system_prompt=system_prompt,
         backend=args.backend,
-        backend_params={
-            "batch_size": 1000,
-        },
     )
-    output_dataset = distiller(input_dataset)
+    curator_response: CuratorResponse = distiller(input_dataset)
+    logging.info(f"Data synthesis cost: {curator_response.cost_info.total_cost}")
+
+    synthetic_output_dataset = curator_response.dataset
     breakpoint()
 
     # Format dataset for post-training
 
     # Upload output to HuggingFace
+
+
+def to_conversation_format(example):
+    return {
+        "conversation": [
+            {"role": "user", "content": example["prompt"]},
+            {"role": "assistant", "content": example["response"]},
+        ]
+    }
 
 
 if __name__ == "__main__":
