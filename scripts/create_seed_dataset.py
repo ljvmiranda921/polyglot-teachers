@@ -115,6 +115,22 @@ def _process_wildchat(num_instances: int, seed: int) -> pd.DataFrame:
     wildchat_df["prompt"] = wildchat_df.conversation.apply(lambda x: x[0]["content"])
     wildchat_df["response"] = wildchat_df.conversation.apply(lambda x: x[1]["content"])
     wildchat_df = wildchat_df.drop(columns=["conversation"])  # No longer needed
+
+    # Some other filtering:
+
+    ## For Japanese, remove prompts that contain "englishtitle" or "katakanaoftitle"
+    ## they look weird and seem to be artifacts from some other application.
+    def _filter_japanese_prompts(row):
+        if row["language"] == "ja":
+            prompt_lower = row["prompt"].lower()
+            if "englishtitle" in prompt_lower or "katakanaoftitle" in prompt_lower:
+                return False
+        return True
+
+    wildchat_df = wildchat_df[
+        wildchat_df.apply(lambda x: _filter_japanese_prompts(x), axis=1)
+    ]
+
     return wildchat_df.reset_index(drop=True)
 
 
