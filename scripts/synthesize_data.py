@@ -22,17 +22,17 @@ def get_args():
     # fmt: off
     description = "Generate synthetic data given a dataset, strategy (generate, translate, refine), and target language."
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("--input_dataset", type=str, help="Seed HuggingFace dataset for data synthesis.")
-    parser.add_argument("--output_dataset", type=str, help="Name of the HuggingFace dataset to store the outputs.")
-    parser.add_argument("--target_lang", type=str, help="The two-letter code (ISO 639-2) of the target language.")
-    parser.add_argument("--strategy", choices=["generate", "translate", "refine"], help="The synthesis strategy to use.")
+    parser.add_argument("--input_dataset", type=str, required=True, help="Seed HuggingFace dataset for data synthesis.")
+    parser.add_argument("--output_dataset", type=str, required=True, help="Name of the HuggingFace dataset to store the outputs.")
+    parser.add_argument("--target_lang", type=str, required=True, help="The two-letter code (ISO 639-2) of the target language.")
+    parser.add_argument("--strategy", choices=["generate", "translate", "refine"], required=True, help="The synthesis strategy to use.")
     parser.add_argument("--model", type=str, default="gpt-4o-mini-2024-07-18", help="The model to use for model generation. If it's a GPT-4 API-based model, will use batch inference. Be sure to check the values in the --cache_dir option.")
     parser.add_argument("--limit", default=None, help="If set, then will only run the synthesis strategy on the first N instances.")
     parser.add_argument("--shuffle", default=None, help="If set, will shuffle the dataset using the seed provided before synthesizing. If --limit is set, then that command will be run first before shuffling.")
     parser.add_argument("--dry_run", action="store_true", help="If set, will only prepare the dataset and call a single instance to show what a response will look like.")
     parser.add_argument("--batch_mode", action="store_true", help="If set, will use batch inference for LLM calls.")
     parser.add_argument("--backend", type=str, default="openai", help="The backend to use for LLM inference.")
-    parser.add_argument("--has_prefilter", action="store_true", help="If set, assumes that the input dataset has a 'strategy' field to pre-filter instances based on the chosen strategy.")
+    parser.add_argument("--has_prefilter", action="store_true", help="If set, assumes that the input dataset has a 'strategy' and 'language' fields to pre-filter instances based on the chosen strategy and language.")
     # fmt: on
     return parser.parse_args()
 
@@ -41,7 +41,7 @@ def main():
     args = get_args()
 
     # Prepare dataset for synthesis
-    dataset = load_dataset(args.input_dataset)
+    dataset = load_dataset(args.input_dataset, split="train")
     if args.limit:
         logging.info(f"Getting the first {args.limit} instances")
         dataset = dataset.select(range(int(args.limit)))
@@ -53,7 +53,10 @@ def main():
     logging.info(f"Using '{args.strategy}' synthesis strategy")
     if args.has_prefilter:
         dataset = dataset.filter(lambda ex: args.strategy in (ex.get("strategy")))
-    breakpoint()
+        if args.strategy != "translate":
+            dataset = dataset.filter(lambda ex: args.target_lang == ex.get("language"))
+    logging.info(f"No. of instances: {len(dataset)}")
+
     format_fn, distiller_fn = get_strategy(name=args.strategy)
 
     lang_name = Language.make(args.target_lang).display_name()
