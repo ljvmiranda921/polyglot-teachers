@@ -98,10 +98,10 @@ def main():
         data_dir = Path("data")
         data_dir.mkdir(parents=True, exist_ok=True)
         safe_name = args.output_dataset.replace("/", "___")
-        out_path = data_dir / f"{safe_name}.parquet"
+        output_path = data_dir / f"{safe_name}.parquet"
         df = output_dataset.to_pandas()
-        df.to_parquet(out_path, index=False)
-        logging.info(f"Saved output dataset to {out_path}")
+        df.to_parquet(output_path, index=False)
+        logging.info(f"Saved output dataset to {output_path}")
 
 
 def prepare_output_dataset(
