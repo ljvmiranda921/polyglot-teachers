@@ -84,7 +84,7 @@ def format_respond(dataset: Dataset, lang_name: str) -> Dataset:
     return dataset
 
 
-def get_strategy(name: str) -> tuple[Callable, curator.LLM]:
+def get_strategy(name: str) -> tuple[Callable[[Dataset, str], Dataset], curator.LLM]:
     """Returns the formatting function and appropriate distiller class based on the synthesis strategy."""
     formatters = {
         "generate": format_generate,

@@ -69,7 +69,7 @@ def main():
     if "Unknown language" in lang_name:
         raise ValueError(f"Unknown language: {args.target_lang}. Please input a two-letter ISO 693-2 code.")  # fmt: skip
 
-    input_dataset = format_fn(dataset, lang_name=lang_name)
+    input_dataset: Dataset = format_fn(dataset, lang_name=lang_name)
     system_prompt = SYSTEM_PROMPT.format(lang_name=lang_name)
 
     # Perform data synthesis
@@ -84,33 +84,32 @@ def main():
     synthetic_output_dataset = curator_response.dataset
 
     # Merge input dataset and the synthesized outputs, and format outputs for post-training
-    merged_dataset = merge_input_and_synth_datasets(dataset, synthetic_output_dataset)
-    output_dataset = merged_dataset.map(to_conversation_format)
+    output_dataset = prepare_output_dataset(input_dataset, synthetic_output_dataset)
     breakpoint()
 
     # Upload output to HuggingFace
 
 
-def merge_input_and_synth_datasets(
-    input_dataset: Dataset, synth_dataset: Dataset
+def prepare_output_dataset(
+    input_dataset: Dataset, synth_dataset: Dataset, strategy: str
 ) -> Dataset:
-    input_df = input_dataset.to_pandas()
+
+    # Merge input dataset and synthesized dataset to keep some metadata
+    input_df = input_dataset.to_pandas().drop(columns=["prompt", "response"])
+    input_df["strategy"] = strategy  # Keep track of the synthesis strategy used
     synth_df = synth_dataset.to_pandas()
-    output_df = pd.merge(
-        input_df,
-        synth_df,
-        on="id",
-        how="left",
-        suffixes=("_orig", "_synth"),
-    )
-    return Dataset.from_pandas(output_df)
+    output_df = pd.merge(input_df, synth_df, on="id", how="left")
+
+    ds = Dataset.from_pandas(output_df)
+    final_ds = ds.map(to_conversation_format)
+    return final_ds
 
 
 def to_conversation_format(example):
     return {
         "conversation": [
-            {"role": "user", "content": example["prompt_synth"]},
-            {"role": "assistant", "content": example["response_synth"]},
+            {"role": "user", "content": example["prompt"]},
+            {"role": "assistant", "content": example["response"]},
         ]
     }
 
