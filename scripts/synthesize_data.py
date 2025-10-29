@@ -32,6 +32,7 @@ def get_args():
     parser.add_argument("--dry_run", action="store_true", help="If set, will only prepare the dataset and call a single instance to show what a response will look like.")
     parser.add_argument("--batch_mode", action="store_true", help="If set, will use batch inference for LLM calls.")
     parser.add_argument("--backend", type=str, default="openai", help="The backend to use for LLM inference.")
+    parser.add_argument("--has_prefilter", action="store_true", help="If set, assumes that the input dataset has a 'strategy' field to pre-filter instances based on the chosen strategy.")
     # fmt: on
     return parser.parse_args()
 
@@ -50,6 +51,9 @@ def main():
 
     # Prepare data synthesis prompts
     logging.info(f"Using '{args.strategy}' synthesis strategy")
+    if args.has_prefilter:
+        dataset = dataset.filter(lambda ex: args.strategy in (ex.get("strategy")))
+    breakpoint()
     format_fn, distiller_fn = get_strategy(name=args.strategy)
 
     lang_name = Language.make(args.target_lang).display_name()
