@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import sys
 from pathlib import Path
 
@@ -34,12 +35,17 @@ def get_args():
     parser.add_argument("--batch_mode", action="store_true", help="If set, will use batch inference for LLM calls.")
     parser.add_argument("--backend", default=None, help="The backend to use for LLM inference.")
     parser.add_argument("--has_prefilter", action="store_true", help="If set, assumes that the input dataset has a 'strategy' and 'language' fields to pre-filter instances based on the chosen strategy and language.")
+    parser.add_argument("--no_cache", action="store_true", help="If set, will not use any caching for LLM calls.")
     # fmt: on
     return parser.parse_args()
 
 
 def main():
     args = get_args()
+
+    if args.no_cache:
+        logging.info("Disabling Curator caching as per --no_cache flag.")
+        os.environ["CURATOR_DISABLE_CACHE"] = "1"
 
     # Prepare dataset for synthesis
     dataset = load_dataset(args.input_dataset, split="train")
@@ -74,21 +80,37 @@ def main():
         backend=args.backend,
     )
     curator_response: CuratorResponse = distiller(input_dataset)
-    logging.info(f"Data synthesis cost: {curator_response.cost_info.total_cost}")
-
+    logging.info(f"Data synthesis cost: {curator_response.cost_info.total_cost} USD")
     synthetic_output_dataset = curator_response.dataset
+
+    # Merge input dataset and the synthesized outputs, and format outputs for post-training
+    merged_dataset = merge_input_and_synth_datasets(dataset, synthetic_output_dataset)
+    output_dataset = merged_dataset.map(to_conversation_format)
     breakpoint()
 
-    # Format dataset for post-training
-
     # Upload output to HuggingFace
+
+
+def merge_input_and_synth_datasets(
+    input_dataset: Dataset, synth_dataset: Dataset
+) -> Dataset:
+    input_df = input_dataset.to_pandas()
+    synth_df = synth_dataset.to_pandas()
+    output_df = pd.merge(
+        input_df,
+        synth_df,
+        on="id",
+        how="left",
+        suffixes=("_orig", "_synth"),
+    )
+    return Dataset.from_pandas(output_df)
 
 
 def to_conversation_format(example):
     return {
         "conversation": [
-            {"role": "user", "content": example["prompt"]},
-            {"role": "assistant", "content": example["response"]},
+            {"role": "user", "content": example["prompt_synth"]},
+            {"role": "assistant", "content": example["response_synth"]},
         ]
     }
 
