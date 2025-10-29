@@ -25,7 +25,7 @@ def get_args():
     parser.add_argument("--input_dataset", type=str, required=True, help="Seed HuggingFace dataset for data synthesis.")
     parser.add_argument("--output_dataset", type=str, required=True, help="Name of the HuggingFace dataset to store the outputs.")
     parser.add_argument("--target_lang", type=str, required=True, help="The two-letter code (ISO 639-2) of the target language.")
-    parser.add_argument("--strategy", choices=["generate", "translate", "refine"], required=True, help="The synthesis strategy to use.")
+    parser.add_argument("--strategy", choices=["generate", "translate", "respond"], required=True, help="The synthesis strategy to use.")
     parser.add_argument("--model", type=str, default="gpt-4o-mini-2024-07-18", help="The model to use for model generation. If it's a GPT-4 API-based model, will use batch inference. Be sure to check the values in the --cache_dir option.")
     parser.add_argument("--limit", default=None, help="If set, then will only run the synthesis strategy on the first N instances.")
     parser.add_argument("--shuffle", default=None, help="If set, will shuffle the dataset using the seed provided before synthesizing. If --limit is set, then that command will be run first before shuffling.")
@@ -65,7 +65,6 @@ def main():
 
     input_dataset = format_fn(dataset, lang_name=lang_name)
     system_prompt = SYSTEM_PROMPT.format(lang_name=lang_name)
-    breakpoint()
 
     # Perform data synthesis
     distiller = distiller_fn(
