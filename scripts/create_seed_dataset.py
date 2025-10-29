@@ -4,6 +4,7 @@ import logging
 import random
 import sys
 import uuid
+from pathlib import Path
 
 import pandas as pd
 from datasets import Dataset, load_dataset
@@ -72,7 +73,23 @@ def main():
     seed_dataset = Dataset.from_pandas(seed_dataset_df)
     logging.info(f"Final seed dataset size: {len(seed_dataset)} instances. Uploading to HuggingFace Hub at {args.output_dataset}...")  # fmt: skip
     logging.info(f"Language distribution: {seed_dataset_df['language'].value_counts()}")
-    seed_dataset.push_to_hub(args.output_dataset, private=True)
+
+    # Upload to HuggingFace hub
+    upload_to_huggingface(seed_dataset, dataset_name=args.output_dataset)
+
+
+def upload_to_huggingface(dataset: Dataset, dataset_name: str):
+    try:
+        dataset.push_to_hub(dataset_name, private=True)
+        logging.info(f"Uploaded dataset to HuggingFace Hub at {dataset_name}")
+    except Exception:
+        logging.exception(
+            "Failed to push dataset to HuggingFace Hub. Saving locally as parquet."
+        )
+        filename = f"seed_dataset_{uuid.uuid4().hex}.parquet"
+        filepath = Path("data") / filename
+        dataset.to_parquet(filepath, index=False)
+        logging.info(f"Saved parquet to {filepath}")
 
 
 def _process_wildchat(num_instances: int, seed: int) -> pd.DataFrame:
