@@ -31,7 +31,7 @@ def get_args():
     parser.add_argument("--shuffle", default=None, help="If set, will shuffle the dataset using the seed provided before synthesizing. If --limit is set, then that command will be run first before shuffling.")
     parser.add_argument("--dry_run", action="store_true", help="If set, will only prepare the dataset and call a single instance to show what a response will look like.")
     parser.add_argument("--batch_mode", action="store_true", help="If set, will use batch inference for LLM calls.")
-    parser.add_argument("--backend", type=str, default="openai", help="The backend to use for LLM inference.")
+    parser.add_argument("--backend", default=None, help="The backend to use for LLM inference.")
     parser.add_argument("--has_prefilter", action="store_true", help="If set, assumes that the input dataset has a 'strategy' and 'language' fields to pre-filter instances based on the chosen strategy and language.")
     # fmt: on
     return parser.parse_args()
@@ -66,14 +66,19 @@ def main():
     input_dataset = format_fn(dataset, lang_name=lang_name)
     system_prompt = SYSTEM_PROMPT.format(lang_name=lang_name)
 
+    breakpoint()
     # Perform data synthesis
     distiller = distiller_fn(
         model_name=args.model,
         batch=args.batch_mode,
         system_prompt=system_prompt,
         backend=args.backend,
+        backend_params={
+            "batch_size": 1000,
+        },
     )
     output_dataset = distiller(input_dataset)
+    breakpoint()
 
     # Format dataset for post-training
 
