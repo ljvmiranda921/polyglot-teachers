@@ -5,9 +5,9 @@ import sys
 from pathlib import Path
 
 import pandas as pd
+from bespokelabs.curator.types.curator_response import CuratorResponse
 from datasets import Dataset, load_dataset
 from langcodes import Language
-from bespokelabs.curator.types.curator_response import CuratorResponse
 
 from scripts.utils.llm_inference import get_strategy
 from scripts.utils.prompts import SYSTEM_PROMPT
