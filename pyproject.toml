@@ -1,7 +1,7 @@
 [project]
-name = "msde"
+name = "mtep"
 version = "0.1.0"
-description = "Multilingual Synthetic Data Evaluation"
+description = "Multilingual Teacher Evaluation Project"
 readme = "README.md"
 authors = [
     { name = "ljvmiranda921", email = "ljvmiranda@gmail.com" }
