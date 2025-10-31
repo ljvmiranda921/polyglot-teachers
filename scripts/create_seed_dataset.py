@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 from datasets import Dataset, load_dataset
+from langcodes import Language
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -35,6 +36,7 @@ def get_data_processors():
         "nvidia/Helpsteer3": _process_nvidia_helpsteer3,
         "OpenAssistant/oasst2": _process_oasst2,
         "utter-project/EuroBlocks-SFT-Synthetic-1124": _process_euroblocks,
+        "CohereLabs/aya_collection": _process_cohere_aya,
         #    "HuggingFaceH4/Multilingual-Thinking": _process_huggingfaceh4,
     }
 
@@ -54,7 +56,7 @@ def get_args():
 def main():
     args = get_args()
 
-    all_dfs = []
+    all_dfs: list[pd.DataFrame] = []
     for dataset_name, processor in get_data_processors().items():
         if args.include:
             if dataset_name not in args.include:
@@ -111,19 +113,17 @@ def _process_wildchat(num_instances: int, seed: int) -> pd.DataFrame:
             "source_id": filtered_df["conversation_hash"].values,
         }
     )
-
     wildchat_df["prompt"] = wildchat_df.conversation.apply(lambda x: x[0]["content"])
     wildchat_df["response"] = wildchat_df.conversation.apply(lambda x: x[1]["content"])
     wildchat_df = wildchat_df.drop(columns=["conversation"])  # No longer needed
 
     # Some other filtering:
 
-    ## For Japanese, remove prompts that contain "englishtitle" or "katakanaoftitle"
-    ## they look weird and seem to be artifacts from some other application.
     def _filter_japanese_prompts(row):
         if row["language"] == "ja":
             prompt_lower = row["prompt"].lower()
             if "englishtitle" in prompt_lower or "katakanaoftitle" in prompt_lower:
+                # Contains some weird API calls that aren't really user instructions
                 return False
         return True
 
@@ -265,6 +265,34 @@ def _process_euroblocks(num_instances: int, seed: int) -> pd.DataFrame:
     # fmt: on
 
     return euroblocks_df.reset_index(drop=True)
+
+
+def _process_cohere_aya(num_instances: int, seed: int) -> pd.DataFrame:
+    """Process the CohereLabs/aya_collection dataset."""
+    aya_ds = load_dataset("CohereLabs/aya_collection", "aya_dataset", split="train")
+
+    def _iso3_to_iso2(code: str) -> str:
+        tag = Language.get(code).to_tag()
+        iso2 = tag.split("-")[0]
+        return iso2
+
+    filtered_df = aya_ds.to_pandas()
+    filtered_df["language"] = filtered_df["language"].apply(_iso3_to_iso2)
+    filtered_df = filtered_df[filtered_df["language"].isin(set(LANG_MAPPING.values()))].reset_index(drop=True)  # fmt: skip
+
+    aya_df = pd.DataFrame(
+        {
+            "id": [uuid.uuid4().hex for _ in range(len(filtered_df))],
+            "source": "CohereLabs/aya_collection",
+            "language": filtered_df["language"].values,
+            "prompt": filtered_df["inputs"].values,
+            "response": filtered_df["targets"].values,
+            "strategy": [["generate", "respond"] for _ in range(len(filtered_df))],
+            "source_id": filtered_df["id"].values,
+        }
+    )
+
+    return aya_df.reset_index(drop=True)
 
 
 def _process_huggingfaceh4(num_instances: int, seed: int) -> pd.DataFrame:
