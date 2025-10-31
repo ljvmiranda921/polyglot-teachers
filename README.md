@@ -21,4 +21,12 @@ Be sure to follow them accordingly.
 <i>Figure 1: Overview of the synthetic data generation pipeline for distilling from a teacher model.</i>
 </p>
 
+### Step 1: Create seed dataset
 
+### Step 2: Generate synthetic data and evaluate its quality
+
+### Step 3: Finetune a student model from a base model
+
+### Step 4: Evaluate the student model
+
+### Step 5: Compute PolyTeacher Score 
