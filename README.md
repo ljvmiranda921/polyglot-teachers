@@ -9,7 +9,7 @@ Make sure that you have `uv` in your system (see [download instructions](https:/
 To install all dependencies, run the following command: `uv sync --dev`.
 This will create a virtual environment, `mtep`, which you can activate by running `source ./venv/bin/activate`.
 
-## ⚙️ Using this framework
+## 📝 Documentation: Using this framework
 
 Below is an overview of a standard synthetic data generation pipeline for distilling from a teacher model. 
 Each numbered step has its corresponding script (or set of scripts).
@@ -22,6 +22,22 @@ Be sure to follow them accordingly.
 </p>
 
 ### Step 1: Create seed dataset
+
+The **seed dataset** will be the basis for some of our data generation methods. 
+For example, in the *generate* strategy, we will sample in-context examples from the seed dataset to condition the teacher model in generating related prompts.
+
+You can run the following script to create a seed dataset from a set of data sources:
+
+```bash
+python -m scripts.create_seed_dataset --output_dataset <output_hf_dataset>
+
+# For example
+python -m scripts.create_seed_dataset --output_dataset ljvmiranda921/msde-seed-S1 --num_instances 300000
+```
+
+You can use the `--num_instances` flag to specify the number of instances to sample from a very large source (e.g., WildChat 4.8M). 
+Not all sources make use of this flag. 
+The seed dataset will then be saved to the Hugging Face Hub under the name specified by `--output_dataset`.
 
 ### Step 2: Generate synthetic data and evaluate its quality
 
