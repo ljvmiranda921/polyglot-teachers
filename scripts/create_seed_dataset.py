@@ -284,11 +284,11 @@ def _process_cohere_aya(num_instances: int, seed: int) -> pd.DataFrame:
         {
             "id": [uuid.uuid4().hex for _ in range(len(filtered_df))],
             "source": "CohereLabs/aya_collection",
-            "language": filtered_df["language"].values,
-            "prompt": filtered_df["inputs"].values,
-            "response": filtered_df["targets"].values,
+            "language": filtered_df["language"].astype(str).values,
+            "prompt": filtered_df["inputs"].astype(str).values,
+            "response": filtered_df["targets"].astype(str).values,
             "strategy": [["generate", "respond"] for _ in range(len(filtered_df))],
-            "source_id": filtered_df["id"].values,
+            "source_id": filtered_df["id"].astype(str).values,
         }
     )
 
