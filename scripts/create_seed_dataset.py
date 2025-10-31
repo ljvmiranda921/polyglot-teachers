@@ -292,8 +292,6 @@ def _process_cohere_aya(num_instances: int, seed: int) -> pd.DataFrame:
         }
     )
 
-    breakpoint()
-
     return aya_df.reset_index(drop=True)
 
 
