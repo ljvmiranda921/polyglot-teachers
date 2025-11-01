@@ -59,6 +59,8 @@ You can set the backend LLM inference engine by using the `--backend` flag and s
 For some models, you can enable batch inference by using the `--batch_mode` flag to save costs.
 The dataset we created in Step 1 has some metadata, so you can use the `--has_prefilter` flag to enable pre-filtering of instances based on the synthesis strategy and target language.
 
+<!-- todo: add script for evaluating intrinsic quality of synthetic data -->
+
 ### Step 3: Finetune a student model from a base model
 
 ### Step 4: Evaluate the student model
