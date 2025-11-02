@@ -57,7 +57,8 @@ python -m scripts.synthesize_data \
 Under the hood, this script uses BespokeLab's [Curator](https://www.bespokelabs.ai/curator) to handle LLM inference.
 You can set the backend LLM inference engine by using the `--backend` flag and send additional parameters using `--backend_params` (see more information in the [official docs](https://docs.bespokelabs.ai/bespoke-curator/how-to-guides)).
 For some models, you can enable batch inference by using the `--batch_mode` flag to save costs.
-The dataset we created in Step 1 has some metadata, so you can use the `--has_prefilter` flag to enable pre-filtering of instances based on the synthesis strategy and target language.
+
+Finally, the dataset we created in Step 1 has some metadata, so you can use the `--has_prefilter` flag to enable pre-filtering of instances based on the synthesis strategy and target language.
 
 <!-- todo: add script for evaluating intrinsic quality of synthetic data -->
 
