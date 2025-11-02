@@ -60,7 +60,7 @@ For some models, you can enable batch inference by using the `--batch_mode` flag
 
 Finally, the dataset we created in Step 1 has some metadata, so you can use the `--has_prefilter` flag to enable pre-filtering of instances based on the synthesis strategy and target language.
 
-<!-- todo: add script for evaluating intrinsic quality of synthetic data -->
+#### Evaluate synthetic data quality
 
 ### Step 3: Finetune a student model from a base model
 
