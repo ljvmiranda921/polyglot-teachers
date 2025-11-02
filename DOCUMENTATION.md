@@ -1,0 +1,58 @@
+# 📝 Documentation: Using this codebase
+
+Below is an overview of a standard synthetic data generation pipeline for distilling from a teacher model. 
+Each numbered step has its corresponding script (or set of scripts).
+Be sure to follow them accordingly.
+
+<p align="center">
+<img src="/assets/distillation_workflow.png" alt="Distillation Workflow" width="600" style="display: block; margin: 0 auto;"/>
+<br/>
+<i>Figure 1: Overview of the synthetic data generation pipeline for distilling from a teacher model.</i>
+</p>
+
+## Step 1: Create seed dataset
+
+The **seed dataset** will be the basis for some of our data generation methods. 
+For example, in the *generate* strategy, we will sample in-context examples from the seed dataset to condition the teacher model in generating related prompts.
+
+You can run the following script to create a seed dataset from a set of data sources:
+
+```bash
+python -m scripts.create_seed_dataset --output_dataset <output_hf_dataset>
+
+# For example
+python -m scripts.create_seed_dataset \
+    --output_dataset ljvmiranda921/msde-seed-S1 \
+    --num_instances 300000
+```
+
+You can use the `--num_instances` flag to specify the number of instances to sample from a very large source (e.g., WildChat 4.8M). 
+Not all sources make use of this flag. 
+The seed dataset will then be saved to the Hugging Face Hub under the name specified by `--output_dataset`.
+
+## Step 2: Generate synthetic data and evaluate its quality
+
+To generate synthetic data using a teacher model, you can run the following script:
+
+```bash
+python -m scripts.synthesize_data \
+    --input_dataset <input_hf_dataset> \   # The seed dataset created in Step 1
+    --output_dataset <output_hf_dataset> \   # The HuggingFace ID of the dataset to save the synthesized data to
+    --target_lang <target_language_code> \  # The target language code (ISO 639-2)
+    --strategy <synthesis_strategy> \  # The synthesis strategy: generate, translate, or respond
+    --model <teacher_model_name> \  # The name of the teacher model to use
+```
+
+Under the hood, this script uses BespokeLab's [Curator](https://www.bespokelabs.ai/curator) to handle LLM inference.
+You can set the backend LLM inference engine by using the `--backend` flag and send additional parameters using `--backend_params` (see more information in the [official docs](https://docs.bespokelabs.ai/bespoke-curator/how-to-guides)).
+For some models, you can enable batch inference by using the `--batch_mode` flag to save costs.
+
+Finally, the dataset we created in Step 1 has some metadata, so you can use the `--has_prefilter` flag to enable pre-filtering of instances based on the synthesis strategy and target language.
+
+<!-- todo: add script for evaluating intrinsic quality of synthetic data -->
+
+## Step 3: Finetune a student model from a base model
+
+## Step 4: Evaluate the student model
+
+## Step 5: Compute PolyTeacher Score 
