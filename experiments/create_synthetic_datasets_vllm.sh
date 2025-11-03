@@ -1,8 +1,16 @@
-#!/bin/bash -l
+#!/bin/bash
+#SBATCH --account=KORHONEN-SL3-GPU
 #SBATCH --job-name=synthesize-data
-#SBATCH --gres=gpu:1,gpu-ram:24G
+#SBATCH --partition ampere
+#SBATCH --nodes 1
+#! change to gpu:4 to use all 4 GPU cards on a GPU node.
+#SBATCH --gres=gpu:1
 #SBATCH --time=00:10:00
 #SBATCH --output=gpu-%j.log
+
+# Module setup: cluster environment and recent python.
+module purge
+module load rhel8/default-amp
 
 # Parse arguments
 MODEL=${1:-"meta-llama/Llama-3.1-8B-Instruct"}
