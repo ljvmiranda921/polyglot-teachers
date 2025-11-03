@@ -1,0 +1,3 @@
+[submodule "curator"]
+	path = curator
+	url = git@github.com:ljvmiranda921/curator.git

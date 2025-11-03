@@ -227,7 +227,7 @@ wheels = [
 [[package]]
 name = "bespokelabs-curator"
 version = "0.1.26"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/ljvmiranda921/curator#5390775303837c1f1ce6df448d10583e578d1337" }
 dependencies = [
     { name = "aiofiles" },
     { name = "anthropic" },
@@ -245,10 +245,6 @@ dependencies = [
     { name = "tqdm" },
     { name = "vertexai" },
     { name = "xxhash" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/69/44/094a4bfe8c4100001489b8c2400d17b7cdaebd31e7628c83127281e482c0/bespokelabs_curator-0.1.26.tar.gz", hash = "sha256:e30df5abfc6548a1183ab671b64f7cbea15c5fb17a27cfa21ac00563285811f7", size = 136062, upload-time = "2025-06-06T03:43:57.71Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/26/6e/4ce22dcfad8128c1b09798709d68b0d47861172eed03dc1614a4ccc3ee50/bespokelabs_curator-0.1.26-py3-none-any.whl", hash = "sha256:e576b6d8f3743e4dea272023e3b0f8cfab4e631be351749f873ef96dddaed9c8", size = 170811, upload-time = "2025-06-06T03:43:55.648Z" },
 ]
 
 [[package]]
@@ -2338,7 +2334,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "bespokelabs-curator", specifier = ">=0.1.26" },
+    { name = "bespokelabs-curator", git = "https://github.com/ljvmiranda921/curator" },
     { name = "ctranslate2", specifier = ">=4.6.0" },
     { name = "datasets", specifier = ">=3.0.2,<4.0.0" },
     { name = "langcodes", specifier = ">=3.5.0" },
