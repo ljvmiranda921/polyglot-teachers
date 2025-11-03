@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
+import tiktoken
 from bespokelabs.curator.types.curator_response import CuratorResponse
 from datasets import Dataset, load_dataset
 from langcodes import Language
@@ -44,9 +45,12 @@ def get_args():
 def main():
     args = get_args()
 
+    # Curator setup
     if args.no_cache:
         logging.info("Disabling Curator caching as per --no_cache flag.")
         os.environ["CURATOR_DISABLE_CACHE"] = "1"
+
+    backend_params = json.loads(args.backend_params) if args.backend_params else None
 
     # Prepare dataset for synthesis
     dataset = load_dataset(args.input_dataset, split="train")
@@ -72,6 +76,11 @@ def main():
 
     input_dataset: Dataset = format_fn(dataset, lang_name=lang_name)
     system_prompt = SYSTEM_PROMPT.format(lang_name=lang_name)
+    if backend_params and "max_model_length" in backend_params:
+        max_model_len = int(backend_params.get("max_model_length"))
+        input_dataset = filter_by_token_length(
+            input_dataset, max_model_len, args.model, system_prompt
+        )
 
     # Perform data synthesis
     distiller = distiller_fn(
@@ -79,7 +88,7 @@ def main():
         batch=args.batch_mode,
         system_prompt=system_prompt,
         backend=args.backend,
-        backend_params=json.loads(args.backend_params) if args.backend_params else None,
+        backend_params=backend_params,
     )
     curator_response: CuratorResponse = distiller(input_dataset)
     logging.info(f"Data synthesis cost: {curator_response.cost_info.total_cost} USD")
@@ -119,6 +128,31 @@ def prepare_output_dataset(
     ds = Dataset.from_pandas(output_df)
     final_ds = ds.map(to_conversation_format)
     return final_ds
+
+
+def filter_by_token_length(
+    dataset: Dataset,
+    max_model_length: int,
+    system_prompt: str,
+    prompt_key: str = "synth_prompt",
+) -> Dataset:
+    encoding = tiktoken.get_encoding("cl100k_base")
+    system_tokens = len(encoding.encode(system_prompt))
+
+    def is_within_length(example):
+        prompt_tokens = len(encoding.encode(example[prompt_key]))
+        total_tokens = prompt_tokens + system_tokens
+        return total_tokens <= max_model_length
+
+    original_len = len(dataset)
+    filtered_dataset = dataset.filter(is_within_length)
+    filtered_len = len(filtered_dataset)
+    logging.info(
+        f"Filtered {original_len - filtered_len} prompts exceeding max_model_length. "
+        f"Remaining: {filtered_len}"
+    )
+
+    return filtered_dataset
 
 
 def to_conversation_format(example):
