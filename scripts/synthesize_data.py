@@ -139,13 +139,14 @@ def filter_by_token_length(
     *,
     system_prompt: str,
     prompt_key: str = "synth_prompt",
+    buffer: int = 500,
 ) -> Dataset:
     encoding = tiktoken.get_encoding("cl100k_base")
     system_tokens = len(encoding.encode(system_prompt))
 
     def is_within_length(example):
         prompt_tokens = len(encoding.encode(example[prompt_key]))
-        total_tokens = prompt_tokens + system_tokens
+        total_tokens = prompt_tokens + system_tokens + buffer
         return total_tokens <= max_model_length
 
     original_len = len(dataset)
