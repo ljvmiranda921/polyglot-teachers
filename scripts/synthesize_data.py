@@ -100,6 +100,7 @@ def main():
     output_dataset = prepare_output_dataset(
         curator_response.dataset, input_dataset=input_dataset, strategy=args.strategy
     )
+    output_dataset = output_dataset.filter(lambda ex: ex["response"] is not None)
 
     # Upload output to HuggingFace
     logging.info(f"Uploading output dataset to HuggingFace: {args.output_dataset}")
