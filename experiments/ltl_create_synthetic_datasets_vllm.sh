@@ -20,4 +20,4 @@ python -m scripts.synthesize_data --input_dataset ljvmiranda921/msde-seed-S1 \
     --limit 10000 \
     --backend vllm \
     --model ${MODEL} \
-    --backend_params '{"tensor_parallel_size":2,"gpu_memory_utilization":0.7, "max_model_length":4096}'
+    --backend_params '{"tensor_parallel_size":2,"gpu_memory_utilization":0.7, "max_model_length":4096, "require_all_responses": False}'
