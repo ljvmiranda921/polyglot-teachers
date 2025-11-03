@@ -3,7 +3,7 @@
 #! change to gpu:4 to use all 4 GPU cards on a GPU node.
 #SBATCH --nodelist=ltl-gpu05
 #SBATCH --gres=gpu:2
-#SBATCH --time=00:10:00
+#SBATCH --time=04:00:00
 #SBATCH --output=gpu-%j.log
 
 # Parse arguments
