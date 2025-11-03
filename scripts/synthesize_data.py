@@ -79,7 +79,10 @@ def main():
     if backend_params and "max_model_length" in backend_params:
         max_model_len = int(backend_params.get("max_model_length"))
         input_dataset = filter_by_token_length(
-            input_dataset, max_model_len, args.model, system_prompt
+            input_dataset,
+            max_model_len,
+            system_prompt=system_prompt,
+            prompt_key="synth_prompt",
         )
 
     # Perform data synthesis
@@ -133,6 +136,7 @@ def prepare_output_dataset(
 def filter_by_token_length(
     dataset: Dataset,
     max_model_length: int,
+    *,
     system_prompt: str,
     prompt_key: str = "synth_prompt",
 ) -> Dataset:
