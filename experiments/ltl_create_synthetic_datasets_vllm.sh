@@ -24,4 +24,4 @@ source .venv/bin/activate
     --limit 10000 \
     --backend vllm \
     --model ${MODEL} \
-    --backend_params '{"max_num_seqs":64,"gpu_utilization":0.7}'
+    --backend_params '{"tensor_parallel_size":2,"gpu_memory_utilization":0.7}'
