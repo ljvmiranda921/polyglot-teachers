@@ -6,10 +6,6 @@
 #SBATCH --time=00:10:00
 #SBATCH --output=gpu-%j.log
 
-# Module setup: cluster environment and recent python.
-module purge
-module load rhel8/default-amp
-
 # Parse arguments
 MODEL=${1:-"meta-llama/Llama-3.1-8B-Instruct"}
 LANGUAGE=${2:-"id"}
