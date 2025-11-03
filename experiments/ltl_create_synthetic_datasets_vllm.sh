@@ -17,7 +17,7 @@ python -m scripts.synthesize_data --input_dataset ljvmiranda921/msde-seed-S1 \
     --target_lang ${LANGUAGE} \
     --strategy generate \
     --has_prefilter \
-    --limit 10000 \
+    --limit 500 \
     --backend vllm \
     --model ${MODEL} \
     --backend_params '{"tensor_parallel_size":2,"gpu_memory_utilization":0.7, "max_model_length":4096}'
