@@ -17,4 +17,5 @@ source .venv/bin/activate
     --has_prefilter \
     --limit 10000 \
     --backend vllm \
-    --model ${MODEL}
+    --model ${MODEL} \
+    --backend_params '{"max_num_seqs":64,"gpu_utilization":0.7}'
