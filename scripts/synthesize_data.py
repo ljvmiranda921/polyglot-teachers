@@ -99,7 +99,10 @@ def main():
 
     # Merge input dataset and the synthesized outputs, and format outputs for post-training
     output_dataset = prepare_output_dataset(
-        curator_response.dataset, input_dataset=input_dataset, strategy=args.strategy
+        curator_response.dataset,
+        input_dataset=input_dataset,
+        strategy=args.strategy,
+        model=args.model,
     )
     output_dataset = output_dataset.filter(lambda ex: ex["response"] is not None)
 
@@ -140,12 +143,17 @@ def filter_by_token_length(
 
 
 def prepare_output_dataset(
-    synth_dataset: Dataset, *, input_dataset: Dataset, strategy: str
+    synth_dataset: Dataset,
+    *,
+    input_dataset: Dataset,
+    strategy: str,
+    model: str,
 ) -> Dataset:
 
     # Merge input dataset and synthesized dataset to keep some metadata
     input_df = input_dataset.to_pandas().drop(columns=["prompt", "response"])
     input_df["strategy"] = strategy  # Keep track of the synthesis strategy used
+    input_df["model"] = model  # Keep track of the model used for synthesis
     synth_df = synth_dataset.to_pandas()
     output_df = pd.merge(input_df, synth_df, on="id", how="left")
 
