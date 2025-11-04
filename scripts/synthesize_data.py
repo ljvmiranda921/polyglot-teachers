@@ -37,6 +37,7 @@ def get_args():
     parser.add_argument("--batch_mode", action="store_true", help="If set, will use batch inference for LLM calls.")
     parser.add_argument("--backend", default=None, help="The backend to use for LLM inference. See: https://docs.bespokelabs.ai/bespoke-curator/how-to-guides")
     parser.add_argument("--no_cache", action="store_true", help="If set, will not use any caching for LLM calls.")
+    parser.add_argument("--append", action="store_true", help="If set, will append to existing output dataset instead of overwriting.")
     parser.add_argument("--backend_params", type=str, default=None, help="If set, will pass these additional parameters (in JSON format) to the backend LLM inference calls.")
     # fmt: on
     return parser.parse_args()
@@ -104,34 +105,11 @@ def main():
 
     # Upload output to HuggingFace
     logging.info(f"Uploading output dataset to HuggingFace: {args.output_dataset}")
-    try:
-        output_dataset.push_to_hub(args.output_dataset, private=False)
-    except Exception:
-        logging.exception(
-            "Failed to push dataset to HuggingFace hub, saving locally as parquet."
-        )
-        data_dir = Path("data")
-        data_dir.mkdir(parents=True, exist_ok=True)
-        safe_name = args.output_dataset.replace("/", "___")
-        output_path = data_dir / f"{safe_name}.parquet"
-        df = output_dataset.to_pandas()
-        df.to_parquet(output_path, index=False)
-        logging.info(f"Saved output dataset to {output_path}")
-
-
-def prepare_output_dataset(
-    synth_dataset: Dataset, *, input_dataset: Dataset, strategy: str
-) -> Dataset:
-
-    # Merge input dataset and synthesized dataset to keep some metadata
-    input_df = input_dataset.to_pandas().drop(columns=["prompt", "response"])
-    input_df["strategy"] = strategy  # Keep track of the synthesis strategy used
-    synth_df = synth_dataset.to_pandas()
-    output_df = pd.merge(input_df, synth_df, on="id", how="left")
-
-    ds = Dataset.from_pandas(output_df)
-    final_ds = ds.map(to_conversation_format)
-    return final_ds
+    upload_to_huggingface(
+        dataset=output_dataset,
+        dataset_name=args.output_dataset,
+        append=args.append,
+    )
 
 
 def filter_by_token_length(
@@ -159,6 +137,52 @@ def filter_by_token_length(
     )
 
     return filtered_dataset
+
+
+def prepare_output_dataset(
+    synth_dataset: Dataset, *, input_dataset: Dataset, strategy: str
+) -> Dataset:
+
+    # Merge input dataset and synthesized dataset to keep some metadata
+    input_df = input_dataset.to_pandas().drop(columns=["prompt", "response"])
+    input_df["strategy"] = strategy  # Keep track of the synthesis strategy used
+    synth_df = synth_dataset.to_pandas()
+    output_df = pd.merge(input_df, synth_df, on="id", how="left")
+
+    ds = Dataset.from_pandas(output_df)
+    final_ds = ds.map(to_conversation_format)
+    return final_ds
+
+
+def upload_to_huggingface(dataset: Dataset, dataset_name: str, append: bool = False):
+    """Upload the dataset to HuggingFace hub. If append is True, will append to existing dataset."""
+    try:
+        if append:
+            logging.info(
+                f"Appending to existing dataset on HuggingFace: {dataset_name}"
+            )
+            existing_dataset = load_dataset(dataset_name, split="train")
+            combined_dataset = Dataset.from_pandas(
+                pd.concat(
+                    [existing_dataset.to_pandas(), dataset.to_pandas()],
+                    ignore_index=True,
+                )
+            )
+            combined_dataset.push_to_hub(dataset_name, private=False)
+        else:
+            logging.info(f"Pushing new dataset to HuggingFace: {dataset_name}")
+            dataset.push_to_hub(dataset_name, private=False)
+    except Exception:
+        logging.exception(
+            "Failed to push dataset to HuggingFace hub, saving locally as parquet."
+        )
+        data_dir = Path("data")
+        data_dir.mkdir(parents=True, exist_ok=True)
+        safe_name = dataset_name.replace("/", "___")
+        output_path = data_dir / f"{safe_name}.parquet"
+        df = dataset.to_pandas()
+        df.to_parquet(output_path, index=False)
+        logging.info(f"Saved output dataset to {output_path}")
 
 
 def to_conversation_format(example):
