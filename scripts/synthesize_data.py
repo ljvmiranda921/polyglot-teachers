@@ -59,12 +59,12 @@ def main():
         dataset = dataset.filter(lambda ex: args.strategy in (ex.get("strategy")))
         if args.strategy != "translate":
             dataset = dataset.filter(lambda ex: args.target_lang == ex.get("language"))
-    if args.limit:
-        logging.info(f"Getting the first {args.limit} instances")
-        dataset = dataset.select(range(min(int(args.limit), len(dataset))))
     if args.shuffle:
         logging.info(f"Shuffling the dataset using seed {args.shuffle}")
         dataset = dataset.shuffle(seed=args.shuffle)
+    if args.limit:
+        logging.info(f"Getting the first {args.limit} instances")
+        dataset = dataset.select(range(min(int(args.limit), len(dataset))))
 
     # Prepare data synthesis prompts
     logging.info(f"Using '{args.strategy}' synthesis strategy")
