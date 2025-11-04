@@ -174,7 +174,7 @@ def upload_to_huggingface(dataset: Dataset, dataset_name: str, append: bool = Fa
                 pd.concat(
                     [existing_dataset.to_pandas(), dataset.to_pandas()],
                     ignore_index=True,
-                )
+                ).reset_index(drop=True)
             )
             combined_dataset.push_to_hub(dataset_name, private=False)
         else:

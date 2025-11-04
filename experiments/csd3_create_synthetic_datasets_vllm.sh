@@ -4,7 +4,7 @@
 #SBATCH --partition ampere
 #SBATCH --nodes 1
 #! change to gpu:4 to use all 4 GPU cards on a GPU node.
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:4
 #SBATCH --time=00:10:00
 #SBATCH --output=gpu-%j.log
 
@@ -14,16 +14,22 @@ module load rhel8/default-amp
 
 # Parse arguments
 MODEL=${1:-"meta-llama/Llama-3.1-8B-Instruct"}
-LANGUAGE=${2:-"id"}
+BACKEND=${2:-"vllm"}
+STRATEGY=${3:-"generate"}
+LIMIT=${4:-10000}
+LANGUAGES=(ar cs de es id ja)
+LANGUAGE=${LANGUAGES[SLURM_ARRAY_TASK_ID]} 
 
 source .venv/bin/activate
 python -m scripts.synthesize_data --help
 python -m scripts.synthesize_data --input_dataset ljvmiranda921/msde-seed-S1 \
     --output_dataset ljvmiranda921/msde-S1-${LANGUAGE} \
     --target_lang ${LANGUAGE} \
-    --strategy generate \
+    --strategy ${STRATEGY} \
     --has_prefilter \
-    --limit 10000 \
-    --backend vllm \
+    --limit ${LIMIT} \
+    --backend ${BACKEND} \
     --model ${MODEL} \
+    --shuffle 921 \
+    --no_cache \
     --backend_params '{"tensor_parallel_size":2,"gpu_memory_utilization":0.7, "max_model_length":4096, "require_all_responses": false}'
