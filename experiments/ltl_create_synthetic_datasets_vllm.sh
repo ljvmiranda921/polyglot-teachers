@@ -13,7 +13,7 @@ LANGUAGE=${2:-"id"}
 source .venv/bin/activate
 python -m scripts.synthesize_data --help
 python -m scripts.synthesize_data --input_dataset ljvmiranda921/msde-seed-S1 \
-    --output_dataset ljvmiranda921/test-synthesize-${LANGUAGE} \
+    --output_dataset ljvmiranda921/msde-S1-${LANGUAGE} \
     --target_lang ${LANGUAGE} \
     --strategy generate \
     --has_prefilter \
