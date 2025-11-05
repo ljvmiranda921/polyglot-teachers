@@ -16,6 +16,7 @@ python -m scripts.finetune_unsloth --help
 python -m scripts.finetune_unsloth \
     --input_dataset ${INPUT_DATASET} \
     --run_name ${RUN_NAME} \
+    --base_model ${BASE_MODEL} \
     --chat_template ${CHAT_TEMPLATE} \
     --num_epochs 2 \
     --learning_rate 2e-5 \
