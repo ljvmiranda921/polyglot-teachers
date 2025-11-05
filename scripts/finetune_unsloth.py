@@ -10,6 +10,9 @@ from unsloth.chat_templates import CHAT_TEMPLATES, get_chat_template  # isort: s
 import torch
 from datasets import Dataset, load_dataset
 from trl import SFTConfig, SFTTrainer
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
