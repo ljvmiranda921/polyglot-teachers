@@ -1,6 +1,6 @@
 # 📝 Documentation: Using this codebase
 
-Below is an overview of a standard synthetic data generation pipeline for distilling from a teacher model. 
+Below is an overview of a standard synthetic data generation pipeline for distilling from a teacher model.
 Each numbered step has its corresponding script (or set of scripts).
 Be sure to follow them accordingly.
 
@@ -12,7 +12,7 @@ Be sure to follow them accordingly.
 
 ## Step 1: Create seed dataset
 
-The **seed dataset** will be the basis for some of our data generation methods. 
+The **seed dataset** will be the basis for some of our data generation methods.
 For example, in the *generate* strategy, we will sample in-context examples from the seed dataset to condition the teacher model in generating related prompts.
 
 You can run the following script to create a seed dataset from a set of data sources:
@@ -26,8 +26,8 @@ python -m scripts.create_seed_dataset \
     --num_instances 300000
 ```
 
-You can use the `--num_instances` flag to specify the number of instances to sample from a very large source (e.g., WildChat 4.8M). 
-Not all sources make use of this flag. 
+You can use the `--num_instances` flag to specify the number of instances to sample from a very large source (e.g., WildChat 4.8M).
+Not all sources make use of this flag.
 The seed dataset will then be saved to the Hugging Face Hub under the name specified by `--output_dataset`.
 
 ## Step 2: Generate synthetic data and evaluate its quality
@@ -55,4 +55,4 @@ Finally, the dataset we created in Step 1 has some metadata, so you can use the 
 
 ## Step 4: Evaluate the student model
 
-## Step 5: Compute PolyTeacher Score 
+## Step 5: Compute PolyTeacher Score
