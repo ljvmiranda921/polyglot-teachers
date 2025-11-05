@@ -241,6 +241,7 @@ def save_finetuned_model(
 
         # Temporary solution: save locally then upload using HfAPI
         local_save_dir = Path("models") / run_name
+        local_save_dir.mkdir(parents=True, exist_ok=True)
         model.save_pretrained_merged(
             local_save_dir, tokenizer, save_method=save_precision
         )
