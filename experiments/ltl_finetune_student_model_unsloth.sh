@@ -19,7 +19,7 @@ python -m scripts.finetune_unsloth \
     --base_model ${BASE_MODEL} \
     --chat_template ${CHAT_TEMPLATE} \
     --num_epochs 2 \
-    --learning_rate 2e-5 \
+    --learning_rate 5e-6 \
     --max_seq_length 2048 \
     --use_lora \
     --load_in_4bit \
