@@ -1,5 +1,6 @@
 import argparse
 import logging
+import json
 import os
 import sys
 from datetime import datetime
@@ -37,6 +38,7 @@ def get_args():
     parser.add_argument("--use_lora", action="store_true", help="If set, will use LoRA for finetuning.")
     parser.add_argument("--load_in_4bit", action="store_true", help="If set, will load the model in 4-bit precision to save memory.")
     parser.add_argument("--save_mode", choices=["merged_16bit", "merged_4bit", "lora"], default="merged_16bit", help="Precision for saving the finetuned model.")
+    parser.add_argument("--input_dataset_filter", type=str, default=None, help="JSON string representing a filter to apply to the input dataset before finetuning. The keys should be the field names and the values should be the values to filter by. This is an AND operation.")
     # fmt: on
     return parser.parse_args()
 
@@ -65,6 +67,7 @@ def main():
         dataset_name=args.input_dataset,
         tokenizer=tokenizer,
         chat_template=args.chat_template,
+        input_dataset_filter=args.input_dataset_filter,
     )
 
     trainer = SFTTrainer(
@@ -154,11 +157,17 @@ def get_model_and_tokenizer(
     return model, tokenizer
 
 
-def prepare_training_data(dataset_name: str, tokenizer, chat_template: str) -> Dataset:
+def prepare_training_data(
+    dataset_name: str,
+    tokenizer,
+    chat_template: str,
+    input_dataset_filter: str,
+    messages_key: str = "messages",
+) -> Dataset:
     """Apply chat template to the post-training dataset. Expects a 'messages' field in the dataset."""
 
     def _formatting_prompts_func(examples):
-        messages = examples["messages"]
+        messages = examples[messages_key]
         texts = [
             tokenizer.apply_chat_template(
                 msg, tokenize=False, add_generation_prompt=False
@@ -169,6 +178,13 @@ def prepare_training_data(dataset_name: str, tokenizer, chat_template: str) -> D
 
     tokenizer = get_chat_template(tokenizer, chat_template=chat_template)
     dataset = load_dataset(dataset_name, split="train")
+    if input_dataset_filter:
+        filter_dict = json.loads(input_dataset_filter)
+        logging.info(f"Applying filter to dataset: {filter_dict}")
+        dataset = dataset.filter(
+            lambda example: all(example[k] == v for k, v in filter_dict.items())
+        )
+
     dataset = dataset.map(_formatting_prompts_func, batched=True)
     return dataset
 
