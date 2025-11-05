@@ -1,8 +1,8 @@
 import argparse
+import json
 import logging
 import os
 import sys
-import json
 from pathlib import Path
 
 import pandas as pd

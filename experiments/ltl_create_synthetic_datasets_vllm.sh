@@ -13,7 +13,7 @@ BACKEND=${2:-"vllm"}
 STRATEGY=${3:-"generate"}
 LIMIT=${4:-10000}
 LANGUAGES=(ar cs de es id ja)
-LANGUAGE=${LANGUAGES[SLURM_ARRAY_TASK_ID]} 
+LANGUAGE=${LANGUAGES[SLURM_ARRAY_TASK_ID]}
 
 source .venv/bin/activate
 python -m scripts.synthesize_data --help
