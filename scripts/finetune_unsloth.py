@@ -1,17 +1,20 @@
 import argparse
-import logging
 import json
+import logging
 import os
 import sys
 from datetime import datetime
+from pathlib import Path
 
 # Unsloth must be imported before torch and trl so that it can patch them properly.
 from unsloth import FastLanguageModel  # isort: skip
 from unsloth.chat_templates import CHAT_TEMPLATES, get_chat_template  # isort: skip
 import torch
 from datasets import Dataset, load_dataset
-from trl import SFTConfig, SFTTrainer
 from dotenv import load_dotenv
+from huggingface_hub import HfApi
+from trl import SFTConfig, SFTTrainer
+
 
 load_dotenv()
 
@@ -224,14 +227,31 @@ def save_finetuned_model(
 ):
     commit_message = f"ckpt for {run_name}"
     if save_precision in ["merged_16bit", "merged_4bit"]:
-        model.push_to_hub_merged(
-            output_hf_name,
-            tokenizer,
+        # TODO: push_to_hub_merged currently ignores revision for some reason
+        # let's use an alternative approach
+        # model.push_to_hub_merged(
+        #     output_hf_name,
+        #     tokenizer,
+        #     revision=run_name,
+        #     save_method=save_precision,
+        #     token=token,
+        #     private=True,
+        #     commit_message=commit_message,
+        # )
+
+        # Temporary solution: save locally then upload using HfAPI
+        local_save_dir = Path("models") / run_name
+        model.save_pretrained_merged(
+            local_save_dir, tokenizer, save_method=save_precision
+        )
+        api = HfApi()
+        api.upload_folder(
+            folder_path=local_save_dir,
+            repo_id=output_hf_name,
+            repo_type="model",
+            path_in_repo=".",
             revision=run_name,
-            save_method=save_precision,
             token=token,
-            private=True,
-            commit_message=commit_message,
         )
     elif save_precision == "lora":
         model.push_to_hub(
