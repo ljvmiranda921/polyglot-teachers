@@ -4,11 +4,12 @@ import os
 import sys
 from datetime import datetime
 
+# Unsloth must be imported before torch and trl so that it can patch them properly.
+from unsloth import FastLanguageModel  # isort: skip
+from unsloth.chat_templates import CHAT_TEMPLATES, get_chat_template  # isort: skip
 import torch
 from datasets import Dataset, load_dataset
 from trl import SFTConfig, SFTTrainer
-from unsloth import FastLanguageModel
-from unsloth.chat_templates import CHAT_TEMPLATES, get_chat_template
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
