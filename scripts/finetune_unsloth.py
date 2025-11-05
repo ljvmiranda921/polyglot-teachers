@@ -222,6 +222,7 @@ def save_finetuned_model(
     save_precision: str,
     token: str,
 ):
+    commit_message = f"ckpt for {run_name}"
     if save_precision in ["merged_16bit", "merged_4bit"]:
         model.push_to_hub_merged(
             output_hf_name,
@@ -229,10 +230,24 @@ def save_finetuned_model(
             revision=run_name,
             save_method=save_precision,
             token=token,
+            private=True,
+            commit_message=commit_message,
         )
     elif save_precision == "lora":
-        model.push_to_hub(output_hf_name, revision=run_name, token=token)
-        tokenizer.push_to_hub(output_hf_name, revision=run_name, token=token)
+        model.push_to_hub(
+            output_hf_name,
+            revision=run_name,
+            private=True,
+            token=token,
+            commit_message=commit_message,
+        )
+        tokenizer.push_to_hub(
+            output_hf_name,
+            revision=run_name,
+            private=True,
+            token=token,
+            commit_message=commit_message,
+        )
     else:
         raise ValueError(f"Unknown save_precision: {save_precision}")
 
