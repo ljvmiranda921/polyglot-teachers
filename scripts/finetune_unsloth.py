@@ -251,6 +251,7 @@ def save_finetuned_model(
             repo_type="model",
             path_in_repo=".",
             revision=run_name,
+            commit_message=commit_message,
             token=token,
         )
     elif save_precision == "lora":
