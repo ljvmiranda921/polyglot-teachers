@@ -2,6 +2,7 @@ import argparse
 import json
 import logging
 import os
+import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -34,7 +35,7 @@ def get_args():
     parser.add_argument("--base_model", type=str, default="meta-llama/Llama-3.1-8B", help="Base model to use for finetuning.")
     parser.add_argument("--run_name", type=str, required=True, help="Name of the run. This will be used to identify the model in TrackIO and also as a revision to the HuggingFace model in --output_model_name.")
     parser.add_argument("--chat_template", type=str, choices=list(CHAT_TEMPLATES.keys()), default="llama-3.1", help="Chat template to use for formatting the messages.")
-    parser.add_argument("--output_model_name", type=str, default="ljvmiranda921/msde-unsloth-sft", help="Name of the output model (HuggingFace ID) to save after finetuning.")
+    parser.add_argument("--output_model_name", type=str, default="ljvmiranda921/msde-sft-dev", help="Name of the output model (HuggingFace ID) to save after finetuning.")
     parser.add_argument("--num_epochs", type=int, default=2, help="Number of epochs to finetune for.")
     parser.add_argument("--learning_rate", type=float, default=2e-5, help="Learning rate for finetuning.")
     parser.add_argument("--max_seq_length", type=int, default=2048, help="Maximum sequence length for the model.")
@@ -245,16 +246,34 @@ def save_finetuned_model(
         model.save_pretrained_merged(
             local_save_dir, tokenizer, save_method=save_precision
         )
-        api = HfApi()
-        api.upload_folder(
-            folder_path=local_save_dir,
-            repo_id=output_hf_name,
-            repo_type="model",
-            path_in_repo=".",
-            revision=run_name,
-            commit_message=commit_message,
-            token=token,
-        )
+        try:
+            api = HfApi()
+            api.create_branch(
+                repo_id=output_hf_name,
+                branch=run_name,
+                repo_type="model",
+                exist_ok=True,
+                token=token,
+            )
+            api.upload_folder(
+                folder_path=local_save_dir,
+                repo_id=output_hf_name,
+                repo_type="model",
+                path_in_repo=".",
+                revision=run_name,
+                commit_message=commit_message,
+                token=token,
+            )
+        except Exception as e:
+            logging.error(f"Upload failed, keeping local directory: {e}")
+            raise
+        else:
+            # Delete local directory to save some space in the cluster
+            shutil.rmtree(local_save_dir)
+            logging.info(
+                f"Successfully uploaded and deleted local directory: {local_save_dir}"
+            )
+
     elif save_precision == "lora":
         model.push_to_hub(
             output_hf_name,
