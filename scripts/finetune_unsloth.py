@@ -83,7 +83,7 @@ def main():
             warmup_steps=5,
             num_train_epochs=args.num_epochs,
             learning_rate=args.learning_rate,
-            logging_steps=1,
+            logging_steps=100,
             optim="adamw_8bit",
             weight_decay=0.001,
             lr_scheduler_type="linear",
