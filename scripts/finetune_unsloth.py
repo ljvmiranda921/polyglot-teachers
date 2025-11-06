@@ -43,6 +43,7 @@ def get_args():
     parser.add_argument("--load_in_4bit", action="store_true", help="If set, will load the model in 4-bit precision to save memory.")
     parser.add_argument("--save_mode", choices=["merged_16bit", "merged_4bit", "lora"], default="merged_16bit", help="Precision for saving the finetuned model.")
     parser.add_argument("--input_dataset_filter", type=str, default=None, help="JSON string representing a filter to apply to the input dataset before finetuning. The keys should be the field names and the values should be the values to filter by. This is an AND operation.")
+    parser.add_argument("--seed", type=int, default=3407, help="Random seed for reproducibility.")
     # fmt: on
     return parser.parse_args()
 
@@ -96,7 +97,7 @@ def main():
             optim="adamw_8bit",
             weight_decay=0.001,
             lr_scheduler_type="linear",
-            seed=3407,
+            seed=args.seed,
             output_dir="outputs",
             report_to="trackio",
             # TrackIO reporting parameters
