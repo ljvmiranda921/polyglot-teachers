@@ -4,8 +4,8 @@
 #SBATCH --partition ampere
 #SBATCH --nodes 1
 #! change to gpu:4 to use all 4 GPU cards on a GPU node.
-#SBATCH --gres=gpu:4
-#SBATCH --time=00:10:00
+#SBATCH --gres=gpu:2
+#SBATCH --time=02:00:00
 #SBATCH --output=gpu-%j.log
 
 # Module setup: cluster environment and recent python.
@@ -13,7 +13,7 @@ module purge
 module load rhel8/default-amp
 
 # Parse arguments
-MODEL=${1:-"meta-llama/Llama-3.1-8B-Instruct"}
+MODEL=${1:-"meta-llama/Llama-3.1-70B-Instruct"}
 BACKEND=${2:-"vllm"}
 STRATEGY=${3:-"generate"}
 LIMIT=${4:-10000}
@@ -32,4 +32,5 @@ python -m scripts.synthesize_data --input_dataset ljvmiranda921/msde-seed-S1 \
     --model ${MODEL} \
     --shuffle 921 \
     --no_cache \
-    --backend_params '{"tensor_parallel_size":2,"gpu_memory_utilization":0.7, "max_model_length":4096, "require_all_responses": false}'
+    --append \
+    --backend_params '{"tensor_parallel_size":4,"gpu_memory_utilization":0.7, "max_model_length":4096, "require_all_responses": false}'
