@@ -25,7 +25,7 @@ logging.basicConfig(
 def get_args():
     # fmt: off
     description = "Generate synthetic data given a dataset, strategy (generate, translate, refine), and target language."
-    parser = argparse.ArgumentParser(description=description)
+    parser = argparse.ArgumentParser(description=description, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--input_dataset", type=str, required=True, help="Seed HuggingFace dataset for data synthesis.")
     parser.add_argument("--output_dataset", type=str, required=True, help="Name of the HuggingFace dataset to store the outputs.")
     parser.add_argument("--target_lang", type=str, required=True, help="The two-letter code (ISO 639-2) of the target language.")
@@ -39,6 +39,7 @@ def get_args():
     parser.add_argument("--no_cache", action="store_true", help="If set, will not use any caching for LLM calls.")
     parser.add_argument("--append", action="store_true", help="If set, will append to existing output dataset instead of overwriting.")
     parser.add_argument("--backend_params", type=str, default=None, help="If set, will pass these additional parameters (in JSON format) to the backend LLM inference calls.")
+    parser.add_argument("--generation_params", type=str, default="{'temperature': 0.8, 'top_p': 0.9}", help="If set, will pass these additional generation parameters (in JSON format) to the LLM generation calls.")
     # fmt: on
     return parser.parse_args()
 
@@ -52,6 +53,7 @@ def main():
         os.environ["CURATOR_DISABLE_CACHE"] = "1"
 
     backend_params = json.loads(args.backend_params) if args.backend_params else None
+    generation_params = json.loads(args.generation_params) if args.generation_params else None  # fmt: skip
 
     # Prepare dataset for synthesis
     dataset = load_dataset(args.input_dataset, split="train")
@@ -93,6 +95,7 @@ def main():
         system_prompt=system_prompt,
         backend=args.backend,
         backend_params=backend_params,
+        generation_params=generation_params,
     )
     curator_response: CuratorResponse = distiller(input_dataset)
     logging.info(f"Data synthesis cost: {curator_response.cost_info.total_cost} USD")
