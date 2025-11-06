@@ -33,7 +33,7 @@ def get_args():
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("--input_dataset", type=str, required=True, help="HuggingFace dataset to use for finetuning. Must contain a 'messages' field in the OpenAI format.")
     parser.add_argument("--base_model", type=str, default="meta-llama/Llama-3.1-8B", help="Base model to use for finetuning.")
-    parser.add_argument("--run_name", type=str, required=True, help="Name of the run. This will be used to identify the model in TrackIO and also as a revision to the HuggingFace model in --output_model_name.")
+    parser.add_argument("--run_name", type=str, required=True, help="Name of the run. This will be used to identify the model in TrackIO and also as a revision to the HuggingFace model in --output_model_name. Will be added as a suffix to a timestamp.")
     parser.add_argument("--chat_template", type=str, choices=list(CHAT_TEMPLATES.keys()), default="llama-3.1", help="Chat template to use for formatting the messages.")
     parser.add_argument("--output_model_name", type=str, default="ljvmiranda921/msde-sft-dev", help="Name of the output model (HuggingFace ID) to save after finetuning.")
     parser.add_argument("--num_epochs", type=int, default=2, help="Number of epochs to finetune for.")
@@ -53,7 +53,12 @@ def main():
     if not hf_token:
         raise ValueError("Please set the HF_TOKEN env variable!")
 
+    # Set-up the run name
     run_name = f"{datetime.now().strftime('%Y%m%dT%H%M%S')}-msde-{args.base_model.replace('/', '___')}"
+    if args.use_lora:
+        run_name += "-lora"
+    if args.load_in_4bit:
+        run_name += "-4bit"
     if args.run_name:
         # Append custom run name suffix
         run_name += f"-{args.run_name}"
