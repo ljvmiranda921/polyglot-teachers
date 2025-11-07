@@ -12,8 +12,13 @@ Specifically, we propose a metric that evaluates the quality of data generated b
 ## ⌛ Setup & Installation
 
 Make sure that you have `uv` in your system (see [download instructions](https://docs.astral.sh/uv/getting-started/installation/)).
-To install all dependencies, run the following command: `uv sync --dev`.
-This will create a virtual environment, `mtep`, which you can activate by running `source ./venv/bin/activate`.
+To install all dependencies, run the following commands: 
+
+```sh
+git submodule update --init --recursive
+uv sync --dev
+source .venv/bin/activate
+```
 
 For more information on how to use this codebase, please refer to the [documentation](DOCUMENTATION.md).
 
