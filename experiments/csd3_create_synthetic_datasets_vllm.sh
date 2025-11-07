@@ -5,7 +5,6 @@
 #SBATCH --nodes 1
 #! change to gpu:4 to use all 4 GPU cards on a GPU node.
 #SBATCH --gres=gpu:2
-#SBATCH --time=02:00:00
 #SBATCH --output=gpu-%j.log
 
 # Module setup: cluster environment and recent python.
@@ -20,6 +19,9 @@ LIMIT=${4:-10000}
 LANGUAGES=(ar cs de es id ja)
 LANGUAGE=${LANGUAGES[SLURM_ARRAY_TASK_ID]}
 
+export HF_HOME=/home/ljvm2/rds/hpc-work/hpc_cache/huggingface
+export HF_HUB_CACHE=/home/ljvm2/rds/hpc-work/hpc_cache/hf_hub
+export VLLM_CACHE_ROOT=/home/ljvm2/rds/hpc-work/hpc_cache/vllm
 source .venv/bin/activate
 python -m scripts.synthesize_data --help
 python -m scripts.synthesize_data --input_dataset ljvmiranda921/msde-seed-S1 \
