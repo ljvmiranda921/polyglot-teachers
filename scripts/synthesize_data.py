@@ -9,10 +9,14 @@ import pandas as pd
 import tiktoken
 from bespokelabs.curator.types.curator_response import CuratorResponse
 from datasets import Dataset, load_dataset
+from dotenv import load_dotenv
 from langcodes import Language
 
 from scripts.utils.llm_inference import get_strategy
 from scripts.utils.prompts import SYSTEM_PROMPT
+
+load_dotenv()
+
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
