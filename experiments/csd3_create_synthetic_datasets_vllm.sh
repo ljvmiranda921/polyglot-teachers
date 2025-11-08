@@ -6,6 +6,7 @@
 #! change to gpu:4 to use all 4 GPU cards on a GPU node.
 #SBATCH --gres=gpu:2
 #SBATCH --output=gpu-%j.log
+#SBATCH --time=6:00:00
 
 # Module setup: cluster environment and recent python.
 . /etc/profile.d/modules.sh 
