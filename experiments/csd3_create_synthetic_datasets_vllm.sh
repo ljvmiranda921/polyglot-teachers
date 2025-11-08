@@ -8,8 +8,11 @@
 #SBATCH --output=gpu-%j.log
 
 # Module setup: cluster environment and recent python.
+. /etc/profile.d/modules.sh 
 module purge
 module load rhel8/default-amp
+module load gcc/11
+module load cuda/12.1
 
 # Parse arguments
 MODEL=${1:-"meta-llama/Llama-3.1-70B-Instruct"}
@@ -22,6 +25,8 @@ LANGUAGE=${LANGUAGES[SLURM_ARRAY_TASK_ID]}
 export HF_HOME=/home/ljvm2/rds/hpc-work/hpc_cache/huggingface
 export HF_HUB_CACHE=/home/ljvm2/rds/hpc-work/hpc_cache/hf_hub
 export VLLM_CACHE_ROOT=/home/ljvm2/rds/hpc-work/hpc_cache/vllm
+export OMP_NUM_THREADS=16
+
 source .venv/bin/activate
 python -m scripts.synthesize_data --help
 python -m scripts.synthesize_data --input_dataset ljvmiranda921/msde-seed-S1 \
