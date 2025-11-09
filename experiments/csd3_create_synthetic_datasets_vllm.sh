@@ -14,6 +14,7 @@ module purge
 module load rhel8/default-amp
 module load gcc/11
 module load cuda/12.1
+module load python/3.11.9/gcc/abrhyqg7  # This should have dev headers
 
 # Parse arguments
 MODEL=${1:-"meta-llama/Llama-3.1-70B-Instruct"}

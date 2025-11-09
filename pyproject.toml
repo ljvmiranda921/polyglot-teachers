@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "ljvmiranda921", email = "ljvmiranda@gmail.com" }
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 dependencies = [
     "bespokelabs-curator>=0.1.26",
     "ctranslate2>=4.6.0",
