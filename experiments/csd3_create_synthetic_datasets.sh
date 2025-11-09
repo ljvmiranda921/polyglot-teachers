@@ -40,5 +40,5 @@ python -m scripts.synthesize_data --input_dataset ljvmiranda921/msde-seed-S1 \
     --shuffle 921 \
     --no_cache \
     --append \
-    --backend_params '{"tensor_parallel_size":2,"gpu_memory_utilization":0.95, "max_model_length":4096, "require_all_responses": false}' \
+    --backend_params '{"tensor_parallel_size":2,"gpu_memory_utilization":0.95, "max_model_length":2048, "require_all_responses": false, "batch_size": 32}' \
     --generation_params '{"temperature": 0.8, "top_p": 0.9}'
