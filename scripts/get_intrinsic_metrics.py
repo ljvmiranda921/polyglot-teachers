@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 import json
 
+import torch
 from datasets import load_dataset, Dataset
 
 
@@ -28,7 +29,7 @@ def get_args():
     description = "Get intrinsic metrics for a given dataset."
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--input_dataset", type=str, required=True, help="HuggingFace dataset to compute intrinsic metrics on.")
-    parser.add_argument("--output_path", type=str, required=False, help="Path to save the intrinsic metrics JSON file. If not set, will save to ./metrics/{dataset_name}_{metric}_scores.json.")
+    parser.add_argument("--output_path", type=str, required=False, help="Path to save the intrinsic metrics JSON file. If not set, will save to ./metrics/{dataset_name}_{metric}_intrinsic_metrics.json.")
     parser.add_argument("--metrics", type=str, nargs="+", choices=["all"] + list(get_intrinsic_metrics().keys()), help="Intrinsic metric to compute.")
     parser.add_argument("--metric_params", type=str, default=None, help="Additional parameters for the metric in JSON format.")
     parser.add_argument("--dry_run", action="store_true", default=False, help="Will perform a dry run without saving any files and using a small amount of samples (1000).")
@@ -39,16 +40,17 @@ def get_args():
 
 def main():
     args = get_args()
+    metrics_to_compute = list(get_intrinsic_metrics().keys()) if "all" in args.metrics else args.metrics  # fmt: skip
+    metrics_to_compute = sorted(set(metrics_to_compute))
+    logging.info(f"Computing intrinsic metrics: {metrics_to_compute} for dataset: {args.input_dataset}")  # fmt: skip
+
     output_path = (
         Path("metrics")
-        / f"{args.input_dataset.replace('/', '___')}_intrinsic_metrics.json"
+        / f"{args.input_dataset.replace('/', '___')}_{'-'.join(metrics_to_compute)}_intrinsic_metrics.json"
         if not args.output_path
         else Path(args.output_path)
     )
     output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    metrics_to_compute = list(get_intrinsic_metrics().keys()) if "all" in args.metrics else args.metrics  # fmt: skip
-    logging.info(f"Computing intrinsic metrics: {metrics_to_compute} for dataset: {args.input_dataset}")  # fmt: skip
 
     dataset = load_dataset(args.input_dataset, split="train")
     if args.input_dataset_filter:
@@ -84,7 +86,6 @@ def _compute_distinct_ri(
     embedding_model: str = "nvidia/llama-embed-nemotron-8b",
 ) -> dict[str, float]:
     """Compute the distinctiveness of the instructions and responses in the dataset."""
-    import torch
     from sentence_transformers import SentenceTransformer
 
     if "prompt" not in dataset.column_names or "response" not in dataset.column_names:
@@ -108,8 +109,71 @@ def _compute_distinct_ri(
     return metrics
 
 
-def _compute_perplexity(dataset, *, base_model: str) -> dict[str, float]:
-    pass
+def _compute_perplexity(
+    dataset,
+    *,
+    base_model: str = "google/gemma-3-4b-pt",
+    batch_size: int = 8,
+    save_all_results: bool = True,
+) -> dict[str, float]:
+    """Compute the perplexity of the responses in the dataset."""
+
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = AutoModelForCausalLM.from_pretrained(base_model).to(device)
+    model.eval()
+    tokenizer = AutoTokenizer.from_pretrained(base_model)
+
+    total_perplexity = 0.0
+    results = []
+
+    instances = [
+        {"prompt": example["prompt"], "response": example["response"]}
+        for example in dataset
+    ]
+
+    # Reference: https://github.com/neulab/data-agora/blob/d7e66e12b03616caa42d818d5c2a387c127014ab/libs/data-agora/data_agora/core/intrinsic_evaluators.py#L127
+    with torch.no_grad():
+        for i in range(0, len(instances), batch_size):
+            batch = instances[i : i + batch_size]
+
+            batch_inputs = []
+            batch_instruction_lens = []
+            for instance in batch:
+                instruction = instance["prompt"]
+                response = instance["response"]
+                batch_inputs.append(instruction + response)
+                batch_instruction_lens.append(len(tokenizer(instruction)["input_ids"]))
+
+            # Tokenize batch
+            inputs = tokenizer(batch_inputs, return_tensors="pt", padding=True).to(device)  # fmt: skip
+            labels = inputs["input_ids"].clone()
+
+            # Mask out loss for instruction tokens for each sequence in batch
+            for j, inst_len in enumerate(batch_instruction_lens):
+                labels[j, :inst_len] = -100
+
+            outputs = model(**inputs, labels=labels)
+            losses = outputs.loss.item()
+
+            for j, instance in enumerate(batch):
+                perplexity = torch.exp(torch.tensor(losses)).item()
+                total_perplexity += perplexity
+
+                result = {
+                    "instruction": instance["instruction"],
+                    "response": instance["response"],
+                    "perplexity": perplexity,
+                }
+
+                results.append(result)
+
+    metrics = {"perplexity": total_perplexity / len(instances)}
+    if save_all_results:
+        metrics["per_instance_perplexity"] = results
+
+    return metrics
 
 
 if __name__ == "__main__":
