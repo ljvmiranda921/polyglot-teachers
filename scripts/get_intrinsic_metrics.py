@@ -1,12 +1,13 @@
 import argparse
+import json
 import logging
 import sys
 from pathlib import Path
-import json
 
 import torch
-from datasets import load_dataset, Dataset
+from datasets import Dataset, load_dataset
 
+from scripts.utils.prompts import MR3_EVAL_PROMPT_TEMPLATE
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -21,6 +22,7 @@ def get_intrinsic_metrics():
     return {
         "distinct_ri": _compute_distinct_ri,
         "perplexity": _compute_perplexity,
+        "reward_model": _compute_mr3_rubric_score,
     }
 
 
@@ -174,6 +176,30 @@ def _compute_perplexity(
         metrics["per_instance_perplexity"] = results
 
     return metrics
+
+
+def _compute_mr3_rubric_score(
+    dataset, *, model="rubricreward/mR3-Qwen3-14B-tgt-prompt-en-thinking"
+):
+    from transformers import AutoTokenizer
+    from vllm import LLM, SamplingParams
+
+    # Setup model. Reference: https://github.com/rubricreward/mr3?tab=readme-ov-file#-using-vllm
+    sampling_params = SamplingParams(temperature=0.6, top_p=0.95, max_tokens=16384, min_p=0, top_k=20)  # fmt: skip
+    llm = LLM(model=model, dtype="bfloat16", max_model_len=32768)
+
+    # Prepare inputs
+    tokenizer = AutoTokenizer.from_pretrained(model)
+    list_text = tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=True,
+        enable_thinking=True,  # Switch between thinking and non-thinking modes.
+    )
+
+    outputs = llm.generate(list_text, sampling_params)
+    print(outputs[0].output.text)
+    # TODO: Implement MR3 rubric score computation
 
 
 if __name__ == "__main__":

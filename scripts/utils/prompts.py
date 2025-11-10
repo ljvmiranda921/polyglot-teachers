@@ -33,3 +33,5 @@ Ensure that your response is coherent, culturally appropriate, and demonstrates 
 Do not generate any other text in your response (for example, do not start your message with any greetings, and never ask for clarification or apologize for struggling with the task).
 Here is the prompt you need to respond to: {prompt}
 """
+
+MR3_EVAL_PROMPT_TEMPLATE = """"""
