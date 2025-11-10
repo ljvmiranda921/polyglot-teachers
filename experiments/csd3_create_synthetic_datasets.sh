@@ -7,6 +7,7 @@
 #SBATCH --gres=gpu:2
 #SBATCH --output=gpu-%j.log
 #SBATCH --time=10:00:00
+#SBATCH --array=0-5
 
 # Module setup: cluster environment and recent python.
 . /etc/profile.d/modules.sh 
