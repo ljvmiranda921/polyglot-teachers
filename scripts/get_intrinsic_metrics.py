@@ -74,6 +74,12 @@ def main():
         logging.info(f">>> {score}")
         metric_scores[metric] = score
 
+    metric_scores["metadata"] = {
+        "input_dataset": args.input_dataset,
+        "num_samples": len(dataset),
+        "input_dataset_filter": args.input_dataset_filter,
+    }
+
     if not args.dry_run:
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(metric_scores, f, indent=4)
