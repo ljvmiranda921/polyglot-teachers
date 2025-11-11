@@ -13,7 +13,9 @@ dependencies = [
     "datasets>=3.0.2,<4.0.0",
     "langcodes>=3.5.0",
     "matplotlib>=3.10.7",
+    "prometheus-eval",
     "python-dotenv>=1.2.1",
+    "sentence-transformers>=5.1.2",
     "tiktoken>=0.12.0",
     "trackio>=0.7.0",
     "transformers>=4.57.1",
@@ -40,6 +42,7 @@ line-length = 88
 
 [tool.uv.sources]
 bespokelabs-curator = { git = "https://github.com/ljvmiranda921/curator" }
+prometheus-eval = { git = "https://github.com/ljvmiranda921/prometheus-eval", subdirectory = "libs/prometheus-eval" }
 
 [dependency-groups]
 dev = [
