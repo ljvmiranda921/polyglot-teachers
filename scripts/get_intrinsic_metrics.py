@@ -190,9 +190,10 @@ def _compute_rubric_score(
     model: str = "Unbabel/M-Prometheus-14B",
     save_all_results: bool = True,
 ) -> dict:
-    from prometheus_eval.vllm import VLLM
     from prometheus_eval import PrometheusEval
     from prometheus_eval.prompts import SCORE_RUBRIC_TEMPLATE
+    from prometheus_eval.vllm import VLLM
+
     from scripts.utils.prompts import M_RUBRIC_PROMPT, get_rubric_criteria
 
     lang_name = Language.make(language).display_name()
