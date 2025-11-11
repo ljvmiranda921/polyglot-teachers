@@ -9,7 +9,7 @@ Specifically, we propose a metric that evaluates the quality of data generated b
 <i>Overview of the PolyTeacher Score and how it fits into the distillation workflow.</i>
 </p>
 
-## ⌛ Setup & Installation
+## Setup & Installation
 
 Make sure that you have `uv` in your system (see [download instructions](https://docs.astral.sh/uv/getting-started/installation/)).
 To install all dependencies, run the following commands: 
