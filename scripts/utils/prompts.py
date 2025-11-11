@@ -34,6 +34,7 @@ Do not generate any other text in your response (for example, do not start your 
 Here is the prompt you need to respond to: {prompt}
 """
 
+# Based on M-Prometheus rubric prompt (slightly adapted for multilingual use)
 M_RUBRIC_PROMPT = """###Task Description: 
 An instruction (might include an Input inside it) in {language}, a response to evaluate, and a score rubric representing a evaluation criteria are given. 
 1. Write a detailed feedback that assess the quality of the response strictly based on the given score rubric, not evaluating in general.
@@ -51,3 +52,15 @@ An instruction (might include an Input inside it) in {language}, a response to e
 {{rubric}}
 
 ###Feedback:"""
+
+
+def get_rubric_criteria(lang_name: str) -> dict:
+    RUBRIC_CRITERIA = {
+        "criteria": f"Is the model proficient in language {lang_name}, including its cultural nuance and grammatical usage, and responds in a helpful and harmless manner according to the instruction?",
+        "score1_description": "The response contains severe grammatical errors, lacks cultural appropriateness, or is unhelpful/harmful. The language proficiency is very poor.",
+        "score2_description": "The response has noticeable grammatical errors and limited cultural awareness. It partially addresses the instruction but with significant gaps in language proficiency or helpfulness.",
+        "score3_description": "The response demonstrates adequate language proficiency with some minor grammatical errors. It shows reasonable cultural awareness and addresses the instruction in a helpful manner, though improvements are possible.",
+        "score4_description": "The response exhibits strong language proficiency with minimal grammatical errors and good cultural nuance. It addresses the instruction in a helpful and harmless way with only minor room for improvement.",
+        "score5_description": "The response demonstrates excellent language proficiency with proper grammar, appropriate cultural nuance, and idiomatic usage. It fully addresses the instruction in a helpful and harmless manner.",
+    }
+    return RUBRIC_CRITERIA
