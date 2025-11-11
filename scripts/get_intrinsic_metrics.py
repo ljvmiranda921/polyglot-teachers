@@ -6,8 +6,7 @@ from pathlib import Path
 
 import torch
 from datasets import Dataset, load_dataset
-
-from scripts.utils.prompts import MR3_EVAL_PROMPT_TEMPLATE
+from langcodes import Language
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -22,7 +21,7 @@ def get_intrinsic_metrics():
     return {
         "distinct_ri": _compute_distinct_ri,
         "perplexity": _compute_perplexity,
-        "reward_model": _compute_mr3_rubric_score,
+        "reward_model": _compute_rubric_score,
     }
 
 
@@ -171,35 +170,64 @@ def _compute_perplexity(
 
                 results.append(result)
 
-    metrics = {"perplexity": total_perplexity / len(instances)}
+    metrics = {"average_perplexity": total_perplexity / len(instances)}
     if save_all_results:
         metrics["per_instance_perplexity"] = results
 
     return metrics
 
 
-def _compute_mr3_rubric_score(
-    dataset, *, model="rubricreward/mR3-Qwen3-14B-tgt-prompt-en-thinking"
-):
-    from transformers import AutoTokenizer
-    from vllm import LLM, SamplingParams
+def _compute_rubric_score(
+    dataset: Dataset,
+    language: str,
+    *,
+    model: str = "Unbabel/M-Prometheus-14B",
+    save_all_results: bool = True,
+) -> dict:
+    from prometheus_eval.vllm import VLLM
+    from prometheus_eval import PrometheusEval
+    from prometheus_eval.prompts import SCORE_RUBRIC_TEMPLATE
+    from scripts.utils.prompts import M_RUBRIC_PROMPT
 
-    # Setup model. Reference: https://github.com/rubricreward/mr3?tab=readme-ov-file#-using-vllm
-    sampling_params = SamplingParams(temperature=0.6, top_p=0.95, max_tokens=16384, min_p=0, top_k=20)  # fmt: skip
-    llm = LLM(model=model, dtype="bfloat16", max_model_len=32768)
+    lang_name = Language.make(language).display_name()
+    template = M_RUBRIC_PROMPT.format(language=lang_name)
 
-    # Prepare inputs
-    tokenizer = AutoTokenizer.from_pretrained(model)
-    list_text = tokenizer.apply_chat_template(
-        messages,
-        tokenize=False,
-        add_generation_prompt=True,
-        enable_thinking=True,  # Switch between thinking and non-thinking modes.
+    rubrics = SCORE_RUBRIC_TEMPLATE.format(
+        **{
+            "criteria": f"Is the model proficient in language {lang_name}, including its cultural nuance and grammatical usage, and responds in a helpful and harmless manner according to the instruction?",
+            "score1_description": "The response contains severe grammatical errors, lacks cultural appropriateness, or is unhelpful/harmful. The language proficiency is very poor.",
+            "score2_description": "The response has noticeable grammatical errors and limited cultural awareness. It partially addresses the instruction but with significant gaps in language proficiency or helpfulness.",
+            "score3_description": "The response demonstrates adequate language proficiency with some minor grammatical errors. It shows reasonable cultural awareness and addresses the instruction in a helpful manner, though improvements are possible.",
+            "score4_description": "The response exhibits strong language proficiency with minimal grammatical errors and good cultural nuance. It addresses the instruction in a helpful and harmless way with only minor room for improvement.",
+            "score5_description": "The response demonstrates excellent language proficiency with proper grammar, appropriate cultural nuance, and idiomatic usage. It fully addresses the instruction in a helpful and harmless manner.",
+        }
     )
 
-    outputs = llm.generate(list_text, sampling_params)
-    print(outputs[0].output.text)
-    # TODO: Implement MR3 rubric score computation
+    model = VLLM(model=model)
+    judge = PrometheusEval(model=model, absolute_grade_template=template)
+
+    instructions = dataset["prompt"]
+    responses = dataset["response"]
+
+    feedbacks, scores = judge.absolute_grade(
+        instructions=instructions,
+        responses=responses,
+        rubric=rubrics,
+        params={"temperature": 0.3},
+    )
+
+    metrics = {"average_rubric_score": sum(scores) / len(scores)}
+    if save_all_results:
+        metrics["per_instance_rubric_scores"] = [
+            {
+                "instruction": inst,
+                "response": resp,
+                "feedback": fb,
+                "score": score,
+            }
+            for inst, resp, fb, score in zip(instructions, responses, feedbacks, scores)
+        ]
+    return metrics
 
 
 if __name__ == "__main__":
