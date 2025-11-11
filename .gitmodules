@@ -1,3 +1,6 @@
 [submodule "curator"]
 	path = curator
 	url = git@github.com:ljvmiranda921/curator.git
+[submodule "prometheus-eval"]
+	path = prometheus-eval
+	url = git@github.com:ljvmiranda921/prometheus-eval.git
