@@ -13,16 +13,31 @@ class SFTExample(BaseModel):
     response: str = Field(description="The expected response from the LLM.")
 
 
+class SFTExampleT(BaseModel):
+    prompt: str = Field(description="The translated input prompt.")
+    response: str = Field(description="The expected response from the LLM.")
+
+
 class SFTSynthesizerResponseOnly(curator.LLM):
     def prompt(self, input: dict) -> str:
         return input["synth_prompt"]
 
     def parse(self, input: dict, response: str) -> dict:
-        return {"id": input["id"], "prompt": input["synth_prompt"], "response": response}  # fmt: skip
+        return {"id": input["id"], "prompt": input["prompt"], "response": response}  # fmt: skip
 
 
 class SFTSynthesizerPromptResponse(curator.LLM):
     response_format = SFTExample
+
+    def prompt(self, input: dict) -> str:
+        return input["synth_prompt"]
+
+    def parse(self, input: dict, response: str) -> dict:
+        return {"id": input["id"], "prompt": response.prompt, "response": response.response}  # fmt: skip
+
+
+class SFTSynthesizerPromptResponseT(curator.LLM):
+    response_format = SFTExampleT
 
     def prompt(self, input: dict) -> str:
         return input["synth_prompt"]
@@ -92,9 +107,10 @@ def get_strategy(name: str) -> tuple[Callable[[Dataset, str], Dataset], curator.
         "respond": format_respond,
     }
     formatter_fn = formatters.get(name)
-    distiller_fn = (
-        SFTSynthesizerPromptResponse
-        if name == "generate"
-        else SFTSynthesizerResponseOnly
-    )
+    distillers = {
+        "generate": SFTSynthesizerPromptResponse,
+        "respond": SFTSynthesizerResponseOnly,
+        "translate": SFTSynthesizerPromptResponseT,
+    }
+    distiller_fn = distillers.get(name)
     return formatter_fn, distiller_fn
