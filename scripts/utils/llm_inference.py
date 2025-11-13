@@ -14,7 +14,7 @@ class SFTExample(BaseModel):
 
 
 class SFTExampleT(BaseModel):
-    prompt: str = Field(description="The translated input prompt.")
+    prompt: str = Field(description="The input prompt translated into the target language (not English).")  # fmt: skip
     response: str = Field(description="The expected response from the LLM.")
 
 
