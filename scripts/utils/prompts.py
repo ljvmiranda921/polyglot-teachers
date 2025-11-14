@@ -20,9 +20,10 @@ New Example:
 
 
 TRANSLATE_TPL = """As a multilingual data generator, your task is to translate the given prompt from English into {lang_name} and generate the appropriate response in the same language.
-Ensure that both the translated prompt and the response are coherent, culturally appropriate, and demonstrate a deep understanding of the language nuances.
+Important: you must return both the translated prompt (into {lang_name}) and the response. Ensure that both the translated prompt and the response are coherent, culturally appropriate, and demonstrate a deep understanding of the language nuances.
 
 Do not generate any other text in your response (for example, do not start your message with any greetings, and never ask for clarification or apologize for struggling with the task).
+Do not return the original English prompt. Remember, you must translate the prompt first and return it.
 Here is the prompt you need to translate and respond to: {prompt}
 """
 
