@@ -334,7 +334,7 @@ wheels = [
 [[package]]
 name = "bespokelabs-curator"
 version = "0.1.26"
-source = { git = "https://github.com/ljvmiranda921/curator#4609c41702280fc62855d74a87f9829e5987fdde" }
+source = { git = "https://github.com/ljvmiranda921/curator#3f3355368f11af8a02a85fdf6c863c50af9459cb" }
 dependencies = [
     { name = "aiofiles" },
     { name = "anthropic" },
