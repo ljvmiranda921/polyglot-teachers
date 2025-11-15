@@ -13,6 +13,7 @@ dependencies = [
     "datasets>=3.0.2,<4.0.0",
     "langcodes>=3.5.0",
     "matplotlib>=3.10.7",
+    "mistral-common>=1.8.5",
     "prometheus-eval",
     "python-dotenv>=1.2.1",
     "sentence-transformers>=5.1.2",
