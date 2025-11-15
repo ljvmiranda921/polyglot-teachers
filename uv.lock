@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.14'",
@@ -2903,6 +2903,7 @@ dependencies = [
     { name = "datasets" },
     { name = "langcodes" },
     { name = "matplotlib" },
+    { name = "mistral-common" },
     { name = "prometheus-eval" },
     { name = "python-dotenv" },
     { name = "sentence-transformers" },
@@ -2932,6 +2933,7 @@ requires-dist = [
     { name = "datasets", specifier = ">=3.0.2,<4.0.0" },
     { name = "langcodes", specifier = ">=3.5.0" },
     { name = "matplotlib", specifier = ">=3.10.7" },
+    { name = "mistral-common", specifier = ">=1.8.5" },
     { name = "prometheus-eval", git = "https://github.com/ljvmiranda921/prometheus-eval?subdirectory=libs%2Fprometheus-eval" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
     { name = "sentence-transformers", specifier = ">=5.1.2" },
