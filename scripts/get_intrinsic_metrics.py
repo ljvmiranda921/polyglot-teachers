@@ -178,7 +178,7 @@ def _compute_perplexity(
                 total_perplexity += perplexity
 
                 result = {
-                    "instruction": instance["instruction"],
+                    "instruction": instance["prompt"],
                     "response": instance["response"],
                     "perplexity": perplexity,
                 }
