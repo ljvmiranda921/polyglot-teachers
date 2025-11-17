@@ -32,7 +32,7 @@ def get_args():
     parser.add_argument("--input_dataset", type=str, required=True, help="HuggingFace dataset to compute intrinsic metrics on.")
     parser.add_argument("--output_path", type=str, required=False, help="Path to save the intrinsic metrics JSON file. If not set, will save to ./metrics/{dataset_name}_{metric}_intrinsic_metrics.json.")
     parser.add_argument("--metrics", type=str, nargs="+", choices=["all"] + list(get_intrinsic_metrics().keys()), help="Intrinsic metric to compute.")
-    parser.add_argument("--metric_params", type=str, default=None, help="Additional parameters for the metric in JSON format.")
+    parser.add_argument("--metric_params", type=str, default=None, help="Additional parameters for the metric in JSON format. You need to specify this as 'metric_fn::{\"param1\": value1, \"param2\": value2},metric_fn2::...'.")
     parser.add_argument("--dry_run", action="store_true", default=False, help="Will perform a dry run without saving any files and using a small amount of samples (1000).")
     parser.add_argument("--input_dataset_filter", type=str, default=None, help="JSON string representing a filter to apply to the input dataset before finetuning. The keys should be the field names and the values should be the values to filter by. This is an AND operation.")
     # fmt: on
@@ -44,6 +44,8 @@ def main():
     metrics_to_compute = list(get_intrinsic_metrics().keys()) if "all" in args.metrics else args.metrics  # fmt: skip
     metrics_to_compute = sorted(set(metrics_to_compute))
     logging.info(f"Computing intrinsic metrics: {metrics_to_compute} for dataset: {args.input_dataset}")  # fmt: skip
+    metric_params = parse_metric_params(args.metric_params) if args.metric_params else {}  # fmt: skip
+    logging.info(f"Using metric parameters: {metric_params}")
 
     output_path = (
         Path("metrics")
@@ -69,8 +71,8 @@ def main():
     for metric in metrics_to_compute:
         metric_fn = get_intrinsic_metrics()[metric]
         logging.info(f"Computing metric: {metric}")
-        metric_params = json.loads(args.metric_params) if args.metric_params else {}
-        score = metric_fn(dataset, args.dry_run, **metric_params)
+        params = metric_params.get(metric, {})
+        score = metric_fn(dataset, args.dry_run, **params)
         logging.info(f">>> {score}")
         metric_scores[metric] = score
 
@@ -84,6 +86,16 @@ def main():
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(metric_scores, f, indent=4)
         logging.info(f"Saved intrinsic metrics to: {output_path}")
+
+
+def parse_metric_params(param_str: str) -> dict[str, dict]:
+    """Parse metric parameters from a string."""
+    metric_params = {}
+    if param_str:
+        for item in param_str.split(","):
+            metric_name, params_json = item.split("::", 1)
+            metric_params[metric_name] = json.loads(params_json)
+    return metric_params
 
 
 def _compute_distinct_ri(
