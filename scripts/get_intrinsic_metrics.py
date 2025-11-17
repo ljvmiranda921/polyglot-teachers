@@ -214,6 +214,7 @@ def _compute_rubric_score(
     *,
     language: str,
     model: str = "Unbabel/M-Prometheus-14B",
+    tensor_parallel_size: int = 1,
     save_all_results: bool = True,
 ) -> dict:
     from prometheus_eval import PrometheusEval
@@ -229,7 +230,7 @@ def _compute_rubric_score(
     template = M_RUBRIC_PROMPT.format(language=lang_name)
     rubrics = SCORE_RUBRIC_TEMPLATE.format(**get_rubric_criteria(lang_name))
 
-    model = VLLM(model=model)
+    model = VLLM(model=model, trust_remote_code=True, tensor_parallel_size=tensor_parallel_size)  # fmt: skip
     judge = PrometheusEval(model=model, absolute_grade_template=template)
 
     instructions = dataset["prompt"]
