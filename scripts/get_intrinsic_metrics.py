@@ -69,7 +69,7 @@ def main():
     # Apply subsampling if specified
     if args.apply_subsampling:
         logging.info("Applying subsampling to the dataset to balance samples.")
-        dataset = subsample_per_strategy(dataset)
+        dataset, subsampling_results = subsample_per_strategy(dataset)
     if args.dry_run:
         logging.info("Dry run: using a small subset of the dataset (1000 samples).")
         dataset = dataset.shuffle().select(range(1000))
@@ -87,6 +87,7 @@ def main():
         "input_dataset": args.input_dataset,
         "num_samples": len(dataset),
         "input_dataset_filter": args.input_dataset_filter,
+        "subsampling_results": subsampling_results if args.apply_subsampling else None,
     }
 
     if not args.dry_run:
@@ -106,7 +107,7 @@ def parse_metric_params(param_str: str) -> dict[str, dict]:
 
 def subsample_per_strategy(
     dataset: Dataset, total_num_samples: int = 10_000, random_state: int = 42
-) -> Dataset:
+) -> tuple[Dataset, dict[str, int]]:
     """Subsample the dataset to have roughly the same number of samples per strategy.
 
     Ensures exactly total_num_samples are returned by distributing samples equally
@@ -162,8 +163,8 @@ def subsample_per_strategy(
                 remaining -= additional
 
     subsampled_df = pd.concat(subsampled_dfs).reset_index(drop=True)
-    breakpoint()
-    return Dataset.from_pandas(subsampled_df)
+    subsampling_results = subsampled_df.strategy.value_counts().to_dict()
+    return Dataset.from_pandas(subsampled_df), subsampling_results
 
 
 def _compute_distinct_ri(
