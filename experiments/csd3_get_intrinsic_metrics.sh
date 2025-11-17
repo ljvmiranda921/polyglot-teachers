@@ -46,8 +46,8 @@ source .venv/bin/activate
 python -m scripts.get_intrinsic_metrics --help
 
 # Compute across models (get 3.5k samples for each strategy)
-METRIC_PARAMS=$(jq -n --arg lang "$LANGUAGE" '{"reward_model::": {"language": $lang, "tensor_parallel_size": 2}}')
-INPUT_FILTER=$(jq -n --arg model "$MODEL" '{"model": $model}')
+METRIC_PARAMS='reward_model::{"language": "'"$LANGUAGE"'", "tensor_parallel_size": 2}'
+INPUT_FILTER='{"model": "'"$MODEL"'"}'
 
 python -m scripts.get_intrinsic_metrics --input_dataset ljvmiranda921/msde-S1-${LANGUAGE} \
     --metrics all \
