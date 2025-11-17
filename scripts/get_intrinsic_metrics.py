@@ -91,10 +91,9 @@ def main():
 def parse_metric_params(param_str: str) -> dict[str, dict]:
     """Parse metric parameters from a string."""
     metric_params = {}
-    if param_str:
-        for item in param_str.split(","):
-            metric_name, params_json = item.split("::", 1)
-            metric_params[metric_name] = json.loads(params_json)
+    for item in param_str.split(","):
+        metric_name, params_json = item.split("::", 1)
+        metric_params[metric_name] = json.loads(params_json)
     return metric_params
 
 
