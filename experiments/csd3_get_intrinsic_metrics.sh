@@ -8,7 +8,7 @@
 #SBATCH --output=gpu-%j.log
 #SBATCH --time=10:00:00
 #! Array computation is 11 models and 6 languages = 66 combinations
-#SBATCH --array=0-65  
+#SBATCH --array=0-65%4  
 
 # Module setup: cluster environment and recent python.
 . /etc/profile.d/modules.sh 
