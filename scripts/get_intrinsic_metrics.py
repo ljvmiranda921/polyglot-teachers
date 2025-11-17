@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 import torch
+import pandas as pd
 from datasets import Dataset, load_dataset
 from langcodes import Language
 
@@ -35,6 +36,7 @@ def get_args():
     parser.add_argument("--metric_params", type=str, default=None, help="Additional parameters for the metric in JSON format. You need to specify this as 'metric_fn::{\"param1\": value1, \"param2\": value2},metric_fn2::...'.")
     parser.add_argument("--dry_run", action="store_true", default=False, help="Will perform a dry run without saving any files and using a small amount of samples (1000).")
     parser.add_argument("--input_dataset_filter", type=str, default=None, help="JSON string representing a filter to apply to the input dataset before finetuning. The keys should be the field names and the values should be the values to filter by. This is an AND operation.")
+    parser.add_argument("--apply_subsampling", action="store_true", default=False, help="Whether to apply subsampling to the dataset before computing metrics. This is to ensure that the number of samples per strategy is roughly the same.")
     # fmt: on
     return parser.parse_args()
 
@@ -63,6 +65,11 @@ def main():
             lambda example: all(example[k] == v for k, v in filter_dict.items())
         )
     dataset = dataset.filter(lambda example: all(example[k] is not None for k in dataset.column_names))  # fmt: skip
+
+    # Apply subsampling if specified
+    if args.apply_subsampling:
+        logging.info("Applying subsampling to the dataset to balance samples.")
+        dataset, subsampling_results = subsample_per_strategy(dataset)
     if args.dry_run:
         logging.info("Dry run: using a small subset of the dataset (1000 samples).")
         dataset = dataset.shuffle().select(range(1000))
@@ -80,6 +87,7 @@ def main():
         "input_dataset": args.input_dataset,
         "num_samples": len(dataset),
         "input_dataset_filter": args.input_dataset_filter,
+        "subsampling_results": subsampling_results if args.apply_subsampling else None,
     }
 
     if not args.dry_run:
@@ -95,6 +103,68 @@ def parse_metric_params(param_str: str) -> dict[str, dict]:
         metric_name, params_json = item.split("::", 1)
         metric_params[metric_name] = json.loads(params_json)
     return metric_params
+
+
+def subsample_per_strategy(
+    dataset: Dataset, total_num_samples: int = 10_000, random_state: int = 42
+) -> tuple[Dataset, dict[str, int]]:
+    """Subsample the dataset to have roughly the same number of samples per strategy.
+
+    Ensures exactly total_num_samples are returned by distributing samples equally
+    across strategies, then redistributing any remaining samples to strategies with
+    available capacity.
+    """
+    df = dataset.to_pandas()
+    strategies = df["strategy"].unique()
+    num_strategies = len(strategies)
+
+    # Equal distribution across strategies
+    base_samples_per_strategy = total_num_samples // num_strategies
+    subsampled_dfs = []
+    samples_taken = {}
+
+    for strategy in strategies:
+        strategy_df = df[df["strategy"] == strategy]
+        num_samples = min(base_samples_per_strategy, len(strategy_df))
+        sampled_df = strategy_df.sample(n=num_samples, random_state=random_state)
+        subsampled_dfs.append(sampled_df)
+        samples_taken[strategy] = num_samples
+
+    # Redistribute remaining samples to strategies with capacity
+    current_total = sum(samples_taken.values())
+    remaining = total_num_samples - current_total
+
+    if remaining > 0:
+        # Create a pool of strategies that can provide more samples
+        available_strategies = [
+            (strategy, len(df[df["strategy"] == strategy]) - samples_taken[strategy])
+            for strategy in strategies
+            if len(df[df["strategy"] == strategy]) > samples_taken[strategy]
+        ]
+        # Sort by available capacity (descending)
+        available_strategies.sort(key=lambda x: x[1], reverse=True)
+
+        # Distribute remaining samples
+        for strategy, available in available_strategies:
+            if remaining == 0:
+                break
+            additional = min(remaining, available)
+            if additional > 0:
+                strategy_df = df[df["strategy"] == strategy]
+                # Get samples not already taken
+                already_sampled = subsampled_dfs[list(strategies).index(strategy)]
+                remaining_pool = strategy_df.drop(already_sampled.index)
+                extra_samples = remaining_pool.sample(
+                    n=additional, random_state=random_state + 1
+                )
+                subsampled_dfs[list(strategies).index(strategy)] = pd.concat(
+                    [already_sampled, extra_samples]
+                )
+                remaining -= additional
+
+    subsampled_df = pd.concat(subsampled_dfs).reset_index(drop=True)
+    subsampling_results = subsampled_df.strategy.value_counts().to_dict()
+    return Dataset.from_pandas(subsampled_df), subsampling_results
 
 
 def _compute_distinct_ri(
@@ -214,6 +284,7 @@ def _compute_rubric_score(
     *,
     language: str,
     model: str = "Unbabel/M-Prometheus-14B",
+    tensor_parallel_size: int = 1,
     save_all_results: bool = True,
 ) -> dict:
     from prometheus_eval import PrometheusEval
@@ -229,7 +300,7 @@ def _compute_rubric_score(
     template = M_RUBRIC_PROMPT.format(language=lang_name)
     rubrics = SCORE_RUBRIC_TEMPLATE.format(**get_rubric_criteria(lang_name))
 
-    model = VLLM(model=model)
+    model = VLLM(model=model, trust_remote_code=True, tensor_parallel_size=tensor_parallel_size)  # fmt: skip
     judge = PrometheusEval(model=model, absolute_grade_template=template)
 
     instructions = dataset["prompt"]
