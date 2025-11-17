@@ -113,11 +113,17 @@ def _compute_distinct_ri(
         mask = ~torch.eye(n, dtype=bool)
         average_similarity = similarity_matrix[mask].mean()
         metrics[f"{k}_distinct_ri"] = 1 - average_similarity.item()
+
+    metrics["metadata"] = {
+        "embedding_model": embedding_model,
+    }
+
     return metrics
 
 
 def _compute_perplexity(
     dataset,
+    dry_run: bool = False,
     *,
     base_model: str = "google/gemma-3-4b-pt",
     batch_size: int = 8,
@@ -126,6 +132,9 @@ def _compute_perplexity(
     """Compute the perplexity of the responses in the dataset."""
 
     from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    if dry_run:
+        base_model = "google/gemma-3-270m"
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = AutoModelForCausalLM.from_pretrained(base_model).to(device)
@@ -180,13 +189,19 @@ def _compute_perplexity(
     if save_all_results:
         metrics["per_instance_perplexity"] = results
 
+    metrics["metadata"] = {
+        "base_model": base_model,
+        "batch_size": batch_size,
+    }
+
     return metrics
 
 
 def _compute_rubric_score(
     dataset: Dataset,
-    language: str,
+    dry_run: bool = False,
     *,
+    language: str,
     model: str = "Unbabel/M-Prometheus-14B",
     save_all_results: bool = True,
 ) -> dict:
@@ -195,6 +210,9 @@ def _compute_rubric_score(
     from prometheus_eval.vllm import VLLM
 
     from scripts.utils.prompts import M_RUBRIC_PROMPT, get_rubric_criteria
+
+    if dry_run:
+        model = "Unbabel/M-Prometheus-3B"
 
     lang_name = Language.make(language).display_name()
     template = M_RUBRIC_PROMPT.format(language=lang_name)
@@ -224,6 +242,12 @@ def _compute_rubric_score(
             }
             for inst, resp, fb, score in zip(instructions, responses, feedbacks, scores)
         ]
+
+    metrics["metadata"] = {
+        "language": language,
+        "model": model,
+    }
+
     return metrics
 
 
