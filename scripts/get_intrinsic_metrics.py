@@ -107,21 +107,63 @@ def parse_metric_params(param_str: str) -> dict[str, dict]:
 def subsample_per_strategy(
     dataset: Dataset, total_num_samples: int = 10_000, random_state: int = 42
 ) -> Dataset:
-    """Subsample the dataset to have roughly the same number of samples per strategy."""
+    """Subsample the dataset to have roughly the same number of samples per strategy.
 
+    Ensures exactly total_num_samples are returned by distributing samples equally
+    across strategies, then redistributing any remaining samples to strategies with
+    available capacity.
+    """
     df = dataset.to_pandas()
+    strategies = df["strategy"].unique()
+    num_strategies = len(strategies)
+
+    # Equal distribution across strategies
+    base_samples_per_strategy = total_num_samples // num_strategies
     subsampled_dfs = []
-    for strategy in df["strategy"].unique():
+    samples_taken = {}
+
+    for strategy in strategies:
         strategy_df = df[df["strategy"] == strategy]
-        num_samples = max(1, total_num_samples // len(df["strategy"].unique()))
-        sampled_df = strategy_df.sample(
-            n=min(num_samples, len(strategy_df)), random_state=random_state
-        )
+        num_samples = min(base_samples_per_strategy, len(strategy_df))
+        sampled_df = strategy_df.sample(n=num_samples, random_state=random_state)
         subsampled_dfs.append(sampled_df)
+        samples_taken[strategy] = num_samples
+
+    # Redistribute remaining samples to strategies with capacity
+    current_total = sum(samples_taken.values())
+    remaining = total_num_samples - current_total
+
+    if remaining > 0:
+        # Create a pool of strategies that can provide more samples
+        available_strategies = [
+            (strategy, len(df[df["strategy"] == strategy]) - samples_taken[strategy])
+            for strategy in strategies
+            if len(df[df["strategy"] == strategy]) > samples_taken[strategy]
+        ]
+        # Sort by available capacity (descending)
+        available_strategies.sort(key=lambda x: x[1], reverse=True)
+
+        # Distribute remaining samples
+        for strategy, available in available_strategies:
+            if remaining == 0:
+                break
+            additional = min(remaining, available)
+            if additional > 0:
+                strategy_df = df[df["strategy"] == strategy]
+                # Get samples not already taken
+                already_sampled = subsampled_dfs[list(strategies).index(strategy)]
+                remaining_pool = strategy_df.drop(already_sampled.index)
+                extra_samples = remaining_pool.sample(
+                    n=additional, random_state=random_state + 1
+                )
+                subsampled_dfs[list(strategies).index(strategy)] = pd.concat(
+                    [already_sampled, extra_samples]
+                )
+                remaining -= additional
 
     subsampled_df = pd.concat(subsampled_dfs).reset_index(drop=True)
     breakpoint()
-    return subsampled_df
+    return Dataset.from_pandas(subsampled_df)
 
 
 def _compute_distinct_ri(
