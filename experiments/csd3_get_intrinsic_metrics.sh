@@ -48,7 +48,7 @@ python -m scripts.get_intrinsic_metrics --help
 # Compute across models (get 3.5k samples for each strategy)
 python -m scripts.get_intrinsic_metrics --input_dataset ljvmiranda921/msde-S1-${LANGUAGE} \
     --metrics all \
-    --output_path /home/ljvm2/rds/hpc-work/multilingual-teacher-eval/metrics/msde-S1-${LANGUAGE}_intrinsic_metrics.json \
+    --output_path /home/ljvm2/rds/hpc-work/multilingual-teacher-eval/metrics/msde-S1-${LANGUAGE}_${MODEL//\//__}_intrinsic_metrics.json \
     --metric_params '{"reward_model::":{"language":"'"${LANGUAGE}"'","tensor_parallel_size":2}}' \
     --input_dataset_filter '{"model":"'"${MODEL}"'"}' \
     --apply_subsampling 
