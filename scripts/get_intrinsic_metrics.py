@@ -2,6 +2,7 @@ import argparse
 import json
 import logging
 import sys
+import time
 from pathlib import Path
 
 import torch
@@ -82,6 +83,7 @@ def main():
         score = metric_fn(dataset, args.dry_run, **params)
         logging.info(f">>> {score}")
         metric_scores[metric] = score
+        time.sleep(120)
 
     metric_scores["metadata"] = {
         "input_dataset": args.input_dataset,

@@ -8,7 +8,7 @@
 #SBATCH --output=gpu-%j.log
 #SBATCH --time=10:00:00
 #! Array computation is 11 models and 6 languages = 66 combinations
-#SBATCH --array=0-65%4  
+#SBATCH --array=0-65%2  
 
 # Module setup: cluster environment and recent python.
 . /etc/profile.d/modules.sh 
@@ -46,12 +46,12 @@ source .venv/bin/activate
 python -m scripts.get_intrinsic_metrics --help
 
 # Compute across models (get 3.5k samples for each strategy)
-METRIC_PARAMS='reward_model::{"language": "'"$LANGUAGE"'", "tensor_parallel_size": 2}'
+METRIC_PARAMS='distinct_ri::{"embedding_model":"google/embedinggemma-300m"}|reward_model::{"language": "'"$LANGUAGE"'", "tensor_parallel_size": 2, "model": "Unbabel/M-Prometheus-3B"}|perplexity::{"base_model":"google/gemma-3-270m","batch_size":64}'
 INPUT_FILTER='{"model": "'"$MODEL"'"}'
 
 python -m scripts.get_intrinsic_metrics --input_dataset ljvmiranda921/msde-S1-${LANGUAGE} \
     --metrics all \
-    --output_path /home/ljvm2/rds/hpc-work/multilingual-teacher-eval/metrics/msde-S1-${LANGUAGE}_${MODEL//\//__}_intrinsic_metrics.json \
+    --output_path /home/ljvm2/rds/hpc-work/dev/multilingual-teacher-eval/metrics/msde-S1-${LANGUAGE}_${MODEL//\//__}_intrinsic_metrics.json \
     --metric_params "$METRIC_PARAMS" \
     --input_dataset_filter "$INPUT_FILTER" \
     --apply_subsampling 
