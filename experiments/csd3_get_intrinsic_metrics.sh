@@ -20,10 +20,17 @@ export VLLM_CACHE_ROOT=/home/ljvm2/rds/hpc-work/hpc_cache/vllm
 export OMP_NUM_THREADS=16
 
 MODELS=(
-    "gpt-4o-mini-2024-08-06"
     "meta-llama/Llama-3.1-70B-Instruct"
     "meta-llama/Llama-3.1-8B-Instruct"
-
+    "CohereLabs/aya-expanse-32b"
+    "cohere-command-a"
+    "google/gemma-3-12b-it"
+    "google/gemma-3-27b-it"
+    "google/gemma-3-4b-it"
+    "gpt-4o-mini-2024-07-18"
+    "ibm-granite/granite-4.0-1b"
+    "ibm-granite/granite-4.0-micro"
+    "mistralai/Mistral-Small-24B-Instruct-2501"
 )
 
 LANGUAGES=(ar cs de es id ja)
