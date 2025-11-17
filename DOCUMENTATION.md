@@ -51,6 +51,18 @@ Finally, the dataset we created in Step 1 has some metadata, so you can use the 
 
 <!-- todo: add script for evaluating intrinsic quality of synthetic data -->
 
+In order to compute intrinsic metrics on the synthesized dataset, you can run the following script:
+
+```bash
+python -m scripts.get_intrinsic_metrics \
+    --input_dataset <input_hf_dataset> \  # The HuggingFace ID of the dataset to compute intrinsic metrics on
+    --metrics <metric1> <metric2> ... \  # The intrinsic metrics to compute (e.g., perplexity, distinct_ri, etc) You can also put all to compute all available metrics
+    --metric_params <metric_fn::{\"param1\": value1},metric_fn2::{\"param2\": value2}> \  # (Optional) Additional parameters for the metrics in JSON format
+    --output_path <output_json_path> \  # (Optional) Path to save the intrinsic metrics JSON file
+```
+
+This command will output a JSON file in the specified output path (or in `./metrics/` by default) containing the computed intrinsic metrics for the dataset.
+
 ## Step 3: Finetune a student model from a base model
 
 ## Step 4: Evaluate the student model
