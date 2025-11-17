@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 import torch
+import pandas as pd
 from datasets import Dataset, load_dataset
 from langcodes import Language
 
@@ -103,8 +104,24 @@ def parse_metric_params(param_str: str) -> dict[str, dict]:
     return metric_params
 
 
-def subsample_per_strategy(dataset: Dataset) -> Dataset:
-    pass
+def subsample_per_strategy(
+    dataset: Dataset, total_num_samples: int = 10_000, random_state: int = 42
+) -> Dataset:
+    """Subsample the dataset to have roughly the same number of samples per strategy."""
+
+    df = dataset.to_pandas()
+    subsampled_dfs = []
+    for strategy in df["strategy"].unique():
+        strategy_df = df[df["strategy"] == strategy]
+        num_samples = max(1, total_num_samples // len(df["strategy"].unique()))
+        sampled_df = strategy_df.sample(
+            n=min(num_samples, len(strategy_df)), random_state=random_state
+        )
+        subsampled_dfs.append(sampled_df)
+
+    subsampled_df = pd.concat(subsampled_dfs).reset_index(drop=True)
+    breakpoint()
+    return subsampled_df
 
 
 def _compute_distinct_ri(
