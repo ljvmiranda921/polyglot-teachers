@@ -37,4 +37,5 @@ python -m scripts.get_intrinsic_metrics --input_dataset ljvmiranda921/msde-S1-ar
     --metrics all \
     --output_path /home/ljvm2/rds/hpc-work/multilingual-teacher-eval/metrics/msde-S1-ar_intrinsic_metrics.json \
     --metric_params '{"reward_model::{"language":"ar", "tensor_parallel_size": 2}}' \
-    --input_dataset_filter '{"model": ${MODEL}}'
+    --input_dataset_filter '{"model": ${MODEL}}' \
+    --apply_subsampling 
