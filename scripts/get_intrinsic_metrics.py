@@ -75,27 +75,47 @@ def main():
         logging.info("Dry run: using a small subset of the dataset (1000 samples).")
         dataset = dataset.shuffle().select(range(1000))
 
-    metric_scores = {}
-    for metric in metrics_to_compute:
-        metric_fn = get_intrinsic_metrics()[metric]
-        logging.info(f"Computing metric: {metric}")
-        params = metric_params.get(metric, {})
-        score = metric_fn(dataset, args.dry_run, **params)
-        logging.info(f">>> {score}")
-        metric_scores[metric] = score
-        time.sleep(120)
-
-    metric_scores["metadata"] = {
+    metadata = {
         "input_dataset": args.input_dataset,
         "num_samples": len(dataset),
         "input_dataset_filter": args.input_dataset_filter,
         "subsampling_results": subsampling_results if args.apply_subsampling else None,
     }
 
-    if not args.dry_run:
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(metric_scores, f, indent=4)
-        logging.info(f"Saved intrinsic metrics to: {output_path}")
+    save_scores(output_path, "metadata", metadata, append=False, dry_run=args.dry_run)
+
+    for metric in metrics_to_compute:
+        metric_fn = get_intrinsic_metrics()[metric]
+        logging.info(f"Computing metric: {metric}")
+        params = metric_params.get(metric, {})
+        score = metric_fn(dataset, args.dry_run, **params)
+        logging.info(f">>> {score}")
+        save_scores(output_path, metric, score, append=True, dry_run=args.dry_run)
+        # Sleep for 2 minutes to let vLLM release GPU memory
+        time.sleep(120)
+
+
+def save_scores(
+    output_path: Path,
+    metric_name: str,
+    metric_data: dict,
+    append: bool = False,
+    dry_run: bool = False,
+) -> None:
+    """Save or append metric scores to a JSON file."""
+    if dry_run:
+        return
+
+    if append:
+        with open(output_path, "r", encoding="utf-8") as f:
+            metric_scores = json.load(f)
+
+        metric_scores[metric_name] = metric_data
+    else:
+        metric_scores = {metric_name: metric_data}
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(metric_scores, f, indent=4)
 
 
 def parse_metric_params(param_str: str) -> dict[str, dict]:
