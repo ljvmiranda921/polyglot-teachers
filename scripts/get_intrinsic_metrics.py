@@ -174,9 +174,11 @@ def _compute_distinct_ri(
     dry_run: bool,
     *,
     embedding_model: str = "nvidia/llama-embed-nemotron-8b",
+    tensor_parallel_size: int = 2,
 ) -> dict[str, float]:
     """Compute the distinctiveness of the instructions and responses in the dataset."""
-    from sentence_transformers import SentenceTransformer
+    from vllm import LLM
+    from sentence_transformers.util import pytorch_cos_sim
 
     if "prompt" not in dataset.column_names or "response" not in dataset.column_names:
         raise ValueError("Dataset must contain 'prompt' and 'response' fields!")
@@ -186,11 +188,21 @@ def _compute_distinct_ri(
     if dry_run:
         embedding_model = "google/embeddinggemma-300m"
 
-    model = SentenceTransformer(embedding_model, trust_remote_code=True)
+    model = LLM(
+        model=embedding_model,
+        task="embed",
+        enforce_eager=True,
+        trust_remote_code=True,
+        tensor_parallel_size=tensor_parallel_size,
+    )
+
     metrics = {}
     for k, texts in {"prompts": prompts, "responses": responses}.items():
-        embeddings = model.encode(texts, convert_to_tensor=True)
-        similarity_matrix = model.similarity(embeddings, embeddings)
+        outputs = model.embed(texts)
+        embeddings = [output.embedding for output in outputs]
+
+        # Compute cosine similarity
+        similarity_matrix = pytorch_cos_sim(embeddings, embeddings)
         similarity_matrix = torch.nan_to_num(similarity_matrix, nan=0.0)
         n = similarity_matrix.shape[0]
         mask = ~torch.eye(n, dtype=bool)
