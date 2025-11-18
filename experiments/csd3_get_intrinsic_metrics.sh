@@ -46,12 +46,14 @@ source .venv/bin/activate
 python -m scripts.get_intrinsic_metrics --help
 
 # Compute across models (get 3.5k samples for each strategy)
-METRIC_PARAMS='distinct_ri::{"embedding_model":"google/embedinggemma-300m"}|reward_model::{"language": "'"$LANGUAGE"'", "tensor_parallel_size": 2, "model": "Unbabel/M-Prometheus-3B"}|perplexity::{"base_model":"google/gemma-3-270m","batch_size":64}'
+METRIC_PARAMS_SM='distinct_ri::{"embedding_model":"google/embedinggemma-300m"}|reward_model::{"language": "'"$LANGUAGE"'", "tensor_parallel_size": 2, "model": "Unbabel/M-Prometheus-3B"}|perplexity::{"base_model":"google/gemma-3-270m","batch_size":64}'
+METRIC_PARAMS_LG='distinct_ri::{"embedding_model":"nvidia/llama-embed-nemotron-8b","tensor_parallel_size":2}|reward_model::{"language": "'"$LANGUAGE"'", "tensor_parallel_size": 2, "model": "Unbabel/M-Prometheus-14B"}|perplexity::{"base_model":"google/gemma-3-270m","tensor_parallel_size":2,"batch_size":16}'
+
 INPUT_FILTER='{"model": "'"$MODEL"'"}'
 
 python -m scripts.get_intrinsic_metrics --input_dataset ljvmiranda921/msde-S1-${LANGUAGE} \
     --metrics all \
     --output_path /home/ljvm2/rds/hpc-work/dev/multilingual-teacher-eval/metrics/msde-S1-${LANGUAGE}_${MODEL//\//__}_intrinsic_metrics.json \
-    --metric_params "$METRIC_PARAMS" \
+    --metric_params "$METRIC_PARAMS_LG" \
     --input_dataset_filter "$INPUT_FILTER" \
     --apply_subsampling 
