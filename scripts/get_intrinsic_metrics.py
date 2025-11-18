@@ -38,6 +38,7 @@ def get_args():
     parser.add_argument("--dry_run", action="store_true", default=False, help="Will perform a dry run without saving any files and using a small amount of samples (1000).")
     parser.add_argument("--input_dataset_filter", type=str, default=None, help="JSON string representing a filter to apply to the input dataset before finetuning. The keys should be the field names and the values should be the values to filter by. This is an AND operation.")
     parser.add_argument("--apply_subsampling", action="store_true", default=False, help="Whether to apply subsampling to the dataset before computing metrics. This is to ensure that the number of samples per strategy is roughly the same.")
+    parser.add_argument("--overwrite", action="store_true", default=False, help="Whether to overwrite the output file if it already exists.")
     # fmt: on
     return parser.parse_args()
 
@@ -101,6 +102,7 @@ def save_scores(
     metric_data: dict,
     append: bool = False,
     dry_run: bool = False,
+    overwrite: bool = False,
 ) -> None:
     """Save or append metric scores to a JSON file."""
     if dry_run:
@@ -109,6 +111,13 @@ def save_scores(
     if append:
         with open(output_path, "r", encoding="utf-8") as f:
             metric_scores = json.load(f)
+
+        # Check if metric already exists and respect overwrite flag
+        if metric_name in metric_scores and not overwrite:
+            logging.info(
+                f"Metric '{metric_name}' already exists in file. Skipping (overwrite=False)."
+            )
+            return
 
         metric_scores[metric_name] = metric_data
     else:
