@@ -178,7 +178,8 @@ def _compute_distinct_ri(
 ) -> dict[str, float]:
     """Compute the distinctiveness of the instructions and responses in the dataset."""
     from vllm import LLM
-    from sentence_transformers.util import pytorch_cos_sim
+    from vllm.outputs import EmbeddingRequestOutput
+    from sentence_transformers.util import cos_sim
 
     if "prompt" not in dataset.column_names or "response" not in dataset.column_names:
         raise ValueError("Dataset must contain 'prompt' and 'response' fields!")
@@ -198,11 +199,11 @@ def _compute_distinct_ri(
 
     metrics = {}
     for k, texts in {"prompts": prompts, "responses": responses}.items():
-        outputs = model.embed(texts)
-        embeddings = [output.embedding for output in outputs]
+        outputs: list[EmbeddingRequestOutput] = model.embed(texts)
+        embeddings = [output.outputs.embedding for output in outputs]
 
         # Compute cosine similarity
-        similarity_matrix = pytorch_cos_sim(embeddings, embeddings)
+        similarity_matrix = cos_sim(embeddings, embeddings)
         similarity_matrix = torch.nan_to_num(similarity_matrix, nan=0.0)
         n = similarity_matrix.shape[0]
         mask = ~torch.eye(n, dtype=bool)
