@@ -83,7 +83,14 @@ def main():
         "subsampling_results": subsampling_results if args.apply_subsampling else None,
     }
 
-    save_scores(output_path, "metadata", metadata, append=False, dry_run=args.dry_run)
+    save_scores(
+        output_path,
+        "metadata",
+        metadata,
+        append=False,
+        dry_run=args.dry_run,
+        overwrite=args.overwrite,
+    )
 
     for metric in metrics_to_compute:
         metric_fn = get_intrinsic_metrics()[metric]
@@ -91,7 +98,14 @@ def main():
         params = metric_params.get(metric, {})
         score = metric_fn(dataset, args.dry_run, **params)
         logging.info(f">>> {score}")
-        save_scores(output_path, metric, score, append=True, dry_run=args.dry_run)
+        save_scores(
+            output_path,
+            metric,
+            score,
+            append=True,
+            dry_run=args.dry_run,
+            overwrite=args.overwrite,
+        )
         # Sleep for 2 minutes to let vLLM release GPU memory
         time.sleep(120)
 
@@ -107,6 +121,10 @@ def save_scores(
     """Save or append metric scores to a JSON file."""
     if dry_run:
         return
+
+    if output_path.exists():
+        # If output_path exists, always append to avoid data loss
+        append = True
 
     if append:
         with open(output_path, "r", encoding="utf-8") as f:
