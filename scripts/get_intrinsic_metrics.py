@@ -372,7 +372,7 @@ def _compute_rubric_score(
         instructions=instructions,
         responses=responses,
         rubric=rubrics,
-        params={"temperature": 0.3},  # TODO: figure out best setup
+        # params={"temperature": 0.3},  # TODO: figure out best setup
     )
 
     metrics = {"average_rubric_score": sum(scores) / len(scores)}
