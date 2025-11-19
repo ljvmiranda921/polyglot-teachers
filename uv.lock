@@ -3797,7 +3797,7 @@ wheels = [
 [[package]]
 name = "prometheus-eval"
 version = "0.1.20"
-source = { git = "https://github.com/ljvmiranda921/prometheus-eval?subdirectory=libs%2Fprometheus-eval#00e661943d67d0a28449429519bf8fe78581996e" }
+source = { git = "https://github.com/ljvmiranda921/prometheus-eval?subdirectory=libs%2Fprometheus-eval#877018c3bcf5c9b05cf699369255c747ec3d0769" }
 dependencies = [
     { name = "aiolimiter" },
     { name = "fastchat" },
