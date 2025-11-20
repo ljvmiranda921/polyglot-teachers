@@ -368,9 +368,10 @@ def _compute_rubric_score(
     instructions = dataset["prompt"]
     responses = dataset["response"]
     inputs = [
-        template.format(instruction=inst, response=resp, rubrics=rubrics)
+        template.format(instruction=inst, response=resp, rubric=rubrics)
         for inst, resp in zip(instructions, responses)
     ]
+    breakpoint()
 
     class Feedback(BaseModel):
         feedback: str
