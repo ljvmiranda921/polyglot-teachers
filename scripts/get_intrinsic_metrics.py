@@ -393,7 +393,8 @@ def _compute_rubric_score(
     feedbacks = [res.feedback for res in results]
     scores = [res.score for res in results]
 
-    metrics = {"average_rubric_score": sum(scores) / len(scores)}
+    not_none_scores = [s for s in scores if s is not None]
+    metrics = {"average_rubric_score": sum(not_none_scores) / len(not_none_scores)}
     if save_all_results:
         metrics["per_instance_rubric_scores"] = [
             {
