@@ -345,35 +345,53 @@ def _compute_rubric_score(
     dry_run: bool = False,
     *,
     language: str,
-    model: str = "Unbabel/M-Prometheus-14B",
+    model_name: str = "Unbabel/M-Prometheus-14B",
     tensor_parallel_size: int = 1,
     save_all_results: bool = True,
 ) -> dict:
-    from prometheus_eval import PrometheusEval
+    from typing import Literal
+
     from prometheus_eval.prompts import SCORE_RUBRIC_TEMPLATE
-    from prometheus_eval.vllm import VLLM
+    import outlines
+    from vllm import LLM, SamplingParams
 
     from scripts.utils.prompts import M_RUBRIC_PROMPT, get_rubric_criteria
+    from pydantic import BaseModel
 
     if dry_run:
-        model = "Unbabel/M-Prometheus-3B"
+        model_name = "Unbabel/M-Prometheus-3B"
 
+    # Prepare inputs
     lang_name = Language.make(language).display_name()
-    template = M_RUBRIC_PROMPT.format(language=lang_name)
     rubrics = SCORE_RUBRIC_TEMPLATE.format(**get_rubric_criteria(lang_name))
-
-    model = VLLM(model=model, trust_remote_code=True, tensor_parallel_size=tensor_parallel_size)  # fmt: skip
-    judge = PrometheusEval(model=model, absolute_grade_template=template)
-
+    template = M_RUBRIC_PROMPT.format(language=lang_name)
     instructions = dataset["prompt"]
     responses = dataset["response"]
+    inputs = [
+        template.format(instruction=inst, response=resp, rubrics=rubrics)
+        for inst, resp in zip(instructions, responses)
+    ]
 
-    feedbacks, scores = judge.absolute_grade(
-        instructions=instructions,
-        responses=responses,
-        rubric=rubrics,
-        # params={"temperature": 0.3},  # TODO: figure out best setup
+    class Feedback(BaseModel):
+        feedback: str
+        score: Literal[1, 2, 3, 4, 5]
+
+    model = outlines.from_vllm_offline(LLM(model_name, trust_remote_code=True, tensor_parallel_size=tensor_parallel_size))  # fmt: skip
+    results = model.batch(
+        inputs,
+        output_type=Feedback,
+        sampling_params=SamplingParams(
+            # Based on: https://github.com/ljvmiranda921/prometheus-eval/blob/dbbfb22a705af8c17dbf9f3217d2616935e8d948/libs/prometheus-eval/prometheus_eval/utils.py#L20-L24
+            temperature=1.0,
+            top_p=0.9,
+            max_tokens=2048,
+            best_of=1,
+            repetition_penalty=1.03,
+        ),
     )
+
+    feedbacks = [res.feedback for res in results]
+    scores = [res.score for res in results]
 
     metrics = {"average_rubric_score": sum(scores) / len(scores)}
     if save_all_results:
