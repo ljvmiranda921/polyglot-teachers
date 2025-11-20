@@ -371,7 +371,6 @@ def _compute_rubric_score(
         template.format(instruction=inst, response=resp, rubric=rubrics)
         for inst, resp in zip(instructions, responses)
     ]
-    breakpoint()
 
     class Feedback(BaseModel):
         feedback: str
