@@ -351,9 +351,9 @@ def _compute_rubric_score(
 ) -> dict:
     from typing import Literal
 
-    from prometheus_eval.prompts import SCORE_RUBRIC_TEMPLATE
     import outlines
-    from vllm import LLM, SamplingParams
+    from prometheus_eval.prompts import SCORE_RUBRIC_TEMPLATE
+    from transformers import AutoModelForCausalLM, AutoTokenizer
 
     from scripts.utils.prompts import M_RUBRIC_PROMPT, get_rubric_criteria
     from pydantic import BaseModel
@@ -376,19 +376,13 @@ def _compute_rubric_score(
         feedback: str
         score: Literal[1, 2, 3, 4, 5]
 
-    model = outlines.from_vllm_offline(LLM(model_name, trust_remote_code=True, tensor_parallel_size=tensor_parallel_size))  # fmt: skip
-    results = model.batch(
-        inputs,
-        output_type=Feedback,
-        sampling_params=SamplingParams(
-            # Based on: https://github.com/ljvmiranda921/prometheus-eval/blob/dbbfb22a705af8c17dbf9f3217d2616935e8d948/libs/prometheus-eval/prometheus_eval/utils.py#L20-L24
-            temperature=1.0,
-            top_p=0.9,
-            max_tokens=2048,
-            best_of=1,
-            repetition_penalty=1.03,
-        ),
+    model = outlines.from_transformers(
+        AutoModelForCausalLM.from_pretrained(model_name, device_map="auto"),
+        AutoTokenizer.from_pretrained(model_name),
     )
+    generator = outlines.Generator(model, output_type=Feedback)
+    # Based on: https://github.com/ljvmiranda921/prometheus-eval/blob/dbbfb22a705af8c17dbf9f3217d2616935e8d948/libs/prometheus-eval/prometheus_eval/utils.py#L20-L24
+    results = generator(inputs, temperature=1.0, top_p=0.9, max_new_tokens=2048)
 
     feedbacks = [res.feedback for res in results]
     scores = [res.score for res in results]
