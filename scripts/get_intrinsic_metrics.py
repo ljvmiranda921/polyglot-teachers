@@ -469,6 +469,7 @@ def _compute_rubric_score(
                 asyncio.as_completed(tasks),
                 total=len(tasks),
                 desc="Processing with OpenAI",
+                miniters=100,
             ):
                 result = await coro
                 results_with_indices.append(result)
