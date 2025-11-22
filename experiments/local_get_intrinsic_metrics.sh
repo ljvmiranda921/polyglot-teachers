@@ -17,7 +17,7 @@ LANGUAGES=(ar cs de es id ja)
 
 for LANGUAGE in "${LANGUAGES[@]}"; do
     for MODEL in "${MODELS[@]}"; do
-        METRIC_PARAMS='reward_model::{"model_name": "http://localhost:8080/v1", "provider":"openai_server","language":"'"$LANGUAGE"'"}'
+        METRIC_PARAMS='reward_model::{"model_name": "http://localhost:8080/v1", "provider":"openai_server","language":"'"$LANGUAGE"'", "max_concurrent_requests": 8}'
         INPUT_FILTER='{"model": "'"$MODEL"'"}'
         OUTPUT_PATH="metrics/msde-S1-${LANGUAGE}_${MODEL//\//__}_intrinsic_metrics.json"
         python -m scripts.get_intrinsic_metrics --input_dataset ljvmiranda921/msde-S1-${LANGUAGE} \
