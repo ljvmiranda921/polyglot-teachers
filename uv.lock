@@ -2573,6 +2573,18 @@ wheels = [
 ]
 
 [[package]]
+name = "llama-cpp-python"
+version = "0.3.16"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "diskcache" },
+    { name = "jinja2" },
+    { name = "numpy" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e4/b4/c8cd17629ced0b9644a71d399a91145aedef109c0333443bef015e45b704/llama_cpp_python-0.3.16.tar.gz", hash = "sha256:34ed0f9bd9431af045bb63d9324ae620ad0536653740e9bb163a2e1fcb973be6", size = 50688636, upload-time = "2025-08-15T04:58:29.212Z" }
+
+[[package]]
 name = "llguidance"
 version = "0.7.30"
 source = { registry = "https://pypi.org/simple" }
@@ -3048,6 +3060,7 @@ dependencies = [
     { name = "ctranslate2" },
     { name = "datasets" },
     { name = "langcodes" },
+    { name = "llama-cpp-python" },
     { name = "matplotlib" },
     { name = "mistral-common" },
     { name = "outlines" },
@@ -3079,6 +3092,7 @@ requires-dist = [
     { name = "ctranslate2", specifier = ">=4.6.0" },
     { name = "datasets", specifier = ">=3.0.2,<4.0.0" },
     { name = "langcodes", specifier = ">=3.5.0" },
+    { name = "llama-cpp-python", specifier = ">=0.3.16" },
     { name = "matplotlib", specifier = ">=3.10.7" },
     { name = "mistral-common", specifier = ">=1.8.5" },
     { name = "outlines", specifier = ">=1.2.8" },
