@@ -15,13 +15,16 @@ MODELS=(
 
 LANGUAGES=(ar cs de es id ja)
 
-
-METRIC_PARAMS='reward_model::{"model_name": "http://localhost:8080/v1", "provider":"openai_server","language":"'"$LANGUAGE"'"}'
-INPUT_FILTER='{"model": "'"$MODEL"'"}'
-OUTPUT_PATH="metrics/msde-S1-${LANGUAGE}_${MODEL//\//__}_intrinsic_metrics.json"
-python -m scripts.get_intrinsic_metrics --input_dataset ljvmiranda921/msde-S1-${LANGUAGE} \
-    --metrics reward_model \
-    --output_path "$OUTPUT_PATH" \
-    --metric_params "$METRIC_PARAMS" \
-    --input_dataset_filter "$INPUT_FILTER" \
-    --apply_subsampling
+for LANGUAGE in "${LANGUAGES[@]}"; do
+    for MODEL in "${MODELS[@]}"; do
+        METRIC_PARAMS='reward_model::{"model_name": "http://localhost:8080/v1", "provider":"openai_server","language":"'"$LANGUAGE"'"}'
+        INPUT_FILTER='{"model": "'"$MODEL"'"}'
+        OUTPUT_PATH="metrics/msde-S1-${LANGUAGE}_${MODEL//\//__}_intrinsic_metrics.json"
+        python -m scripts.get_intrinsic_metrics --input_dataset ljvmiranda921/msde-S1-${LANGUAGE} \
+            --metrics reward_model \
+            --output_path "$OUTPUT_PATH" \
+            --metric_params "$METRIC_PARAMS" \
+            --input_dataset_filter "$INPUT_FILTER" \
+            --apply_subsampling
+    done
+done
