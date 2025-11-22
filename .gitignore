@@ -221,3 +221,6 @@ data/*
 unsloth_compiled_cache/
 models/*
 metrics/*
+
+# Llama.cpp models
+*.gguf
