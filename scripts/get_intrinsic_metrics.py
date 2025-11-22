@@ -1,6 +1,7 @@
 import argparse
 import json
 import logging
+import os
 import sys
 import time
 from pathlib import Path
@@ -9,6 +10,7 @@ import torch
 import pandas as pd
 from datasets import Dataset, load_dataset
 from langcodes import Language
+from tqdm import tqdm
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -36,6 +38,7 @@ def get_args():
     parser.add_argument("--metrics", type=str, nargs="+", choices=["all"] + list(get_intrinsic_metrics().keys()), help="Intrinsic metric to compute.")
     parser.add_argument("--metric_params", type=str, default=None, help="Additional parameters for the metric in JSON format. You need to specify this as 'metric_fn::{\"param1\": value1, \"param2\": value2}|metric_fn2::...'.")
     parser.add_argument("--dry_run", action="store_true", default=False, help="Will perform a dry run without saving any files and using a small amount of samples (1000).")
+    parser.add_argument("--limit", type=int, default=None, help="Limit the number of samples to use from the dataset.")
     parser.add_argument("--input_dataset_filter", type=str, default=None, help="JSON string representing a filter to apply to the input dataset before finetuning. The keys should be the field names and the values should be the values to filter by. This is an AND operation.")
     parser.add_argument("--apply_subsampling", action="store_true", default=False, help="Whether to apply subsampling to the dataset before computing metrics. This is to ensure that the number of samples per strategy is roughly the same.")
     parser.add_argument("--overwrite", action="store_true", default=False, help="Whether to overwrite the output file if it already exists.")
@@ -75,6 +78,9 @@ def main():
     if args.dry_run:
         logging.info("Dry run: using a small subset of the dataset (1000 samples).")
         dataset = dataset.shuffle().select(range(1000))
+    if args.limit is not None:
+        logging.info(f"Limiting dataset to {args.limit} samples.")
+        dataset = dataset.select(range(args.limit))
 
     metadata = {
         "input_dataset": args.input_dataset,
@@ -373,16 +379,53 @@ def _compute_rubric_score(
     ]
 
     class Feedback(BaseModel):
-        feedback: str
         score: Literal[1, 2, 3, 4, 5]
+        feedback: str
 
-    model = outlines.from_transformers(
-        AutoModelForCausalLM.from_pretrained(model_name, device_map="auto"),
-        AutoTokenizer.from_pretrained(model_name),
-    )
-    generator = outlines.Generator(model, output_type=Feedback)
-    # Based on: https://github.com/ljvmiranda921/prometheus-eval/blob/dbbfb22a705af8c17dbf9f3217d2616935e8d948/libs/prometheus-eval/prometheus_eval/utils.py#L20-L24
-    results = generator.batch(inputs, temperature=1.0, top_p=0.9, max_new_tokens=2048)
+    if model_name.lower().endswith("gguf"):
+        # Infer that it's a GGUF model
+        from llama_cpp import Llama
+        from huggingface_hub import hf_hub_download
+
+        # Extract filename from model name (e.g., "M-Prometheus-3B-Q4_K_M-GGUF" -> "m-prometheus-3b-q4_k_m.gguf")
+        model_basename = model_name.split("/")[-1]
+        if model_basename.upper().endswith("-GGUF"):
+            model_basename = model_basename[:-5]  # Remove "-GGUF"
+        model_filename = model_basename.lower() + ".gguf"
+
+        logging.info(f"Downloading GGUF model {model_filename} from {model_name}...")
+        model_path = hf_hub_download(
+            repo_id=model_name,
+            filename=model_filename,
+            cache_dir="./models/",
+        )
+        logging.info(f"Model downloaded to {model_path}")
+
+        model = outlines.from_llamacpp(Llama(str(model_path), n_ctx=8192))
+        generator = outlines.Generator(model, output_type=Feedback)
+        results = []
+        for input in tqdm(inputs):
+            raw_output = generator(input, max_tokens=2048)
+            try:
+                results.append(Feedback.model_validate_json(raw_output))
+            except Exception as e:
+                logging.error(f"Validation error: {raw_output} | Error: {e}")
+                results.append(Feedback(score=1, feedback="Invalid output"))
+    else:
+        model = outlines.from_transformers(
+            AutoModelForCausalLM.from_pretrained(model_name, device_map="auto"),
+            AutoTokenizer.from_pretrained(model_name),
+        )
+        generator = outlines.Generator(model, output_type=Feedback)
+        # Based on: https://github.com/ljvmiranda921/prometheus-eval/blob/dbbfb22a705af8c17dbf9f3217d2616935e8d948/libs/prometheus-eval/prometheus_eval/utils.py#L20-L24
+        raw_outputs = generator.batch(inputs, max_new_tokens=2048)
+        results = []
+        for output in raw_outputs:
+            try:
+                results.append(Feedback.model_validate_json(output))
+            except Exception as e:
+                logging.error(f"Validation error: {output} | Error: {e}")
+                results.append(Feedback(score=1, feedback="Invalid output"))
 
     feedbacks = [res.feedback for res in results]
     scores = [res.score for res in results]
