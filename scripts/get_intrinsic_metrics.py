@@ -352,17 +352,19 @@ def _compute_rubric_score(
     *,
     language: str,
     model_name: str = "Unbabel/M-Prometheus-14B",
+    provider: str = "transformers",
     tensor_parallel_size: int = 1,
     save_all_results: bool = True,
+    openai_api_key: str = "EMPTY",
+    max_concurrent_requests: int = 4,
 ) -> dict:
     from typing import Literal
 
     import outlines
     from prometheus_eval.prompts import SCORE_RUBRIC_TEMPLATE
-    from transformers import AutoModelForCausalLM, AutoTokenizer
+    from pydantic import BaseModel
 
     from scripts.utils.prompts import M_RUBRIC_PROMPT, get_rubric_criteria
-    from pydantic import BaseModel
 
     if dry_run:
         model_name = "Unbabel/M-Prometheus-3B"
@@ -382,12 +384,12 @@ def _compute_rubric_score(
         score: Literal[1, 2, 3, 4, 5]
         feedback: str
 
-    if model_name.lower().endswith("gguf"):
-        # Infer that it's a GGUF model
+    if provider == "llamacpp":
         from llama_cpp import Llama
         from huggingface_hub import hf_hub_download
 
-        # Extract filename from model name (e.g., "M-Prometheus-3B-Q4_K_M-GGUF" -> "m-prometheus-3b-q4_k_m.gguf")
+        # Extract filename from model name
+        # (e.g., "M-Prometheus-3B-Q4_K_M-GGUF" -> "m-prometheus-3b-q4_k_m.gguf")
         model_basename = model_name.split("/")[-1]
         if model_basename.upper().endswith("-GGUF"):
             model_basename = model_basename[:-5]  # Remove "-GGUF"
@@ -411,7 +413,9 @@ def _compute_rubric_score(
             except Exception as e:
                 logging.error(f"Validation error: {raw_output} | Error: {e}")
                 results.append(Feedback(score=1, feedback="Invalid output"))
-    else:
+    elif provider == "transformers":
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+
         model = outlines.from_transformers(
             AutoModelForCausalLM.from_pretrained(model_name, device_map="auto"),
             AutoTokenizer.from_pretrained(model_name),
@@ -426,6 +430,64 @@ def _compute_rubric_score(
             except Exception as e:
                 logging.error(f"Validation error: {output} | Error: {e}")
                 results.append(Feedback(score=1, feedback="Invalid output"))
+    elif provider == "openai_server":
+        import asyncio
+        from openai import AsyncOpenAI
+
+        async def process_with_openai(inputs, base_url, api_key, max_concurrent):
+            """Process inputs asynchronously using OpenAI-compatible server."""
+            client = AsyncOpenAI(base_url=base_url, api_key=api_key)
+            semaphore = asyncio.Semaphore(max_concurrent)
+
+            async def process_single(input_text, index):
+                async with semaphore:
+                    try:
+                        response = await client.beta.chat.completions.parse(
+                            model=base_url,
+                            messages=[
+                                {
+                                    "role": "user",
+                                    "content": input_text,
+                                }
+                            ],
+                            response_format=Feedback,
+                            max_tokens=2048,
+                        )
+                        parsed = response.choices[0].message.parsed
+                        return index, parsed
+                    except Exception as e:
+                        logging.error(f"Error processing input {index}: {e}")
+                        return index, Feedback(score=1, feedback=f"Error: {str(e)}")
+
+            # Create tasks for all inputs with their indices
+            tasks = [process_single(inp, i) for i, inp in enumerate(inputs)]
+
+            # Process with progress bar
+            results_with_indices = []
+            for coro in tqdm(
+                asyncio.as_completed(tasks),
+                total=len(tasks),
+                desc="Processing with OpenAI",
+            ):
+                result = await coro
+                results_with_indices.append(result)
+
+            # Sort by original index to maintain order
+            results_with_indices.sort(key=lambda x: x[0])
+            return [result for _, result in results_with_indices]
+
+        logging.info(
+            f"Using OpenAI-compatible server at {model_name} with {max_concurrent_requests} concurrent requests"
+        )
+        results = asyncio.run(
+            process_with_openai(
+                inputs, model_name, openai_api_key, max_concurrent_requests
+            )
+        )
+    else:
+        raise ValueError(
+            f"Unknown provider: {provider}. Must be 'transformers', 'llamacpp', or 'openai_server'"
+        )
 
     feedbacks = [res.feedback for res in results]
     scores = [res.score for res in results]
@@ -445,7 +507,8 @@ def _compute_rubric_score(
 
     metrics["metadata"] = {
         "language": language,
-        "model": model,
+        "model": model_name,
+        "provider": provider,
     }
 
     return metrics
