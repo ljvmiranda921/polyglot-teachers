@@ -382,7 +382,7 @@ def _compute_rubric_score(
     )
     generator = outlines.Generator(model, output_type=Feedback)
     # Based on: https://github.com/ljvmiranda921/prometheus-eval/blob/dbbfb22a705af8c17dbf9f3217d2616935e8d948/libs/prometheus-eval/prometheus_eval/utils.py#L20-L24
-    results = generator(inputs, temperature=1.0, top_p=0.9, max_new_tokens=2048)
+    results = generator.batch(inputs, temperature=1.0, top_p=0.9, max_new_tokens=2048)
 
     feedbacks = [res.feedback for res in results]
     scores = [res.score for res in results]
