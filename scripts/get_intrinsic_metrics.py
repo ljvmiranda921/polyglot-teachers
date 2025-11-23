@@ -444,7 +444,7 @@ def _compute_rubric_score(
         results = []
         for output in raw_outputs:
             try:
-                results.append(Feedback.model_validate_json(output))
+                results.append(Feedback.model_validate_json(output.outputs[0].text))
             except Exception as e:
                 logging.error(f"Validation error: {output} | Error: {e}")
                 results.append(Feedback(score=1, feedback="Invalid output"))
