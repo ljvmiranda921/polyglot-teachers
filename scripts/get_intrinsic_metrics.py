@@ -433,18 +433,14 @@ def _compute_rubric_score(
                 results.append(Feedback(score=1, feedback="Invalid output"))
     elif provider == "vllm":
         from vllm import LLM, SamplingParams
-        from vllm.sampling_params import StructuredOutputsParams
+        from vllm.sampling_params import GuidedDecodingParams
 
-        model = outlines.from_vllm_offline(LLM(model=model_name, tensor_parallel_size=tensor_parallel_size))  # fmt: skip
-        generator = outlines.Generator(model, output_type=Feedback)
-        raw_outputs = generator.batch(
-            inputs,
-            sampling_params=SamplingParams(
-                structured_outputs=StructuredOutputsParams(
-                    json=Feedback.model_json_schema()
-                )
-            ),
+        llm = LLM(model=model_name, tensor_parallel_size=tensor_parallel_size)
+        sampling_params = SamplingParams(
+            max_tokens=4096,
+            guided_decoding=GuidedDecodingParams(json=Feedback.model_json_schema()),
         )
+        raw_outputs = llm.generate(inputs, sampling_params=sampling_params)
         results = []
         for output in raw_outputs:
             try:
