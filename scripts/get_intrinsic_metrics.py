@@ -431,6 +431,28 @@ def _compute_rubric_score(
             except Exception as e:
                 logging.error(f"Validation error: {output} | Error: {e}")
                 results.append(Feedback(score=1, feedback="Invalid output"))
+    elif provider == "vllm":
+        from vllm import LLM, SamplingParams
+        from vllm.sampling_params import StructuredOutputsParams
+
+        model = outlines.from_vllm_offline(LLM(model=model_name, tensor_parallel_size=tensor_parallel_size))  # fmt: skip
+        generator = outlines.Generator(model, output_type=Feedback)
+        raw_outputs = generator.batch(
+            inputs,
+            sampling_params=SamplingParams(
+                structured_outputs=StructuredOutputsParams(
+                    json=Feedback.model_json_schema()
+                )
+            ),
+        )
+        results = []
+        for output in raw_outputs:
+            try:
+                results.append(Feedback.model_validate_json(output))
+            except Exception as e:
+                logging.error(f"Validation error: {output} | Error: {e}")
+                results.append(Feedback(score=1, feedback="Invalid output"))
+
     elif provider == "openai_server":
         import asyncio
         from openai import AsyncOpenAI
@@ -488,7 +510,7 @@ def _compute_rubric_score(
         )
     else:
         raise ValueError(
-            f"Unknown provider: {provider}. Must be 'transformers', 'llamacpp', or 'openai_server'"
+            f"Unknown provider: {provider}. Must be 'transformers', 'llamacpp', 'vllm', or 'openai_server'"
         )
 
     feedbacks = [res.feedback for res in results]
