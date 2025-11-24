@@ -20,6 +20,7 @@ export HF_HOME=/home/ljvm2/rds/hpc-work/hpc_cache/huggingface
 export HF_HUB_CACHE=/home/ljvm2/rds/hpc-work/hpc_cache/hf_hub
 export VLLM_CACHE_ROOT=/home/ljvm2/rds/hpc-work/hpc_cache/vllm
 export OMP_NUM_THREADS=16
+export CUDA_VISIBLE_DEVICES=0,1
 
 MODELS=(
     "meta-llama/Llama-3.1-70B-Instruct"
@@ -48,7 +49,7 @@ python -m scripts.get_intrinsic_metrics --help
 # Compute across models (get 3.5k samples for each strategy)
 # Run each metric separately to allow vLLM to release memory between runs
 METRIC_PARAMS_SM='distinct_ri::{"embedding_model":"google/embeddinggemma-300m"}|reward_model::{"language": "'"$LANGUAGE"'", "tensor_parallel_size": 2, "model": "Unbabel/M-Prometheus-3B"}|perplexity::{"base_model":"google/gemma-3-270m","batch_size":64}'
-METRIC_PARAMS_LG='distinct_ri::{"embedding_model":"nvidia/llama-embed-nemotron-8b","tensor_parallel_size":2}|reward_model::{"language": "'"$LANGUAGE"'", "tensor_parallel_size": 2, "model": "Unbabel/M-Prometheus-14B"}|perplexity::{"base_model":"google/gemma-3-270m","batch_size":32}'
+METRIC_PARAMS_LG='distinct_ri::{"embedding_model":"nvidia/llama-embed-nemotron-8b","tensor_parallel_size":2}|reward_model::{"language": "'"$LANGUAGE"'", "tensor_parallel_size": 2, "model": "Unbabel/M-Prometheus-7B"}|perplexity::{"base_model":"google/gemma-3-4b-pt","batch_size":8}'
 
 METRIC_PARAMS="$METRIC_PARAMS_LG"
 
@@ -63,6 +64,8 @@ python -m scripts.get_intrinsic_metrics --input_dataset ljvmiranda921/msde-S1-${
     --input_dataset_filter "$INPUT_FILTER" \
     --apply_subsampling
 
+sleep 60
+
 # Run reward_model metric
 python -m scripts.get_intrinsic_metrics --input_dataset ljvmiranda921/msde-S1-${LANGUAGE} \
     --metrics reward_model \
@@ -70,6 +73,8 @@ python -m scripts.get_intrinsic_metrics --input_dataset ljvmiranda921/msde-S1-${
     --metric_params "$METRIC_PARAMS" \
     --input_dataset_filter "$INPUT_FILTER" \
     --apply_subsampling
+
+sleep 60
 
 # Run perplexity metric
 python -m scripts.get_intrinsic_metrics --input_dataset ljvmiranda921/msde-S1-${LANGUAGE} \
