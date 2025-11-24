@@ -288,8 +288,8 @@ def _compute_perplexity(
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = AutoModelForCausalLM.from_pretrained(base_model).to(device)
-    model.eval()
     tokenizer = AutoTokenizer.from_pretrained(base_model)
+    model.eval()
 
     total_perplexity = 0.0
     results = []
