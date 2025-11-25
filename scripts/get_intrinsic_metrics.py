@@ -104,7 +104,6 @@ def main():
         logging.info(f"Computing metric: {metric}")
         params = metric_params.get(metric, {})
         score = metric_fn(dataset, args.dry_run, **params)
-        logging.info(f">>> {score}")
         save_scores(
             output_path,
             metric,
