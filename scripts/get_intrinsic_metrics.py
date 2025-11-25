@@ -320,7 +320,10 @@ def _compute_perplexity(
                 labels[j, :inst_len] = -100
 
             outputs = model(**inputs, labels=labels)
-            losses = outputs.loss.item()
+
+            # Move loss to CPU immediately and free GPU tensors
+            losses = outputs.loss.detach().cpu().item()
+            del inputs, labels, outputs
 
             for j, instance in enumerate(batch):
                 perplexity = torch.exp(torch.tensor(losses)).item()
@@ -333,6 +336,10 @@ def _compute_perplexity(
                 }
 
                 results.append(result)
+
+            # Clear GPU cache after processing batch
+            if device == "cuda":
+                torch.cuda.empty_cache()
 
     metrics = {"average_perplexity": total_perplexity / len(instances)}
     if save_all_results:
