@@ -104,7 +104,6 @@ def main():
         logging.info(f"Computing metric: {metric}")
         params = metric_params.get(metric, {})
         score = metric_fn(dataset, args.dry_run, **params)
-        logging.info(f"Done!")
         save_scores(
             output_path,
             metric,
@@ -321,7 +320,10 @@ def _compute_perplexity(
                 labels[j, :inst_len] = -100
 
             outputs = model(**inputs, labels=labels)
-            losses = outputs.loss.item()
+
+            # Move loss to CPU immediately and free GPU tensors
+            losses = outputs.loss.detach().cpu().item()
+            del inputs, labels, outputs
 
             for j, instance in enumerate(batch):
                 perplexity = torch.exp(torch.tensor(losses)).item()
@@ -334,6 +336,10 @@ def _compute_perplexity(
                 }
 
                 results.append(result)
+
+            # Clear GPU cache every 10 batches to balance memory and performance
+            if device == "cuda" and (i // batch_size) % 10 == 0:
+                torch.cuda.empty_cache()
 
     metrics = {"average_perplexity": total_perplexity / len(instances)}
     if save_all_results:
