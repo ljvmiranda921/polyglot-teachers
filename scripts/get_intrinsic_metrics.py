@@ -337,8 +337,8 @@ def _compute_perplexity(
 
                 results.append(result)
 
-            # Clear GPU cache after processing batch
-            if device == "cuda":
+            # Clear GPU cache every 10 batches to balance memory and performance
+            if device == "cuda" and (i // batch_size) % 10 == 0:
                 torch.cuda.empty_cache()
 
     metrics = {"average_perplexity": total_perplexity / len(instances)}
