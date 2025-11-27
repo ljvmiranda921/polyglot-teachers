@@ -287,6 +287,7 @@ def _compute_perplexity(
     base_model: str = "google/gemma-3-4b-pt",
     batch_size: int = 8,
     save_all_results: bool = True,
+    max_length: int = 16_384,
 ) -> dict[str, float]:
     """Compute the perplexity of the responses in the dataset."""
 
@@ -321,13 +322,21 @@ def _compute_perplexity(
                 batch_inputs.append(instruction + response)
                 batch_instruction_lens.append(len(tokenizer(instruction)["input_ids"]))
 
-            # Tokenize batch
-            inputs = tokenizer(batch_inputs, return_tensors="pt", padding=True).to(device)  # fmt: skip
+            # Tokenize batch with truncation
+            inputs = tokenizer(
+                batch_inputs,
+                return_tensors="pt",
+                padding=True,
+                truncation=True,
+                max_length=max_length,
+            ).to(device)
             labels = inputs["input_ids"].clone()
 
             # Mask out loss for instruction tokens for each sequence in batch
             for j, inst_len in enumerate(batch_instruction_lens):
-                labels[j, :inst_len] = -100
+                # Ensure instruction length doesn't exceed truncated sequence length
+                actual_inst_len = min(inst_len, inputs["input_ids"].shape[1])
+                labels[j, :actual_inst_len] = -100
 
             outputs = model(**inputs, labels=labels)
 
@@ -358,6 +367,7 @@ def _compute_perplexity(
     metrics["metadata"] = {
         "base_model": base_model,
         "batch_size": batch_size,
+        "max_length": max_length,
     }
 
     return metrics
