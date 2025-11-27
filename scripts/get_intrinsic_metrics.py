@@ -100,6 +100,7 @@ def main():
     )
 
     for metric in metrics_to_compute:
+        start_time = time.time()
         metric_fn = get_intrinsic_metrics()[metric]
         logging.info(f"Computing metric: {metric}")
         params = metric_params.get(metric, {})
@@ -112,8 +113,17 @@ def main():
             dry_run=args.dry_run,
             overwrite=args.overwrite,
         )
+        time_elapsed = time.time() - start_time
+        logging.info(f"Done processing: {metric} (time elapsed={_get_human_time(metric_elapsed)})")  # fmt: skip
         # Sleep for 2 minutes to let vLLM release GPU memory
         time.sleep(120)
+
+
+def _get_human_time(seconds: float) -> str:
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    seconds = int(seconds % 60)
+    return f"{hours:02d}h{minutes:02d}m{seconds:02d}s"
 
 
 def save_scores(
@@ -300,7 +310,7 @@ def _compute_perplexity(
 
     # Reference: https://github.com/neulab/data-agora/blob/d7e66e12b03616caa42d818d5c2a387c127014ab/libs/data-agora/data_agora/core/intrinsic_evaluators.py#L127
     with torch.no_grad():
-        for i in range(0, len(instances), batch_size):
+        for i in tqdm(range(0, len(instances), batch_size)):
             batch = instances[i : i + batch_size]
 
             batch_inputs = []
