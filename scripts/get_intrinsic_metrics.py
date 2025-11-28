@@ -287,6 +287,7 @@ def _compute_perplexity(
     base_model: str = "google/gemma-3-4b-pt",
     batch_size: int = 8,
     save_all_results: bool = True,
+    max_length: int = 16_384,
 ) -> dict[str, float]:
     """Compute the perplexity of the responses in the dataset."""
 
@@ -321,13 +322,21 @@ def _compute_perplexity(
                 batch_inputs.append(instruction + response)
                 batch_instruction_lens.append(len(tokenizer(instruction)["input_ids"]))
 
-            # Tokenize batch
-            inputs = tokenizer(batch_inputs, return_tensors="pt", padding=True).to(device)  # fmt: skip
+            # Tokenize batch with truncation
+            inputs = tokenizer(
+                batch_inputs,
+                return_tensors="pt",
+                padding=True,
+                truncation=True,
+                max_length=max_length,
+            ).to(device)
             labels = inputs["input_ids"].clone()
 
             # Mask out loss for instruction tokens for each sequence in batch
             for j, inst_len in enumerate(batch_instruction_lens):
-                labels[j, :inst_len] = -100
+                # Ensure instruction length doesn't exceed truncated sequence length
+                actual_inst_len = min(inst_len, inputs["input_ids"].shape[1])
+                labels[j, :actual_inst_len] = -100
 
             outputs = model(**inputs, labels=labels)
 
@@ -358,6 +367,7 @@ def _compute_perplexity(
     metrics["metadata"] = {
         "base_model": base_model,
         "batch_size": batch_size,
+        "max_length": max_length,
     }
 
     return metrics
@@ -450,13 +460,29 @@ def _compute_rubric_score(
     elif provider == "vllm":
         from vllm import LLM, SamplingParams
         from vllm.sampling_params import GuidedDecodingParams
+        from transformers import AutoTokenizer
 
         llm = LLM(model=model_name, tensor_parallel_size=tensor_parallel_size)
+
+        # Truncate inputs to avoid context length issues
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        max_input_length = 8192  # Conservative limit for input tokens
+        truncated_inputs = []
+        for input_text in inputs:
+            tokens = tokenizer.encode(input_text)
+            if len(tokens) > max_input_length:
+                logging.warning(f"Truncating input from {len(tokens)} to {max_input_length} tokens")
+                truncated_tokens = tokens[:max_input_length]
+                truncated_text = tokenizer.decode(truncated_tokens, skip_special_tokens=True)
+                truncated_inputs.append(truncated_text)
+            else:
+                truncated_inputs.append(input_text)
+
         sampling_params = SamplingParams(
             max_tokens=4096,
             guided_decoding=GuidedDecodingParams(json=Feedback.model_json_schema()),
         )
-        raw_outputs = llm.generate(inputs, sampling_params=sampling_params)
+        raw_outputs = llm.generate(truncated_inputs, sampling_params=sampling_params)
         results = []
         for output in raw_outputs:
             try:
