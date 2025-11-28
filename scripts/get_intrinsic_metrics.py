@@ -460,13 +460,29 @@ def _compute_rubric_score(
     elif provider == "vllm":
         from vllm import LLM, SamplingParams
         from vllm.sampling_params import GuidedDecodingParams
+        from transformers import AutoTokenizer
 
         llm = LLM(model=model_name, tensor_parallel_size=tensor_parallel_size)
+
+        # Truncate inputs to avoid context length issues
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        max_input_length = 8192  # Conservative limit for input tokens
+        truncated_inputs = []
+        for input_text in inputs:
+            tokens = tokenizer.encode(input_text)
+            if len(tokens) > max_input_length:
+                logging.warning(f"Truncating input from {len(tokens)} to {max_input_length} tokens")
+                truncated_tokens = tokens[:max_input_length]
+                truncated_text = tokenizer.decode(truncated_tokens, skip_special_tokens=True)
+                truncated_inputs.append(truncated_text)
+            else:
+                truncated_inputs.append(input_text)
+
         sampling_params = SamplingParams(
             max_tokens=4096,
             guided_decoding=GuidedDecodingParams(json=Feedback.model_json_schema()),
         )
-        raw_outputs = llm.generate(inputs, sampling_params=sampling_params)
+        raw_outputs = llm.generate(truncated_inputs, sampling_params=sampling_params)
         results = []
         for output in raw_outputs:
             try:
