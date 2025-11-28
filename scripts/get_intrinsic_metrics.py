@@ -114,7 +114,7 @@ def main():
             overwrite=args.overwrite,
         )
         time_elapsed = time.time() - start_time
-        logging.info(f"Done processing: {metric} (time elapsed={_get_human_time(metric_elapsed)})")  # fmt: skip
+        logging.info(f"Done processing: {metric} (time elapsed={_get_human_time(time_elapsed)})")  # fmt: skip
         # Sleep for 2 minutes to let vLLM release GPU memory
         time.sleep(120)
 
