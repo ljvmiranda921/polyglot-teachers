@@ -384,6 +384,7 @@ def _compute_rubric_score(
     save_all_results: bool = True,
     openai_api_key: str = "EMPTY",
     max_concurrent_requests: int = 4,
+    max_input_length: Optional[int] = None,
 ) -> dict:
     from typing import Literal
 
@@ -466,23 +467,28 @@ def _compute_rubric_score(
 
         # Truncate inputs to avoid context length issues
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        max_input_length = 8192  # Conservative limit for input tokens
-        truncated_inputs = []
-        for input_text in inputs:
-            tokens = tokenizer.encode(input_text)
-            if len(tokens) > max_input_length:
-                logging.warning(f"Truncating input from {len(tokens)} to {max_input_length} tokens")
-                truncated_tokens = tokens[:max_input_length]
-                truncated_text = tokenizer.decode(truncated_tokens, skip_special_tokens=True)
-                truncated_inputs.append(truncated_text)
-            else:
-                truncated_inputs.append(input_text)
+        if max_input_length:
+            logging.info(f"Truncating inputs to max length of {max_input_length} tokens")  # fmt: skip
+            _inputs = []
+            for input_text in inputs:
+                tokens = tokenizer.encode(input_text)
+                if len(tokens) > max_input_length:
+                    logging.warning(f"Truncating input from {len(tokens)} to {max_input_length} tokens")  # fmt: skip
+                    truncated_tokens = tokens[:max_input_length]
+                    truncated_text = tokenizer.decode(
+                        truncated_tokens, skip_special_tokens=True
+                    )
+                    _inputs.append(truncated_text)
+                else:
+                    _inputs.append(input_text)
+        else:
+            _inputs = inputs
 
         sampling_params = SamplingParams(
             max_tokens=4096,
             guided_decoding=GuidedDecodingParams(json=Feedback.model_json_schema()),
         )
-        raw_outputs = llm.generate(truncated_inputs, sampling_params=sampling_params)
+        raw_outputs = llm.generate(_inputs, sampling_params=sampling_params)
         results = []
         for output in raw_outputs:
             try:
