@@ -221,6 +221,8 @@ data/*
 unsloth_compiled_cache/
 models/*
 metrics/*
+notebooks/.ipynb_checkpoints/
+notebooks/**/data/*
 
 # Llama.cpp models
 *.gguf
