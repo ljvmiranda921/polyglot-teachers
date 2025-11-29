@@ -5,15 +5,14 @@ from typing import Optional
 class ModelInfo(BaseModel):
     name: str
     model_family: str
+    url: Optional[str] = None
 
     # Model characteristics
     parameter_size: float
     context_length: Optional[int] = None
 
     # Multilingual capability
-    pct_multi_pretraining: Optional[float] = (
-        None  # % of multilingual data in pretraining
-    )
+    pct_multi_pretraining: Optional[float] = None
     num_languages_supported: Optional[int] = None
 
     # Training approach
