@@ -1,12 +1,16 @@
-# Model information
-
 from pydantic import BaseModel
+from typing import Optional
 
 
 class ModelInfo(BaseModel):
     name: str
     model_family: str
+    # Model characteristics
     parameter_size: float
+    pct_multi_pretraining: Optional[float] = None
+    # Cost
+    cost_in_mtok: Optional[float] = None
+    cost_out_mtok: Optional[float] = None
 
 
 MODEL_INFORMATION: list[ModelInfo] = [
