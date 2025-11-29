@@ -5,30 +5,28 @@ from typing import Optional
 class ModelInfo(BaseModel):
     name: str
     model_family: str
+
     # Model characteristics
     parameter_size: float
-    pct_multi_pretraining: Optional[float] = None
-    # Cost
-    cost_in_mtok: Optional[float] = None
-    cost_out_mtok: Optional[float] = None
+    context_length: Optional[int] = None
+
+    # Multilingual capability
+    pct_multi_pretraining: Optional[float] = (
+        None  # % of multilingual data in pretraining
+    )
+    num_languages_supported: Optional[int] = None
+
+    # Training approach
+    instruction_tuned: Optional[bool] = None
+    training_approach: Optional[list[str]] = None  # e.g., ["SFT", "RLHF"], ["DPO"]
+
+    # Cost & efficiency
+    cost_in_mtok: Optional[float] = None  # Cost per million input tokens (USD)
+    cost_out_mtok: Optional[float] = None  # Cost per million output tokens (USD)
+
+    # Metadata
+    release_date: Optional[str] = None  # YYYY-MM format
+    license: Optional[str] = None  # e.g., "apache-2.0", "proprietary"
 
 
-MODEL_INFORMATION: list[ModelInfo] = [
-    # fmt: off
-    # Cohere models
-    ModelInfo(name="CohereLabs/aya-expanse-32b", model_family="cohere", parameter_size=32.0),
-    ModelInfo(name="cohere-command-a", model_family="cohere", parameter_size=104.0),
-    # Google Gemma models
-    ModelInfo(name="google/gemma-3-4b-it", model_family="gemma", parameter_size=4.0),
-    ModelInfo(name="google/gemma-3-12b-it", model_family="gemma", parameter_size=12.0),
-    ModelInfo(name="google/gemma-3-27b-it", model_family="gemma", parameter_size=27.0),
-    # OpenAI models
-    ModelInfo(name="gpt-4o-mini-2024-07-18", model_family="gpt", parameter_size=8.0),
-    # IBM Granite models
-    ModelInfo(name="ibm-granite/granite-4.0-micro", model_family="granite", parameter_size=0.5),
-    ModelInfo(name="ibm-granite/granite-4.0-1b", model_family="granite", parameter_size=1.0),
-    # Meta Llama models
-    ModelInfo(name="meta-llama/Llama-3.1-8B-Instruct", model_family="llama", parameter_size=8.0),
-    ModelInfo(name="meta-llama/Llama-3.1-70B-Instruct", model_family="llama", parameter_size=70.0),
-    # fmt: on
-]
+MODEL_INFORMATION: list[ModelInfo] = []
