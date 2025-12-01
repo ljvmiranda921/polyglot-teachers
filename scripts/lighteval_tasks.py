@@ -13,7 +13,7 @@ from lighteval.utils.language import Language
 
 GLOBAL_MMLU_LITE = [
     LightevalTaskConfig(
-        name=f"global_mmlu_lite_{language.value}_mcf",
+        name=f"global_mmlu_lite:{standardize_tag(language.value)}",
         prompt_function=get_mcq_prompt_function(
             language,
             lambda line: {
@@ -28,7 +28,7 @@ GLOBAL_MMLU_LITE = [
             },
             formulation=MCFFormulation(),
         ),
-        suite=("community",),
+        suite=("lighteval",),
         hf_repo="CohereForAI/Global-MMLU-Lite",
         hf_subset=standardize_tag(language.value),
         evaluation_splits=("test",),
@@ -51,6 +51,7 @@ GLOBAL_MMLU_LITE = [
     ]
 ]
 
-TASKS_TABLE: list[LightevalTaskConfig] = [
-    GLOBAL_MMLU_LITE,
-]
+M_GSM = []
+
+
+TASKS_TABLE: list[LightevalTaskConfig] = GLOBAL_MMLU_LITE
