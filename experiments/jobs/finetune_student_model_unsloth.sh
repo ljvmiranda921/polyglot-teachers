@@ -1,9 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=sft
-#! change to gpu:4 to use all 4 GPU cards on a GPU node.
-#SBATCH --nodelist=ltl-gpu05
-#SBATCH --gres=gpu:1
-#SBATCH --output=gpu-%j.log
+# Job execution script for finetuning student model with unsloth
 
 # Parse arguments
 INPUT_DATASET=${1:-"ljvmiranda921/msde-S1-es"}
