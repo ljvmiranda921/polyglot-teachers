@@ -64,8 +64,14 @@ GLOBAL_MMLU_LITE = [
 ]
 
 
-def get_judge_prompt_mrewardbench():
-    pass
+def get_judge_prompt_mrewardbench(question, answer, gold, **kwargs):
+    MREWARDBENCH_TEMPLATE = ""
+    content = MREWARDBENCH_TEMPLATE.format(
+        question=question,
+        target=gold,
+        predicted_answer=answer,
+    )
+    return [{"role": "user", "content": content}]
 
 
 def process_judge_response_mrewardbench(response: str) -> float:
@@ -80,6 +86,7 @@ def process_judge_response_mrewardbench(response: str) -> float:
 
 class JudgeMRewardBench(JudgeLLM):
     def __init__(self):
+        # TODO: update this. use as reference: https://github.com/huggingface/lighteval/blob/main/src/lighteval/metrics/metrics_sample.py#L1011
         super().__init__(
             judge_model_name="gpt-4o-2024-08-06",
             template=get_judge_prompt_mrewardbench,
@@ -91,8 +98,13 @@ class JudgeMRewardBench(JudgeLLM):
     def compute(
         self, responses: list[ModelResponse], docs: list[Doc], **kwargs
     ) -> list:
+        # TODO
         pass
 
+
+# the judge is then passed on to the SampleMetric: https://github.com/huggingface/lighteval/blob/99ef5b98d422cf3620eebec9db13285493d35542/src/lighteval/metrics/metrics.py#L553C1-L562C6
+# which is then passed on to the metrics in the LightEvaltask config: https://github.com/huggingface/lighteval/blob/99ef5b98d422cf3620eebec9db13285493d35542/src/lighteval/tasks/tasks/mt_bench/main.py#L82
+# but it's kinda weird because you see something like this: https://github.com/huggingface/lighteval/blob/99ef5b98d422cf3620eebec9db13285493d35542/src/lighteval/tasks/tasks/mt_bench/main.py#L38
 
 M_REWARDBENCH = []
 
