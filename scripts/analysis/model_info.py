@@ -67,11 +67,13 @@ MODEL_INFORMATION: list[ModelInfo] = [
         name="gpt-4o-mini-2024-07-18",
         model_family="GPT-4o",
         parameter_size="Unknown",
+        context_length=128_000,
     ),
     ModelInfo(
         name="ibm-granite/granite-4.0-1b",
         model_family="Granite",
         parameter_size=1.0,
+        context_length=128_000,
     ),
     ModelInfo(
         name="ibm-granite/granite-4.0-micro",
@@ -84,10 +86,12 @@ MODEL_INFORMATION: list[ModelInfo] = [
         name="meta-llama/Llama-3.1-70B-Instruct",
         model_family="Llama",
         parameter_size=70.0,
+        context_length=8_000,
     ),
     ModelInfo(
         name="meta-llama/Llama-3.1-8B-Instruct",
         model_family="Llama",
         parameter_size=8.0,
+        context_length=8_000,
     ),
 ]
