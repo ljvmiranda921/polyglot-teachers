@@ -23,6 +23,9 @@ class ModelInfo(BaseModel):
     cost_in_mtok: Optional[float] = None  # Cost per million input tokens (USD)
     cost_out_mtok: Optional[float] = None  # Cost per million output tokens (USD)
 
+    # Performance
+    benchmark_scores: Optional[dict[str, float]] = None
+
     # Metadata
     release_date: Optional[str] = None  # YYYY-MM format
     license: Optional[str] = None  # e.g., "apache-2.0", "proprietary"
