@@ -226,3 +226,6 @@ notebooks/**/data/*
 
 # Llama.cpp models
 *.gguf
+
+# Litellm cache
+.litellm_cache/
