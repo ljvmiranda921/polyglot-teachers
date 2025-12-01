@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Literal
 
 
 class ModelInfo(BaseModel):
@@ -8,7 +8,7 @@ class ModelInfo(BaseModel):
     url: Optional[str] = None
 
     # Model characteristics
-    parameter_size: float
+    parameter_size: float | Literal["Unknown"]
     context_length: Optional[int] = None
 
     # Multilingual capability
@@ -32,53 +32,62 @@ MODEL_INFORMATION: list[ModelInfo] = [
     ModelInfo(
         name="CohereLabs/aya-expanse-32b",
         model_family="Aya",
-        parameter_size=32.0,  # TODO: Fill in
+        parameter_size=32.0,
         context_length=128_000,
         num_languages_supported=23,
     ),
     ModelInfo(
         name="cohere-command-a",
         model_family="Command",
-        parameter_size=111.0,  # TODO: Fill in
-    ),
-    ModelInfo(
-        name="google/gemma-3-12b-it",
-        model_family="Gemma",
-        parameter_size=0.0,  # TODO: Fill in
+        parameter_size=111.0,
+        context_length=256_000,
     ),
     ModelInfo(
         name="google/gemma-3-27b-it",
         model_family="Gemma",
-        parameter_size=0.0,  # TODO: Fill in
+        parameter_size=27.0,
+        context_length=128_000,
+        num_languages_supported=140,
+    ),
+    ModelInfo(
+        name="google/gemma-3-12b-it",
+        model_family="Gemma",
+        parameter_size=12.0,
+        context_length=128_000,
+        num_languages_supported=140,
     ),
     ModelInfo(
         name="google/gemma-3-4b-it",
         model_family="Gemma",
-        parameter_size=0.0,  # TODO: Fill in
+        parameter_size=4.0,
+        context_length=128_000,
+        num_languages_supported=140,
     ),
     ModelInfo(
         name="gpt-4o-mini-2024-07-18",
         model_family="GPT-4o",
-        parameter_size=0.0,  # TODO: Fill in
+        parameter_size="Unknown",
     ),
     ModelInfo(
         name="ibm-granite/granite-4.0-1b",
         model_family="Granite",
-        parameter_size=0.0,  # TODO: Fill in
+        parameter_size=1.0,
     ),
     ModelInfo(
         name="ibm-granite/granite-4.0-micro",
         model_family="Granite",
-        parameter_size=0.0,  # TODO: Fill in
+        parameter_size=3.0,
+        context_length=128_000,
+        num_languages_supported=12,
     ),
     ModelInfo(
         name="meta-llama/Llama-3.1-70B-Instruct",
         model_family="Llama",
-        parameter_size=0.0,  # TODO: Fill in
+        parameter_size=70.0,
     ),
     ModelInfo(
         name="meta-llama/Llama-3.1-8B-Instruct",
         model_family="Llama",
-        parameter_size=0.0,  # TODO: Fill in
+        parameter_size=8.0,
     ),
 ]
