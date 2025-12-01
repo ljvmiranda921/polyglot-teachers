@@ -32,12 +32,14 @@ MODEL_INFORMATION: list[ModelInfo] = [
     ModelInfo(
         name="CohereLabs/aya-expanse-32b",
         model_family="Aya",
-        parameter_size=0.0,  # TODO: Fill in
+        parameter_size=32.0,  # TODO: Fill in
+        context_length=128_000,
+        num_languages_supported=23,
     ),
     ModelInfo(
         name="cohere-command-a",
         model_family="Command",
-        parameter_size=0.0,  # TODO: Fill in
+        parameter_size=111.0,  # TODO: Fill in
     ),
     ModelInfo(
         name="google/gemma-3-12b-it",
