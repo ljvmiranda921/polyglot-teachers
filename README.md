@@ -21,9 +21,4 @@ source .venv/bin/activate
 ```
 
 For more information on how to use this codebase, please refer to the [documentation](DOCUMENTATION.md).
-
-### (Internal) Working in the LTL Cluster
-
-Some commands can be run inside the LTL Slurm cluster.
-You can check the [experiments folder](experiments/) for example scripts that start with `ltl` to reproduce the datasets and experiments.
-There are also equivalent scripts for running commands in [CSD3](https://www.csd3.cam.ac.uk/), these are prepended with `csd3`.
+For information on running experiments on the cluster, see the [experiment documentation](experiments/README.md).
