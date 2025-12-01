@@ -105,6 +105,8 @@ class JudgeMRewardBench(JudgeLLM):
 # the judge is then passed on to the SampleMetric: https://github.com/huggingface/lighteval/blob/99ef5b98d422cf3620eebec9db13285493d35542/src/lighteval/metrics/metrics.py#L553C1-L562C6
 # which is then passed on to the metrics in the LightEvaltask config: https://github.com/huggingface/lighteval/blob/99ef5b98d422cf3620eebec9db13285493d35542/src/lighteval/tasks/tasks/mt_bench/main.py#L82
 # but it's kinda weird because you see something like this: https://github.com/huggingface/lighteval/blob/99ef5b98d422cf3620eebec9db13285493d35542/src/lighteval/tasks/tasks/mt_bench/main.py#L38
+# IGNORE EVERYTHING ABOVE. I THINK THIS IS JUST MCQ. what the others did is that an LM made a response, and then it's judged.
+# FOR US IT"S JUST MCQ!! SO SIMPLE! don't do the things above!!
 
 M_REWARDBENCH = []
 
