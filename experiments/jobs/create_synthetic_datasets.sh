@@ -1,11 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=synthesize-data
-#! change to gpu:4 to use all 4 GPU cards on a GPU node.
-#SBATCH --nodelist=ltl-gpu05
-#SBATCH --gres=gpu:2
-#SBATCH --time=04:00:00
-#SBATCH --output=gpu-%j.log
-#SBATCH --array=0-5
+# Job execution script for creating synthetic datasets
 
 # Parse arguments
 MODEL=${1:-"meta-llama/Llama-3.1-8B-Instruct"}
@@ -26,7 +20,6 @@ python -m scripts.synthesize_data --input_dataset ljvmiranda921/msde-seed-S1 \
     --backend ${BACKEND} \
     --model ${MODEL} \
     --shuffle 921 \
-    --no_cache \
     --append \
     --backend_params '{"tensor_parallel_size":2,"gpu_memory_utilization":0.7, "max_model_length":4096, "require_all_responses": false}' \
     --generation_params '{"temperature": 0.8, "top_p": 0.9}'
