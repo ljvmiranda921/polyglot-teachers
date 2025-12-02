@@ -7,7 +7,11 @@ from langcodes import standardize_tag
 from lighteval.metrics.dynamic_metrics import loglikelihood_acc_metric
 from lighteval.metrics.normalizations import LogProbCharNorm  # fmt: skip
 from lighteval.metrics.normalizations import LogProbPMINorm, LogProbTokenNorm
-from lighteval.metrics.utils.metric_utils import CorpusLevelMetric, MetricCategory, MetricUseCase
+from lighteval.metrics.utils.metric_utils import (
+    CorpusLevelMetric,
+    MetricCategory,
+    MetricUseCase,
+)
 from lighteval.tasks.default_prompts import LETTER_INDICES
 from lighteval.tasks.lighteval_task import LightevalTaskConfig
 from lighteval.tasks.multilingual.utils.task_utils import get_metrics_for_formulation
@@ -162,7 +166,7 @@ def compute_mrewardbench_weighted_acc(items: list) -> float:
 
     for item in items:
         # Extract source/subset from item (adjust field name as needed)
-        subset = item.source if hasattr(item, 'source') else "Unknown"
+        subset = item.source if hasattr(item, "source") else "Unknown"
 
         if subset not in subset_items:
             subset_items[subset] = []
@@ -185,10 +189,16 @@ def compute_mrewardbench_weighted_acc(items: list) -> float:
                 weighted_sum += subset_accuracies[subset] * count
                 total_examples += count
 
-        category_accuracies[category] = weighted_sum / total_examples if total_examples > 0 else 0.0
+        category_accuracies[category] = (
+            weighted_sum / total_examples if total_examples > 0 else 0.0
+        )
 
     # Average across categories
-    return sum(category_accuracies.values()) / len(category_accuracies) if category_accuracies else 0.0
+    return (
+        sum(category_accuracies.values()) / len(category_accuracies)
+        if category_accuracies
+        else 0.0
+    )
 
 
 # Corpus-level metric for M-RewardBench weighted accuracy
@@ -271,14 +281,10 @@ M_REWARDBENCH = [
         hf_subset=iso2_to_extended.get(standardize_tag(language.value)),
         evaluation_splits=("test",),
         few_shots_split="test",
-        metric=get_metrics_for_formulation(
-            MCFFormulation(),
-            [
-                loglikelihood_acc_metric(normalization=LogProbTokenNorm()),
-                loglikelihood_acc_metric(normalization=LogProbCharNorm()),
-                loglikelihood_acc_metric(normalization=LogProbPMINorm()),
-            ],
-        ),
+        metric=[
+            loglikelihood_acc_metric(normalization=LogProbTokenNorm()),
+            mrewardbench_weighted_acc_metric,
+        ],
     )
     for language in [
         Language.ARABIC,
@@ -296,23 +302,34 @@ TASKS_TABLE: list[LightevalTaskConfig] = GLOBAL_MMLU_LITE + M_REWARDBENCH
 
 # ==== Usage Example for Weighted Metric ====
 #
-# To use the weighted accuracy metric in M_REWARDBENCH tasks, just add mrewardbench_weighted_acc_metric
-# to your metric list:
+# To use the weighted accuracy metric in M_REWARDBENCH tasks, add mrewardbench_weighted_acc_metric
+# to your metric list.
+#
+# IMPORTANT: Don't use get_metrics_for_formulation with default MCFFormulation() as it will
+# override your metrics! Either:
+# 1. Pass metrics directly, OR
+# 2. Use MCFFormulation(choice_prefix=None) to avoid override
 #
 # M_REWARDBENCH = [
 #     LightevalTaskConfig(
 #         name=f"mrewardbench:{standardize_tag(language.value)}",
 #         prompt_function=...,
 #         # ... other config ...
-#         metric=get_metrics_for_formulation(
-#             MCFFormulation(),
-#             [
-#                 loglikelihood_acc_metric(normalization=LogProbTokenNorm()),
-#                 loglikelihood_acc_metric(normalization=LogProbCharNorm()),
-#                 loglikelihood_acc_metric(normalization=LogProbPMINorm()),
-#                 mrewardbench_weighted_acc_metric,  # ← Just add this!
-#             ],
-#         ),
+#         # Option 1: Pass metrics directly (RECOMMENDED)
+#         metric=[
+#             loglikelihood_acc_metric(normalization=LogProbTokenNorm()),
+#             loglikelihood_acc_metric(normalization=LogProbCharNorm()),
+#             loglikelihood_acc_metric(normalization=LogProbPMINorm()),
+#             mrewardbench_weighted_acc_metric,
+#         ],
+#         # Option 2: Use get_metrics_for_formulation with choice_prefix=None
+#         # metric=get_metrics_for_formulation(
+#         #     MCFFormulation(choice_prefix=None),
+#         #     [
+#         #         loglikelihood_acc_metric(normalization=LogProbTokenNorm()),
+#         #         mrewardbench_weighted_acc_metric,
+#         #     ],
+#         # ),
 #     )
 #     for language in [...]
 # ]
