@@ -4,7 +4,6 @@ from typing import Any
 import random
 
 from langcodes import standardize_tag
-from langcodes import Language as LangCodeLanguage
 from lighteval.metrics.dynamic_metrics import loglikelihood_acc_metric
 from lighteval.metrics.normalizations import LogProbCharNorm  # fmt: skip
 from lighteval.metrics.normalizations import LogProbPMINorm, LogProbTokenNorm
@@ -110,21 +109,22 @@ def get_mrewardbench_eval_instances(line: dict) -> dict[str, Any]:
     choices = [responses[0][1], responses[1][1]]
 
     question = PROMPT_TEMPLATE.format(
-        src_lang=line["source_language"],
-        tgt_lang=line["target_language"],
+        src_lang=line["language"],
+        tgt_lang=line["language"],
         question=line["prompt"],
     )
 
     return {"question": question, "choices": choices, "gold_idx": gold_idx}
 
 
-def iso2_to_extended_format(iso2_code: str) -> str:
-    """Convert ISO 639-1 (2-letter) language code to extended format with script."""
-    lang = LangCodeLanguage.get(iso2_code)
-    maximized = lang.maximize()
-    alpha3 = lang.to_alpha3()
-    script = maximized.script
-    return f"{alpha3}_{script}" if script else alpha3
+iso2_to_extended = {
+    "ar": "arb_Arab",
+    "cs": "ces_Latn",
+    "de": "deu_Latn",
+    "es": "spa_Latn",
+    "id": "ind_Latn",
+    "ja": "jpn_Jpan",
+}
 
 
 M_REWARDBENCH = [
@@ -137,7 +137,7 @@ M_REWARDBENCH = [
         ),
         suite=("lighteval",),
         hf_repo="CohereLabsCommunity/multilingual-reward-bench",
-        hf_subset=iso2_to_extended_format(standardize_tag(language.value)),
+        hf_subset=iso2_to_extended.get(standardize_tag(language.value)),
         evaluation_splits=("test",),
         few_shots_split="test",
         metric=get_metrics_for_formulation(
