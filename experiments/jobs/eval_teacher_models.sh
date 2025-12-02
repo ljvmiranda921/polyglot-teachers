@@ -1,20 +1,22 @@
 #!/bin/bash
+# Recommended SBATCH --array: 14 tasks x 9 models (e.g., 14x9=126)
 
+# Run those with all languages available first
 TASKS=(
-    "lighteval|global_mmlu_lite:ar|0|0"
     "lighteval|global_mmlu_lite:de|0|0"
     "lighteval|global_mmlu_lite:es|0|0"
-    "lighteval|global_mmlu_lite:id|0|0"
     "lighteval|global_mmlu_lite:ja|0|0"
-    "lighteval|mrewardbench_mcf:ar|0|0"
-    "lighteval|mrewardbench_mcf:cs|0|0"
     "lighteval|mrewardbench_mcf:de|0|0"
     "lighteval|mrewardbench_mcf:es|0|0"
-    "lighteval|mrewardbench_mcf:id|0|0"
     "lighteval|mrewardbench_mcf:ja|0|0"
     "lighteval|mgsm:de|0|0"
     "lighteval|mgsm:es|0|0"
     "lighteval|mgsm:ja|0|0"
+    "lighteval|global_mmlu_lite:ar|0|0"
+    "lighteval|mrewardbench_mcf:ar|0|0"
+    "lighteval|global_mmlu_lite:id|0|0"
+    "lighteval|mrewardbench_mcf:id|0|0"
+    "lighteval|mrewardbench_mcf:cs|0|0"
 )
 
 MODELS=(
