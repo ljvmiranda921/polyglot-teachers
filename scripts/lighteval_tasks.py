@@ -73,7 +73,11 @@ GLOBAL_MMLU_LITE = [
 
 
 def get_mrewardbench_eval_instances(line: dict) -> dict[str, Any]:
-    """Returns an eval instance of M-RewardBench containing the question, choices, and gold index."""
+    """Returns an eval instance of M-RewardBench containing the question, choices, and gold index.
+
+    The chosen and rejected responses are shuffled randomly, and gold_idx tracks which position
+    contains the chosen (correct) response.
+    """
     # Reference: https://github.com/Cohere-Labs-Community/m-rewardbench/blob/main/scripts/generative.py#L218
     PROMPT_TEMPLATE = (
         "Please act as an impartial judge and evaluate the quality of the responses provided by two AI assistants to the user question displayed below. "  # noqa
@@ -81,7 +85,7 @@ def get_mrewardbench_eval_instances(line: dict) -> dict[str, Any]:
         "You should choose the assistant that follows the user's instructions and answers the user's question better. "  # noqa
         "Your evaluation should consider factors such as the helpfulness, relevance, accuracy, depth, creativity, and level of detail of their responses. "  # noqa
         "Also, make sure that the assistant responses are in {tgt_lang}. "  # noqa
-        "Begin your evaluation by comparing the two responses and provide a short explanation. "  # noqa
+        "Begin your evaluation by comparing the two responses. "  # noqa
         "Avoid any position biases and ensure that the order in which the responses were presented does not influence your decision. "  # noqa
         "Do not allow the length of the responses to influence your evaluation. "  # noqa
         "Do not favor certain names of the assistants. "  # noqa
@@ -90,19 +94,25 @@ def get_mrewardbench_eval_instances(line: dict) -> dict[str, Any]:
         '"A" if assistant A is better, "B" if assistant B is better.'  # noqa, removed tie option as , and \"[[C]]\ " for a tie
         "Don't put any quotation marks around your final verdict. "  # noqa
         "Here is the user question: {question} "  # noqa
-        "Here is assistant A's response: {assistant_a_response} "  # noqa
-        "Here is assistant B's response: {assistant_b_response} "  # noqa
     )
 
     chosen_response = line["chosen"]
     rejected_response = line["rejected"]
 
-    PROMPT_TEMPLATE.format(
+    # Shuffle chosen and rejected, keeping track of which is correct
+    responses = [("chosen", chosen_response), ("rejected", rejected_response)]
+    random.shuffle(responses)
+
+    # Find which position has the chosen response
+    gold_idx = 0 if responses[0][0] == "chosen" else 1
+
+    # Extract just the response texts for the choices
+    choices = [responses[0][1], responses[1][1]]
+
+    question = PROMPT_TEMPLATE.format(
         src_lang=line["source_language"],
         tgt_lang=line["target_language"],
         question=line["prompt"],
-        assistant_a_response=chosen_response,
-        assistant_b_response=rejected_response,
     )
 
     return {"question": question, "choices": choices, "gold_idx": gold_idx}
@@ -122,9 +132,7 @@ M_REWARDBENCH = [
         name=f"mrewardbench:{standardize_tag(language.value)}",
         prompt_function=get_mcq_prompt_function(
             language,
-            lambda line: {
-                # TODO: follow this https://github.com/filbench/lighteval/blob/main/filbench/sib200.py
-            },
+            lambda line: get_mrewardbench_eval_instances(line),
             formulation=MCFFormulation(),
         ),
         suite=("lighteval",),
