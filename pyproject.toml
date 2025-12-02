@@ -30,7 +30,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-tpu = ["google-tunix"]
+tpu = [
+    "google-tunix",
+]
 eval = ["lighteval>=0.10.0"]
 
 
@@ -60,6 +62,7 @@ conflicts = [
 [tool.uv.sources]
 bespokelabs-curator = { git = "https://github.com/ljvmiranda921/curator" }
 prometheus-eval = { git = "https://github.com/ljvmiranda921/prometheus-eval", subdirectory = "libs/prometheus-eval" }
+google-tunix = { git = "https://github.com/google/tunix", rev = "cc267fd9450b7b7400d7193a4beca07a037bd311" }
 
 [dependency-groups]
 dev = [

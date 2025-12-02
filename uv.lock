@@ -3840,7 +3840,6 @@ requires-dist = [
     { name = "bespokelabs-curator", git = "https://github.com/ljvmiranda921/curator" },
     { name = "ctranslate2", specifier = ">=4.6.0" },
     { name = "datasets", specifier = ">=3.0.2,<4.0.0" },
-    { name = "google-tunix", marker = "sys_platform == 'linux' and extra == 'tpu'", git = "https://github.com/google/tunix?rev=cc267fd9450b7b7400d7193a4beca07a037bd311" },
     { name = "google-tunix", marker = "extra == 'tpu'", git = "https://github.com/google/tunix?rev=cc267fd9450b7b7400d7193a4beca07a037bd311" },
     { name = "langcodes", specifier = ">=3.5.0" },
     { name = "lighteval", marker = "extra == 'eval'", specifier = ">=0.10.0" },
