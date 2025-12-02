@@ -220,13 +220,13 @@ def parse_choice_from_response(prediction: str, gold_index: int) -> dict:
     }
 
 
-generative_acc_metric = SampleLevelMetricGrouping(
-    metric_name=["acc"],
-    higher_is_better={"acc": True},
+generative_acc_metric = SampleLevelMetric(
+    metric_name="acc",
+    higher_is_better=True,
     category=MetricCategory.GENERATIVE,
     use_case=MetricUseCase.ACCURACY,
-    sample_level_fn=parse_choice_from_response,
-    corpus_level_fn={"acc": np.mean},
+    sample_level_fn=lambda predictions, golds, **kwargs: parse_choice_from_response(predictions[0], golds[0]),
+    corpus_level_fn=np.mean,
 )
 
 # Corpus-level metric for M-RewardBench weighted accuracy
