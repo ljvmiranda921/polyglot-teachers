@@ -8,15 +8,8 @@ from langcodes import standardize_tag
 from lighteval.metrics.dynamic_metrics import loglikelihood_acc_metric
 from lighteval.metrics.normalizations import LogProbCharNorm  # fmt: skip
 from lighteval.metrics.normalizations import LogProbPMINorm, LogProbTokenNorm
-from lighteval.metrics.utils.metric_utils import (
-    SampleLevelMetric,
-    SampleLevelMetricGrouping,
-)
-from lighteval.metrics.utils.metric_utils import (
-    CorpusLevelMetric,
-    MetricCategory,
-    MetricUseCase,
-)
+from lighteval.metrics.utils.metric_utils import SampleLevelMetric
+from lighteval.metrics.utils.metric_utils import CorpusLevelMetric, MetricCategory, MetricUseCase  # fmt: skip
 from lighteval.tasks.default_prompts import LETTER_INDICES
 from lighteval.tasks.lighteval_task import LightevalTaskConfig
 from lighteval.tasks.multilingual.utils.task_utils import get_metrics_for_formulation
@@ -225,7 +218,9 @@ generative_acc_metric = SampleLevelMetric(
     higher_is_better=True,
     category=MetricCategory.GENERATIVE,
     use_case=MetricUseCase.ACCURACY,
-    sample_level_fn=lambda predictions, golds, **kwargs: parse_choice_from_response(predictions[0], golds[0]),
+    sample_level_fn=lambda predictions, golds, **kwargs: parse_choice_from_response(
+        predictions[0], golds[0]
+    ),
     corpus_level_fn=np.mean,
 )
 
