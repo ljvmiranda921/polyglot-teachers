@@ -75,11 +75,7 @@ GLOBAL_MMLU_LITE = [
 ]
 
 
-# from last night LJ to morning LJ: IGNORE EVERYTHING ABOVE. I THINK THIS IS JUST MCQ. what the others did is that an LM made a response, and then it's judged.
-# FOR US IT"S JUST MCQ!! SO SIMPLE! ignore everything above!!
-
 # ==== M-RewardBench ====
-
 
 # Subset mapping from source to category (matches m-rewardbench structure)
 # Reference: https://github.com/Cohere-Labs-Community/m-rewardbench/blob/main/analysis/compute_iaa.py#L59
