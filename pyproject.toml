@@ -12,7 +12,6 @@ dependencies = [
     "ctranslate2>=4.6.0",
     "datasets>=3.0.2,<4.0.0",
     "langcodes>=3.5.0",
-    "lighteval>=0.10.0",
     "llama-cpp-python>=0.3.16",
     "matplotlib>=3.10.7",
     "mistral-common>=1.8.5",
@@ -30,6 +29,11 @@ dependencies = [
     "wheel>=0.45.1",
 ]
 
+[project.optional-dependencies]
+tpu = ["google-tunix"]
+eval = ["lighteval>=0.10.0"]
+
+
 [tool.ruff]
 # Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
 select = ["E", "F"]
@@ -44,6 +48,14 @@ multi_line_output = 9
 
 [tool.black]
 line-length = 88
+
+[tool.uv]
+conflicts = [
+    [
+      { extra = "tpu" },
+      { extra = "eval" },
+    ],
+]
 
 [tool.uv.sources]
 bespokelabs-curator = { git = "https://github.com/ljvmiranda921/curator" }
