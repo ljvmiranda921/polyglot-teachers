@@ -160,12 +160,10 @@ def compute_mrewardbench_weighted_acc(items: list) -> float:
     3. Weights subsets by EXAMPLE_COUNTS within each category
     4. Averages across categories with equal weights
     """
-    # Group items by subset and compute accuracy per subset
     subset_accuracies = {}
     subset_items: dict[str, list[tuple[Any, Any]]] = {}
 
     for item in items:
-        # Extract source/subset from item (adjust field name as needed)
         subset = item.source if hasattr(item, "source") else "Unknown"
 
         if subset not in subset_items:
@@ -177,7 +175,6 @@ def compute_mrewardbench_weighted_acc(items: list) -> float:
         total = len(pairs)
         subset_accuracies[subset] = correct / total if total > 0 else 0.0
 
-    # Compute weighted average per category using EXAMPLE_COUNTS
     category_accuracies = {}
     for category, subsets in SUBSET_MAPPING.items():
         weighted_sum = 0.0
@@ -242,11 +239,7 @@ def get_mrewardbench_eval_instances(line: dict) -> dict[str, Any]:
     # Shuffle chosen and rejected, keeping track of which is correct
     responses = [("chosen", chosen_response), ("rejected", rejected_response)]
     random.shuffle(responses)
-
-    # Find which position has the chosen response
     gold_idx = 0 if responses[0][0] == "chosen" else 1
-
-    # Extract just the response texts for the choices
     choices = [responses[0][1], responses[1][1]]
 
     question = PROMPT_TEMPLATE.format(
@@ -298,38 +291,3 @@ M_REWARDBENCH = [
 
 
 TASKS_TABLE: list[LightevalTaskConfig] = GLOBAL_MMLU_LITE + M_REWARDBENCH
-
-
-# ==== Usage Example for Weighted Metric ====
-#
-# To use the weighted accuracy metric in M_REWARDBENCH tasks, add mrewardbench_weighted_acc_metric
-# to your metric list.
-#
-# IMPORTANT: Don't use get_metrics_for_formulation with default MCFFormulation() as it will
-# override your metrics! Either:
-# 1. Pass metrics directly, OR
-# 2. Use MCFFormulation(choice_prefix=None) to avoid override
-#
-# M_REWARDBENCH = [
-#     LightevalTaskConfig(
-#         name=f"mrewardbench:{standardize_tag(language.value)}",
-#         prompt_function=...,
-#         # ... other config ...
-#         # Option 1: Pass metrics directly (RECOMMENDED)
-#         metric=[
-#             loglikelihood_acc_metric(normalization=LogProbTokenNorm()),
-#             loglikelihood_acc_metric(normalization=LogProbCharNorm()),
-#             loglikelihood_acc_metric(normalization=LogProbPMINorm()),
-#             mrewardbench_weighted_acc_metric,
-#         ],
-#         # Option 2: Use get_metrics_for_formulation with choice_prefix=None
-#         # metric=get_metrics_for_formulation(
-#         #     MCFFormulation(choice_prefix=None),
-#         #     [
-#         #         loglikelihood_acc_metric(normalization=LogProbTokenNorm()),
-#         #         mrewardbench_weighted_acc_metric,
-#         #     ],
-#         # ),
-#     )
-#     for language in [...]
-# ]
