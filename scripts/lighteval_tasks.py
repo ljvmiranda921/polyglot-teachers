@@ -8,7 +8,10 @@ from langcodes import standardize_tag
 from lighteval.metrics.dynamic_metrics import loglikelihood_acc_metric
 from lighteval.metrics.normalizations import LogProbCharNorm  # fmt: skip
 from lighteval.metrics.normalizations import LogProbPMINorm, LogProbTokenNorm
-from lighteval.metrics.utils.metric_utils import SampleLevelMetric, SampleLevelMetricGrouping
+from lighteval.metrics.utils.metric_utils import (
+    SampleLevelMetric,
+    SampleLevelMetricGrouping,
+)
 from lighteval.metrics.utils.metric_utils import (
     CorpusLevelMetric,
     MetricCategory,
@@ -208,17 +211,18 @@ def parse_choice_from_response(prediction: str, gold_index: int) -> dict:
     # Extract the first occurrence of A or B
     predicted_choice = None
     for char in prediction:
-        if char in ['A', 'B']:
+        if char in ["A", "B"]:
             predicted_choice = char
             break
 
     # Map to index (A=0, B=1)
-    pred_idx = 0 if predicted_choice == 'A' else 1 if predicted_choice == 'B' else -1
+    pred_idx = 0 if predicted_choice == "A" else 1 if predicted_choice == "B" else -1
 
     return {
         "acc": 1.0 if pred_idx == gold_index else 0.0,
         "pred_idx": pred_idx,
     }
+
 
 generative_acc_metric = SampleLevelMetricGrouping(
     metric_name=["acc"],
@@ -292,13 +296,15 @@ iso2_to_extended = {
 }
 
 
-M_REWARDBENCH = [
+# M-RewardBench with MCF formulation (loglikelihood-based)
+# Use this for local models that support logprob computation (HuggingFace, vLLM, etc.)
+M_REWARDBENCH_MCF = [
     LightevalTaskConfig(
-        name=f"mrewardbench:{standardize_tag(language.value)}",
+        name=f"mrewardbench_mcf:{standardize_tag(language.value)}",
         prompt_function=get_mcq_prompt_function(
             language,
             lambda line: get_mrewardbench_eval_instances(line),
-            formulation=CFFormulation(),  # Changed from MCFFormulation to CFFormulation for generative eval
+            formulation=MCFFormulation(),
         ),
         suite=("lighteval",),
         hf_repo="CohereLabsCommunity/multilingual-reward-bench",
@@ -306,7 +312,7 @@ M_REWARDBENCH = [
         evaluation_splits=("test",),
         few_shots_split="test",
         metric=[
-            generative_acc_metric,  # Use generative metric instead of loglikelihood
+            loglikelihood_acc_metric(normalization=LogProbTokenNorm()),
             mrewardbench_weighted_acc_metric,
         ],
     )
@@ -320,5 +326,36 @@ M_REWARDBENCH = [
     ]
 ]
 
+# M-RewardBench with CF formulation (generative)
+# Use this for API models via litellm (OpenAI, Anthropic, Cohere, etc.)
+M_REWARDBENCH_CF = [
+    LightevalTaskConfig(
+        name=f"mrewardbench_cf:{standardize_tag(language.value)}",
+        prompt_function=get_mcq_prompt_function(
+            language,
+            lambda line: get_mrewardbench_eval_instances(line),
+            formulation=CFFormulation(),
+        ),
+        suite=("lighteval",),
+        hf_repo="CohereLabsCommunity/multilingual-reward-bench",
+        hf_subset=iso2_to_extended.get(standardize_tag(language.value)),
+        evaluation_splits=("test",),
+        few_shots_split="test",
+        metric=[
+            generative_acc_metric,
+            mrewardbench_weighted_acc_metric,
+        ],
+    )
+    for language in [
+        Language.ARABIC,
+        Language.CZECH,
+        Language.GERMAN,
+        Language.SPANISH,
+        Language.INDONESIAN,
+        Language.JAPANESE,
+    ]
+]
 
-TASKS_TABLE: list[LightevalTaskConfig] = GLOBAL_MMLU_LITE + M_REWARDBENCH
+TASKS_TABLE: list[LightevalTaskConfig] = (
+    GLOBAL_MMLU_LITE + M_REWARDBENCH_MCF + M_REWARDBENCH_CF
+)
