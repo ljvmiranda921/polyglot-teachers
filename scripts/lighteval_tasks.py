@@ -140,6 +140,14 @@ M_REWARDBENCH = [
         hf_subset=iso2_to_extended_format(standardize_tag(language.value)),
         evaluation_splits=("test",),
         few_shots_split="test",
+        metric=get_metrics_for_formulation(
+            MCFFormulation(),
+            [
+                loglikelihood_acc_metric(normalization=LogProbTokenNorm()),
+                loglikelihood_acc_metric(normalization=LogProbCharNorm()),
+                loglikelihood_acc_metric(normalization=LogProbPMINorm()),
+            ],
+        ),
     )
     for language in [
         Language.ARABIC,
@@ -152,4 +160,4 @@ M_REWARDBENCH = [
 ]
 
 
-TASKS_TABLE: list[LightevalTaskConfig] = GLOBAL_MMLU_LITE
+TASKS_TABLE: list[LightevalTaskConfig] = GLOBAL_MMLU_LITE + M_REWARDBENCH
