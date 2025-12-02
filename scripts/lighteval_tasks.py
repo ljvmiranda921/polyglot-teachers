@@ -3,10 +3,12 @@ import sys
 from typing import Any
 import random
 
+import numpy as np
 from langcodes import standardize_tag
 from lighteval.metrics.dynamic_metrics import loglikelihood_acc_metric
 from lighteval.metrics.normalizations import LogProbCharNorm  # fmt: skip
 from lighteval.metrics.normalizations import LogProbPMINorm, LogProbTokenNorm
+from lighteval.metrics.utils.metric_utils import SampleLevelMetric, SampleLevelMetricGrouping
 from lighteval.metrics.utils.metric_utils import (
     CorpusLevelMetric,
     MetricCategory,
@@ -16,7 +18,7 @@ from lighteval.tasks.default_prompts import LETTER_INDICES
 from lighteval.tasks.lighteval_task import LightevalTaskConfig
 from lighteval.tasks.multilingual.utils.task_utils import get_metrics_for_formulation
 from lighteval.tasks.templates.multichoice import get_mcq_prompt_function
-from lighteval.tasks.templates.utils.formulation import MCFFormulation
+from lighteval.tasks.templates.utils.formulation import CFFormulation, MCFFormulation
 from lighteval.utils.language import Language
 
 logging.basicConfig(
@@ -198,6 +200,35 @@ def compute_mrewardbench_weighted_acc(items: list) -> float:
     )
 
 
+# Sample-level metric for parsing generative responses (A or B)
+def parse_choice_from_response(prediction: str, gold_index: int) -> dict:
+    """Parse 'A' or 'B' from the generated response and check if correct."""
+    prediction = prediction.strip().upper()
+
+    # Extract the first occurrence of A or B
+    predicted_choice = None
+    for char in prediction:
+        if char in ['A', 'B']:
+            predicted_choice = char
+            break
+
+    # Map to index (A=0, B=1)
+    pred_idx = 0 if predicted_choice == 'A' else 1 if predicted_choice == 'B' else -1
+
+    return {
+        "acc": 1.0 if pred_idx == gold_index else 0.0,
+        "pred_idx": pred_idx,
+    }
+
+generative_acc_metric = SampleLevelMetricGrouping(
+    metric_name=["acc"],
+    higher_is_better={"acc": True},
+    category=MetricCategory.GENERATIVE,
+    use_case=MetricUseCase.ACCURACY,
+    sample_level_fn=parse_choice_from_response,
+    corpus_level_fn={"acc": np.mean},
+)
+
 # Corpus-level metric for M-RewardBench weighted accuracy
 mrewardbench_weighted_acc_metric = CorpusLevelMetric(
     metric_name="weighted_acc",
@@ -267,7 +298,7 @@ M_REWARDBENCH = [
         prompt_function=get_mcq_prompt_function(
             language,
             lambda line: get_mrewardbench_eval_instances(line),
-            formulation=MCFFormulation(),
+            formulation=CFFormulation(),  # Changed from MCFFormulation to CFFormulation for generative eval
         ),
         suite=("lighteval",),
         hf_repo="CohereLabsCommunity/multilingual-reward-bench",
@@ -275,7 +306,7 @@ M_REWARDBENCH = [
         evaluation_splits=("test",),
         few_shots_split="test",
         metric=[
-            loglikelihood_acc_metric(normalization=LogProbTokenNorm()),
+            generative_acc_metric,  # Use generative metric instead of loglikelihood
             mrewardbench_weighted_acc_metric,
         ],
     )
