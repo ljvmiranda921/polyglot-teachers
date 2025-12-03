@@ -38,7 +38,7 @@ echo "Evaluating model: ${MODEL} on task: ${TASK}"
 
 source .venv/bin/activate
 lighteval vllm --help
-lighteval vllm "model_name=${MODEL},tensor_parallel_size=2,gpu_memory_utilization=0.9" "${TASK}" \ 
+lighteval vllm "model_name=${MODEL},tensor_parallel_size=2,gpu_memory_utilization=0.9" "${TASK}" \
     --custom-tasks scripts/lighteval_tasks.py \
     --output-dir lighteval-results \
     --results-path-template '{output_dir}/{org}___{model}' \
