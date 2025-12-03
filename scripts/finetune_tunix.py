@@ -40,6 +40,7 @@ def get_args():
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size for finetuning.")
     parser.add_argument("--num_epochs", type=int, default=3, help="Number of epochs to finetune for.")
     parser.add_argument("--max_seq_length", type=int, default=2048, help="Maximum sequence length for the model.")
+    parser.add_argument("--quantize", action="store_true", help="If set, will quantize the model to 4-bit using QWIX.")
     parser.add_argument("--use_lora", action="store_true", help="If set, will use LoRA for finetuning.")
     parser.add_argument("--checkpoints_dir", type=str, default="./checkpoints", help="Directory to save checkpoints.")
     parser.add_argument("--seed", type=int, default=3407, help="Random seed for reproducibility.")
@@ -50,6 +51,7 @@ def get_args():
 def main():
     args = get_args()
 
+    # Setup checkpoints and sharding mesh
     checkpoints_dir = {
         "full_ckpt": Path(args.checkpoints_dir) / "full_ckpts",
         "lora_ckpt": Path(args.checkpoints_dir) / "lora_ckpts",
@@ -59,11 +61,18 @@ def main():
         ckpt_path.mkdir(parents=True, exist_ok=True)
 
     mesh_config = get_device_info()
+    mesh: jax.sharding.Mesh = jax.make_mesh(*mesh_config, axis_types=(jax.sharding.AxisType.Auto,) * len(mesh_config[0]))  # fmt: skip
 
+    # Initialize the baes model and tokenizer
     base_model, tokenizer, eos_tokens = get_model_and_tokenizer(
         model_name=args.base_model,
-        mesh_config=mesh_config,
+        mesh=mesh,
         tokenizer_path=args.use_tokenizer if args.use_tokenizer else args.base_model,
+    )
+    model = (
+        get_lora_model(base_model, mesh=mesh, quantize=args.quantize)
+        if args.use_lora
+        else base_model
     )
 
 
@@ -90,7 +99,7 @@ def get_device_info() -> list:
 def get_model_and_tokenizer(
     model_name: str,
     *,
-    mesh_config: list,
+    mesh: jax.sharding.Mesh,
     tokenizer_path: str,
 ):
     """Load model and tokenizer from HuggingFace Hub.
@@ -131,7 +140,6 @@ def get_model_and_tokenizer(
     else:
         raise ValueError(f"Unsupported model: {model_name}")
 
-    mesh = jax.make_mesh(*mesh_config, axis_types=(jax.sharding.AxisType.Auto,) * len(mesh_config[0]))  # fmt: skip
     with mesh:
         base_model = params_safetensors_lib.create_model_from_safe_tensors(local_model_path, (model_config), mesh)  # fmt: skip
         nnx.display(base_model)
@@ -143,6 +151,42 @@ def get_model_and_tokenizer(
         print(f"Using EOS token IDs: {eos_tokens}")
 
     return base_model, tokenizer, eos_tokens
+
+
+def get_lora_model(
+    base_model,
+    *,
+    mesh: jax.sharding.Mesh,
+    quantize: bool,
+    lora_r: int = 16,
+    lora_alpha: float = 2.0,
+):
+    """Wrap the base model with LoRA adapters and optionally quantize it."""
+    if quantize:
+        lora_provider = qwix.LoraProvider(
+            module_path=".*q_einsum|.*kv_einsum|.*gate_proj|.*down_proj|.*up_proj",
+            rank=lora_r,
+            alpha=lora_alpha,
+            weight_qtype="nf4",
+            tile_size=128,
+        )
+    else:
+        lora_provider = qwix.LoraProvider(
+            module_path=".*q_einsum|.*kv_einsum|.*gate_proj|.*down_proj|.*up_proj",
+            rank=lora_r,
+            alpha=lora_alpha,
+        )
+
+    model_input = base_model.get_model_input()
+    lora_model = qwix.apply_lora_to_model(base_model, lora_provider, **model_input)
+
+    with mesh:
+        state = nnx.state(lora_model)
+        pspecs = nnx.get_partition_spec(state)
+        sharded_state = jax.lax.with_sharding_constraint(state, pspecs)
+        nnx.update(lora_model, sharded_state)
+
+    return lora_model
 
 
 if __name__ == "__main__":
