@@ -302,7 +302,7 @@ class _Tokenize(grain.MapTransform):
 
     def map(self, element: dict[str, Any]) -> tuple[np.ndarray, np.ndarray]:
         """Tokenize the input."""
-        # TODO
+        # TODO: it's probably about parsing the messages in the OpenAI format
 
 
 class _BuildTrainInput(grain.MapTransform):
