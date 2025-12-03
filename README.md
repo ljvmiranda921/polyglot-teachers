@@ -17,6 +17,10 @@ To install all dependencies, run the following commands:
 ```sh
 git submodule update --init --recursive
 uv sync --dev
+# When training on TPUs and developing models via tunix
+# uv sync --extra tpu
+# When doing evaluations via lighteval
+# uv sync --extra eval
 source .venv/bin/activate
 ```
 
