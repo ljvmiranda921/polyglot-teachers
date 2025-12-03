@@ -39,6 +39,8 @@ def get_args():
     parser.add_argument("--learning_rate", type=float, default=5e-6, help="Learning rate for finetuning.")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size for finetuning.")
     parser.add_argument("--num_epochs", type=int, default=3, help="Number of epochs to finetune for.")
+    parser.add_argument("--max_steps", type=int, default=-1, help="If > 0, overrides num_epochs to set the maximum number of training steps to perform.")
+    parser.add_argument("--eval_steps", type=int, default=20, help="Number of steps between evaluations.")
     parser.add_argument("--max_seq_length", type=int, default=2048, help="Maximum sequence length for the model.")
     parser.add_argument("--quantize", action="store_true", help="If set, will quantize the model to 4-bit using QWIX.")
     parser.add_argument("--use_lora", action="store_true", help="If set, will use LoRA for finetuning.")
@@ -74,6 +76,7 @@ def main():
         if args.use_lora
         else base_model
     )
+    nnx.display(model)
 
 
 def get_device_info() -> list:
@@ -142,7 +145,6 @@ def get_model_and_tokenizer(
 
     with mesh:
         base_model = params_safetensors_lib.create_model_from_safe_tensors(local_model_path, (model_config), mesh)  # fmt: skip
-        nnx.display(base_model)
 
     # Load tokenizer
     tokenizer = tokenizer_lib.Tokenizer(tokenizer_path=tokenizer_path)
