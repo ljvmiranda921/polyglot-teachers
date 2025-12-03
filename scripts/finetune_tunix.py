@@ -65,7 +65,7 @@ def main():
     mesh_config = get_device_info()
     mesh: jax.sharding.Mesh = jax.make_mesh(*mesh_config, axis_types=(jax.sharding.AxisType.Auto,) * len(mesh_config[0]))  # fmt: skip
 
-    # Initialize the baes model and tokenizer
+    # Initialize the model and tokenizer
     base_model, tokenizer, eos_tokens = get_model_and_tokenizer(
         model_name=args.base_model,
         mesh=mesh,
