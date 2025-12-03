@@ -33,6 +33,7 @@ def get_args():
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--input_dataset", type=str, required=True, help="HuggingFace dataset to use for finetuning. Must contain a 'messages' field in the OpenAI format.")
     parser.add_argument("--base_model", type=str, default="google/gemma-3-270m", help="Base model to use for finetuning.")
+    parser.add_argument("--use_tokenizer", type=str, default="gs://gemma-data/tokenizers/tokenizer_gemma3.model", help="Path to tokenizer to use. If not set, will use the tokenizer associated with --base_model.")
     parser.add_argument("--run_name", type=str, required=True, help="Name of the run. This will be used to identify the model in TrackIO and also as a revision to the HuggingFace model in --output_model_name. Will be added as a suffix to a timestamp.")
     parser.add_argument("--output_model_name", type=str, default="ljvmiranda921/msde-sft-dev", help="Name of the output model (HuggingFace ID) to save after finetuning.")
     parser.add_argument("--learning_rate", type=float, default=5e-6, help="Learning rate for finetuning.")
@@ -56,6 +57,14 @@ def main():
     }
     for _, ckpt_path in checkpoints_dir.items():
         ckpt_path.mkdir(parents=True, exist_ok=True)
+
+    mesh_config = get_device_info()
+
+    base_model, tokenizer, eos_tokens = get_model_and_tokenizer(
+        model_name=args.base_model,
+        mesh_config=mesh_config,
+        tokenizer_path=args.use_tokenizer if args.use_tokenizer else args.base_model,
+    )
 
 
 def get_device_info() -> list:
@@ -91,6 +100,8 @@ def get_model_and_tokenizer(
 
     NOTE: Currently only supports Gemma-3 models.
     """
+    logging.warning("Currently only Gemma-3 models are supported.")
+
     local_model_path = snapshot_download(
         repo_id=model_name,
         ignore_patterns=["*.pth"],  # Ignore PyTorch .pth weight files
@@ -131,7 +142,7 @@ def get_model_and_tokenizer(
         eos_tokens.append(tokenizer.eos_id())
         print(f"Using EOS token IDs: {eos_tokens}")
 
-    return
+    return base_model, tokenizer, eos_tokens
 
 
 if __name__ == "__main__":
