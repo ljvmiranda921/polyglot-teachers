@@ -33,6 +33,13 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
+CHAT_TEMPLATES = {
+    "gemma-3": {
+        "prefix": "<start_of_turn>user\n",
+        "suffix": "\n<end_of_turn>\n<start_of_turn>model\n",
+    }
+}
+
 
 def get_args():
     # fmt: off
@@ -214,6 +221,10 @@ def get_lora_model(
 def get_dataset(
     dataset_name: str,
     *,
+    tokenizer: tokenizer_lib.Tokenizer,
+    batch_size: int,
+    num_epochs: int,
+    max_seq_length: int,
     validation_split_name: Optional[str] = None,
     chat_template_name: str = "gemma-3",
     seed: int = 42,
@@ -232,7 +243,26 @@ def get_dataset(
         train_size = int(0.95 * len(full_ds))
         train_ds, eval_ds = full_ds.select(range(train_size)), full_ds.select(range(train_size, len(full_ds)))  # fmt: skip
 
-    pass
+    if chat_template_name not in CHAT_TEMPLATES:
+        raise ValueError(f"Unsupported chat template name: {chat_template_name}")
+    input_template = CHAT_TEMPLATES.get(chat_template_name)
+    train_loader = _build_data_loader(
+        data_source=train_ds,
+        batch_size=batch_size,
+        num_epochs=num_epochs,
+        max_seq_len=max_seq_length,
+        tokenizer=tokenizer,
+        input_template=input_template,
+    )
+    eval_loader = _build_data_loader(
+        data_source=eval_ds,
+        batch_size=batch_size,
+        num_epochs=1,
+        max_seq_len=max_seq_length,
+        tokenizer=tokenizer,
+        input_template=input_template,
+    )
+    return train_loader, eval_loader
 
 
 def _build_data_loader(
