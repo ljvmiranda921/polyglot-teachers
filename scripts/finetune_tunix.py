@@ -4,6 +4,7 @@ import os
 import json
 import logging
 from pathlib import Path
+from typing import Optional
 
 import jax
 import numpy as np
@@ -12,6 +13,8 @@ import jax.numpy as jnp  # numpy commands in TPU
 from orbax import checkpoint as ocp  # checkpointing
 import qwix  # quantization
 import optax  # gradient and optimization library
+import datasets
+from grain import python as grain
 from tunix.generate import tokenizer_adapter as tokenizer_lib
 from huggingface_hub import snapshot_download
 from tunix.sft import metrics_logger, peft_trainer, utils
@@ -189,6 +192,29 @@ def get_lora_model(
         nnx.update(lora_model, sharded_state)
 
     return lora_model
+
+
+def get_dataset(
+    dataset_name: str,
+    *,
+    validation_split_name: Optional[str] = None,
+    seed: int = 42,
+):
+
+    # Some datasets won't have their own validation dataset
+    # so if it's not provided, we take 5% of the training set randomly (seeded).
+    if validation_split_name:
+        train_ds, eval_ds = datasets.load_dataset(
+            dataset_name, split=("train", validation_split_name)
+        )
+    else:
+        logging.warning("No validation split name provided. Using 5%% of the training set as validation.")  # fmt: skip
+        full_ds = datasets.load_dataset(dataset_name, split="train", trust_remote_code=True)  # fmt: skip
+        full_ds = full_ds.shuffle(seed=seed)
+        train_size = int(0.95 * len(full_ds))
+        train_ds, eval_ds = full_ds.select(range(train_size)), full_ds.select(range(train_size, len(full_ds)))  # fmt: skip
+
+    pass
 
 
 if __name__ == "__main__":
