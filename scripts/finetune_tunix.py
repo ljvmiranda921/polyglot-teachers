@@ -4,7 +4,7 @@ import os
 import json
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any
 
 import jax
 import numpy as np
@@ -21,6 +21,7 @@ from tunix.sft import metrics_logger, peft_trainer, utils
 from tunix.models.gemma3 import model as gemma_lib
 from tunix.models.gemma3 import params_safetensors as params_safetensors_lib
 from tunix.models.gemma3 import params as gemma_params
+from tunix.sft.peft_trainer import TrainingInput
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -107,11 +108,13 @@ def get_model_and_tokenizer(
     *,
     mesh: jax.sharding.Mesh,
     tokenizer_path: str,
+    tokenizer_type: str = "sentencepiece",
 ):
     """Load model and tokenizer from HuggingFace Hub.
 
     The tokenizer_path can be a GCS path (e.g., gs://gemma-data/tokenizers/tokenizer_gemma3.model)
     or a HugingFace Hub repo ID (in case you're using a different model family).
+    For the former, use tokenizer_type="sentencepiece", for the latter, use tokenizer_type="huggingface".
 
     NOTE: Currently only supports Gemma-3 models.
     """
@@ -150,7 +153,7 @@ def get_model_and_tokenizer(
         base_model = params_safetensors_lib.create_model_from_safe_tensors(local_model_path, (model_config), mesh)  # fmt: skip
 
     # Load tokenizer
-    tokenizer = tokenizer_lib.Tokenizer(tokenizer_path=tokenizer_path)
+    tokenizer = tokenizer_lib.Tokenizer(tokenizer_type=tokenizer_type, tokenizer_path=tokenizer_path)  # fmt: skip
     if tokenizer.eos_id() not in eos_tokens:
         eos_tokens.append(tokenizer.eos_id())
         print(f"Using EOS token IDs: {eos_tokens}")
@@ -198,6 +201,7 @@ def get_dataset(
     dataset_name: str,
     *,
     validation_split_name: Optional[str] = None,
+    chat_template_name: str = "gemma-3",
     seed: int = 42,
 ):
 
@@ -215,6 +219,97 @@ def get_dataset(
         train_ds, eval_ds = full_ds.select(range(train_size)), full_ds.select(range(train_size, len(full_ds)))  # fmt: skip
 
     pass
+
+
+def _build_data_loader(
+    data_source: grain.RandomAccessDataSource,
+    batch_size: int,
+    num_epochs: int | None,
+    max_seq_len: int,
+    tokenizer: tokenizer_lib.Tokenizer,
+    input_template: dict[str, str],
+) -> grain.DataLoader:
+    return grain.DataLoader(
+        data_source=data_source,
+        sampler=grain.IndexSampler(
+            num_records=len(data_source),
+            num_epochs=num_epochs,
+            shard_options=grain.NoSharding(),
+        ),
+        operations=[
+            _Tokenize(tokenizer, input_template),
+            _BuildTrainInput(max_seq_len, tokenizer.pad_id()),
+            _FilterOverlength(max_seq_len),
+            grain.Batch(batch_size=batch_size, drop_remainder=True),
+        ],
+    )
+
+
+class _Tokenize(grain.MapTransform):
+    """Tokenize the input."""
+
+    def __init__(
+        self, tokenizer: tokenizer_lib.Tokenizer, input_template: dict[str, str]
+    ):
+        self._tokenizer = tokenizer
+        self._input_template = input_template
+
+    def map(self, element: dict[str, Any]) -> tuple[np.ndarray, np.ndarray]:
+        """Tokenize the input."""
+        # TODO
+
+
+class _BuildTrainInput(grain.MapTransform):
+    """Build a TrainingInput from a tuple of source and destination tokens."""
+
+    def __init__(self, max_seq_len: int, pad_value: int | bool):
+        self._max_seq_len = max_seq_len
+        self._pad_value = pad_value
+
+    def map(self, tokens: tuple[np.ndarray, np.ndarray]) -> TrainingInput:
+        src_tokens, dst_tokens = tokens
+
+        # The input sequence fed to the model is simply the concatenation of the
+        # source and the destination.
+        tokens = np.concat([src_tokens, dst_tokens], axis=0)
+
+        # To prevent the model from updating based on the source (input)
+        # tokens, add a target mask to each input.
+        q_mask = np.zeros_like(src_tokens, dtype=np.bool)
+        a_mask = np.ones_like(dst_tokens, dtype=np.bool)
+        mask = np.concat([q_mask, a_mask], axis=0)
+
+        # If the input tokens sequence is smaller than the target sequence size,
+        # then pad it with pad tokens.
+        tokens = self._pad_up_to_max_len(tokens, self._pad_value)
+
+        # Don't want to perform the backward pass on the pad tokens.
+        mask = self._pad_up_to_max_len(mask, 0)
+
+        return TrainingInput(input_tokens=tokens, input_mask=mask)
+
+    def _pad_up_to_max_len(
+        self, input_tensor: np.ndarray, pad_value: int
+    ) -> np.ndarray:
+        """Pad the given tensor up to sequence length of a batch."""
+        seq_len = input_tensor.shape[0]
+        to_pad = np.maximum(self._max_seq_len - seq_len, 0)
+        return np.pad(
+            input_tensor,
+            [[0, to_pad]],
+            mode="constant",
+            constant_values=pad_value,
+        )
+
+
+class _FilterOverlength(grain.FilterTransform):
+    """Filter out overlength examples."""
+
+    def __init__(self, max_seq_len: int):
+        self._max_seq_len = max_seq_len
+
+    def filter(self, element: TrainingInput) -> bool:
+        return element.input_tokens.shape[0] <= self._max_seq_len
 
 
 if __name__ == "__main__":
