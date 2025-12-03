@@ -229,9 +229,11 @@ def get_dataset(
     chat_template_name: str = "gemma-3",
     seed: int = 42,
 ):
+    """Load dataset and build data loaders for training and evaluation.
 
-    # Some datasets won't have their own validation dataset
-    # so if it's not provided, we take 5% of the training set randomly (seeded).
+    Some datasets won't have their own validation dataset so if it's not
+    provided, we take 5% of the training set randomly (seeded).
+    """
     if validation_split_name:
         train_ds, eval_ds = datasets.load_dataset(
             dataset_name, split=("train", validation_split_name)
