@@ -22,6 +22,9 @@ from tunix.models.gemma3 import model as gemma_lib
 from tunix.models.gemma3 import params_safetensors as params_safetensors_lib
 from tunix.models.gemma3 import params as gemma_params
 from tunix.sft.peft_trainer import TrainingInput
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -57,6 +60,10 @@ def get_args():
 def main():
     args = get_args()
 
+    hf_token = os.environ.get("HF_TOKEN", None)
+    if hf_token is None:
+        raise ValueError("HuggingFace token not found in HF_TOKEN environment variable.")  # fmt: skip
+
     # Setup checkpoints and sharding mesh
     checkpoints_dir = {
         "full_ckpt": Path(args.checkpoints_dir) / "full_ckpts",
@@ -74,6 +81,8 @@ def main():
         model_name=args.base_model,
         mesh=mesh,
         tokenizer_path=args.use_tokenizer if args.use_tokenizer else args.base_model,
+        tokenizer_type="sentencepiece" if args.use_tokenizer else "huggingface",
+        hf_token=hf_token,
     )
     model = (
         get_lora_model(base_model, mesh=mesh, quantize=args.quantize)
@@ -109,6 +118,7 @@ def get_model_and_tokenizer(
     mesh: jax.sharding.Mesh,
     tokenizer_path: str,
     tokenizer_type: str = "sentencepiece",
+    hf_token: Optional[str] = None,
 ):
     """Load model and tokenizer from HuggingFace Hub.
 
@@ -153,7 +163,11 @@ def get_model_and_tokenizer(
         base_model = params_safetensors_lib.create_model_from_safe_tensors(local_model_path, (model_config), mesh)  # fmt: skip
 
     # Load tokenizer
-    tokenizer = tokenizer_lib.Tokenizer(tokenizer_type=tokenizer_type, tokenizer_path=tokenizer_path)  # fmt: skip
+    tokenizer = tokenizer_lib.Tokenizer(
+        tokenizer_type=tokenizer_type,
+        tokenizer_path=tokenizer_path,
+        hf_access_token=hf_token,
+    )
     if tokenizer.eos_id() not in eos_tokens:
         eos_tokens.append(tokenizer.eos_id())
         print(f"Using EOS token IDs: {eos_tokens}")
