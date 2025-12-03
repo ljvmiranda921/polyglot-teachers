@@ -13,16 +13,11 @@ from orbax import checkpoint as ocp  # checkpointing
 import qwix  # quantization
 import optax  # gradient and optimization library
 from tunix.generate import tokenizer_adapter as tokenizer_lib
-from tunix.models import gemma3, qwen2, qwen3, llama3
 from huggingface_hub import snapshot_download
-from tunix.sft import metrics_logger
-from tunix.sft import peft_trainer
-from tunix.sft import utils
-from tunix.sft.utils import show_hbm_usage
-
-# from tunix.models.gemma3 import model as gemma_lib
-# from tunix.models.gemma3 import params_safetensors as params_safetensors_lib
-# from tunix.models.gemma3 import params as gemma_params
+from tunix.sft import metrics_logger, peft_trainer, utils
+from tunix.models.gemma3 import model as gemma_lib
+from tunix.models.gemma3 import params_safetensors as params_safetensors_lib
+from tunix.models.gemma3 import params as gemma_params
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -83,7 +78,19 @@ def get_device_info() -> list:
     return mesh_config
 
 
-def get_model_and_tokenizer(model_name: str):
+def get_model_and_tokenizer(
+    model_name: str,
+    *,
+    mesh_config: list,
+    tokenizer_path: str,
+):
+    """Load model and tokenizer from HuggingFace Hub.
+
+    The tokenizer_path can be a GCS path (e.g., gs://gemma-data/tokenizers/tokenizer_gemma3.model)
+    or a HugingFace Hub repo ID (in case you're using a different model family).
+
+    NOTE: Currently only supports Gemma-3 models.
+    """
     local_model_path = snapshot_download(
         repo_id=model_name,
         ignore_patterns=["*.pth"],  # Ignore PyTorch .pth weight files
@@ -97,7 +104,34 @@ def get_model_and_tokenizer(model_name: str):
         eos_tokens = generation_configs.get("eos_token_id", [])
         logging.info(f"Using EOS token IDs: {eos_tokens}")
 
-    show_hbm_usage("Before loading model and tokenizer")
+    utils.show_hbm_usage("Before loading model and tokenizer")
+
+    # TODO: Add support for other model families
+    if "gemma-3-270m" in model_name:
+        model_config = gemma_lib.ModelConfig.gemma3_270m()
+    elif "gemma-3-1b" in model_name:
+        model_config = gemma_lib.ModelConfig.gemma3_1b()
+    elif "gemma-3-4b" in model_name:
+        model_config = gemma_lib.ModelConfig.gemma3_4b()
+    elif "gemma-3-12b" in model_name:
+        model_config = gemma_lib.ModelConfig.gemma3_12b()
+    elif "gemma-3-27b" in model_name:
+        model_config = gemma_lib.ModelConfig.gemma3_27b()
+    else:
+        raise ValueError(f"Unsupported model: {model_name}")
+
+    mesh = jax.make_mesh(*mesh_config, axis_types=(jax.sharding.AxisType.Auto,) * len(mesh_config[0]))  # fmt: skip
+    with mesh:
+        base_model = params_safetensors_lib.create_model_from_safe_tensors(local_model_path, (model_config), mesh)  # fmt: skip
+        nnx.display(base_model)
+
+    # Load tokenizer
+    tokenizer = tokenizer_lib.Tokenizer(tokenizer_path=tokenizer_path)
+    if tokenizer.eos_id() not in eos_tokens:
+        eos_tokens.append(tokenizer.eos_id())
+        print(f"Using EOS token IDs: {eos_tokens}")
+
+    return
 
 
 if __name__ == "__main__":
