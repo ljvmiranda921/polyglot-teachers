@@ -145,11 +145,23 @@ def main():
         metrics_logging_options=full_logging_options,
         checkpoint_root_directory=checkpoints_dir["lora_ckpt"] if args.use_lora else checkpoints_dir["full_ckpt"],  # fmt: skip
     )
+
+    def _gen_model_input_fn(x: peft_trainer.TrainingInput) -> dict[str, Any]:
+        pad_mask = x.input_tokens != tokenizer.pad_id
+        positions = utils.build_positions_from_mask(pad_mask)
+        attention_mask = utils.make_causal_attn_mask(pad_mask)
+        return {
+            "input_tokens": x.input_tokens,
+            "input_mask": x.input_mask,
+            "positions": positions,
+            "attention_mask": attention_mask,
+        }
+
     trainer = peft_trainer.PeftTrainer(
         model=model,
         optimizer=optax.adamw(learning_rate=args.learning_rate),
         training_config=training_config,
-    ).with_gen_model_input_fn(gen_model_input_fn)
+    ).with_gen_model_input_fn(_gen_model_input_fn)
 
     with mesh:
         trainer.train(train_ds, eval_ds)
@@ -438,18 +450,6 @@ class _FilterOverlength(grain.FilterTransform):
 
     def filter(self, element: peft_trainer.TrainingInput) -> bool:
         return element.input_tokens.shape[0] <= self._max_seq_len
-
-
-def gen_model_input_fn(x: peft_trainer.TrainingInput) -> dict[str, Any]:
-    pad_mask = x.input_tokens != tokenizer.pad_id
-    positions = utils.build_positions_from_mask(pad_mask)
-    attention_mask = utils.make_causal_attn_mask(pad_mask)
-    return {
-        "input_tokens": x.input_tokens,
-        "input_mask": x.input_mask,
-        "positions": positions,
-        "attention_mask": attention_mask,
-    }
 
 
 def save_finetuned_model(
