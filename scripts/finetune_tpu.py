@@ -23,6 +23,8 @@ from tunix.models.gemma3 import params as gemma_params
 from tunix.models.gemma3 import params_safetensors as params_safetensors_lib
 from tunix.sft import metrics_logger, peft_trainer, utils
 
+from scripts.get_intrinsic_metrics import subsample_per_strategy
+
 load_dotenv()
 
 logging.basicConfig(
@@ -61,6 +63,8 @@ def get_args():
     parser.add_argument("--quantize", action="store_true", help="If set, will quantize the model to 4-bit using QWIX.")
     parser.add_argument("--use_lora", action="store_true", help="If set, will use LoRA for finetuning.")
     parser.add_argument("--checkpoints_dir", type=str, default="./checkpoints", help="Directory to save checkpoints.")
+    parser.add_argument("--apply_subsampling", action="store_true", default=False, help="Whether to apply subsampling to the dataset before finetuning. This is to ensure that the number of samples per strategy is roughly the same.")
+    parser.add_argument("--max_train_samples", type=int, default=None, help="If set, will limit the number of training samples to this number when sampling.")
     parser.add_argument("--input_dataset_filter", type=str, default=None, help="JSON string representing a filter to apply to the input dataset before finetuning. The keys should be the field names and the values should be the values to filter by. This is an AND operation.")
     parser.add_argument("--seed", type=int, default=3407, help="Random seed for reproducibility.")
     # fmt: on
@@ -123,7 +127,7 @@ def main():
 
     # Load the dataset
     dataset_filter = json.loads(args.input_dataset_filter) if args.input_dataset_filter else None  # fmt: skip
-    train_ds, eval_ds = get_dataset(
+    train_ds, eval_ds = prepare_training_data(
         dataset_name=args.input_dataset,
         tokenizer=tokenizer,
         batch_size=args.batch_size,
@@ -133,6 +137,8 @@ def main():
         chat_template_name="gemma-3",
         input_dataset_filter=dataset_filter,
         seed=args.seed,
+        apply_subsampling=args.apply_subsampling,
+        max_train_samples=args.max_train_samples,
     )
 
     # Setup training options
@@ -296,13 +302,15 @@ def get_lora_model(
     return lora_model
 
 
-def get_dataset(
+def prepare_training_data(
     dataset_name: str,
     *,
     tokenizer: tokenizer_lib.Tokenizer,
     batch_size: int,
     num_epochs: int,
     max_seq_length: int,
+    apply_subsampling: bool = False,
+    max_train_samples: int = None,
     input_dataset_filter: Optional[dict] = None,
     validation_split_name: Optional[str] = None,
     chat_template_name: str = "gemma-3",
@@ -330,6 +338,18 @@ def get_dataset(
         dataset = dataset.filter(
             lambda example: all(example[k] == v for k, v in filter_dict.items())
         )
+
+    if apply_subsampling:
+        assert max_train_samples is not None, "max_train_samples must be set when apply_subsampling is True."  # fmt: skip
+        logging.info("Applying subsampling to the dataset to balance strategies.")
+        dataset, subsampling_results = subsample_per_strategy(
+            dataset, total_num_samples=max_train_samples, random_state=42
+        )
+        logging.info(f"Subsampling results: {subsampling_results}")
+
+    if max_train_samples is not None and not apply_subsampling:
+        logging.info(f"Sampling {max_train_samples} samples from the dataset.")
+        dataset = dataset.shuffle(seed=42).select(range(max_train_samples))
 
     if chat_template_name not in CHAT_TEMPLATES:
         raise ValueError(f"Unsupported chat template name: {chat_template_name}")

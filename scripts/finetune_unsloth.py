@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 from huggingface_hub import HfApi
 from trl import SFTConfig, SFTTrainer
 
+from scripts.get_intrinsic_metrics import subsample_per_strategy
 
 load_dotenv()
 
@@ -42,6 +43,8 @@ def get_args():
     parser.add_argument("--use_lora", action="store_true", help="If set, will use LoRA for finetuning.")
     parser.add_argument("--load_in_4bit", action="store_true", help="If set, will load the model in 4-bit precision to save memory.")
     parser.add_argument("--save_mode", choices=["merged_16bit", "merged_4bit", "lora"], default="merged_16bit", help="Precision for saving the finetuned model.")
+    parser.add_argument("--apply_subsampling", action="store_true", default=False, help="Whether to apply subsampling to the dataset before finetuning. This is to ensure that the number of samples per strategy is roughly the same.")
+    parser.add_argument("--max_train_samples", type=int, default=None, help="If set, will limit the number of training samples to this number when sampling.")
     parser.add_argument("--input_dataset_filter", type=str, default=None, help="JSON string representing a filter to apply to the input dataset before finetuning. The keys should be the field names and the values should be the values to filter by. This is an AND operation.")
     parser.add_argument("--seed", type=int, default=3407, help="Random seed for reproducibility.")
     # fmt: on
@@ -78,6 +81,8 @@ def main():
         tokenizer=tokenizer,
         chat_template=args.chat_template,
         input_dataset_filter=args.input_dataset_filter,
+        apply_subsampling=args.apply_subsampling,
+        max_train_samples=args.max_train_samples,
     )
 
     trainer = SFTTrainer(
@@ -173,6 +178,8 @@ def prepare_training_data(
     chat_template: str,
     input_dataset_filter: str,
     messages_key: str = "messages",
+    apply_subsampling: bool = False,
+    max_train_samples: int = None,
 ) -> Dataset:
     """Apply chat template to the post-training dataset. Expects a 'messages' field in the dataset."""
 
@@ -194,6 +201,18 @@ def prepare_training_data(
         dataset = dataset.filter(
             lambda example: all(example[k] == v for k, v in filter_dict.items())
         )
+
+    if apply_subsampling:
+        assert max_train_samples is not None, "max_train_samples must be set when apply_subsampling is True."  # fmt: skip
+        logging.info("Applying subsampling to the dataset to balance strategies.")
+        dataset, subsampling_results = subsample_per_strategy(
+            dataset, total_num_samples=max_train_samples, random_state=42
+        )
+        logging.info(f"Subsampling results: {subsampling_results}")
+
+    if max_train_samples is not None and not apply_subsampling:
+        logging.info(f"Sampling {max_train_samples} samples from the dataset.")
+        dataset = dataset.shuffle(seed=42).select(range(max_train_samples))
 
     dataset = dataset.map(_formatting_prompts_func, batched=True)
     return dataset
