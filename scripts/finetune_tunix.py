@@ -56,6 +56,7 @@ def get_args():
     parser.add_argument("--max_steps", type=int, default=-1, help="If > 0, overrides num_epochs to set the maximum number of training steps to perform.")
     parser.add_argument("--eval_steps", type=int, default=20, help="Number of steps between evaluations.")
     parser.add_argument("--max_seq_length", type=int, default=2048, help="Maximum sequence length for the model.")
+    parser.add_argument("--validation_split", default=None, help="Name of the validation split in the dataset. If not set, will use 5%% of the training set as validation.")
     parser.add_argument("--quantize", action="store_true", help="If set, will quantize the model to 4-bit using QWIX.")
     parser.add_argument("--use_lora", action="store_true", help="If set, will use LoRA for finetuning.")
     parser.add_argument("--checkpoints_dir", type=str, default="./checkpoints", help="Directory to save checkpoints.")
@@ -97,6 +98,18 @@ def main():
         else base_model
     )
     nnx.display(model)
+
+    # Load the dataset
+    train_loader, eval_loader = get_dataset(
+        dataset_name=args.input_dataset,
+        tokenizer=tokenizer,
+        batch_size=args.batch_size,
+        num_epochs=args.num_epochs,
+        max_seq_length=args.max_seq_length,
+        validation_split_name=args.validation_split,
+        chat_template_name="gemma-3",
+        seed=args.seed,
+    )
 
 
 def get_device_info() -> list:
@@ -228,7 +241,7 @@ def get_dataset(
     validation_split_name: Optional[str] = None,
     chat_template_name: str = "gemma-3",
     seed: int = 42,
-):
+) -> tuple[grain.DataLoader, grain.DataLoader]:
     """Load dataset and build data loaders for training and evaluation.
 
     Some datasets won't have their own validation dataset so if it's not
