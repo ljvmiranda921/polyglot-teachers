@@ -60,6 +60,7 @@ def get_args():
     parser.add_argument("--quantize", action="store_true", help="If set, will quantize the model to 4-bit using QWIX.")
     parser.add_argument("--use_lora", action="store_true", help="If set, will use LoRA for finetuning.")
     parser.add_argument("--checkpoints_dir", type=str, default="./checkpoints", help="Directory to save checkpoints.")
+    parser.add_argument("--input_dataset_filter", type=str, default=None, help="JSON string representing a filter to apply to the input dataset before finetuning. The keys should be the field names and the values should be the values to filter by. This is an AND operation.")
     parser.add_argument("--seed", type=int, default=3407, help="Random seed for reproducibility.")
     # fmt: on
     return parser.parse_args()
@@ -100,6 +101,7 @@ def main():
     nnx.display(model)
 
     # Load the dataset
+    dataset_filter = json.loads(args.input_dataset_filter) if args.input_dataset_filter else None  # fmt: skip
     train_loader, eval_loader = get_dataset(
         dataset_name=args.input_dataset,
         tokenizer=tokenizer,
@@ -108,6 +110,7 @@ def main():
         max_seq_length=args.max_seq_length,
         validation_split_name=args.validation_split,
         chat_template_name="gemma-3",
+        input_dataset_filter=dataset_filter,
         seed=args.seed,
     )
 
@@ -238,6 +241,7 @@ def get_dataset(
     batch_size: int,
     num_epochs: int,
     max_seq_length: int,
+    input_dataset_filter: Optional[dict] = None,
     validation_split_name: Optional[str] = None,
     chat_template_name: str = "gemma-3",
     seed: int = 42,
@@ -258,8 +262,16 @@ def get_dataset(
         train_size = int(0.95 * len(full_ds))
         train_ds, eval_ds = full_ds.select(range(train_size)), full_ds.select(range(train_size, len(full_ds)))  # fmt: skip
 
+    if input_dataset_filter:
+        filter_dict = json.loads(input_dataset_filter)
+        logging.info(f"Applying filter to dataset: {filter_dict}")
+        dataset = dataset.filter(
+            lambda example: all(example[k] == v for k, v in filter_dict.items())
+        )
+
     if chat_template_name not in CHAT_TEMPLATES:
         raise ValueError(f"Unsupported chat template name: {chat_template_name}")
+
     input_template = CHAT_TEMPLATES.get(chat_template_name)
     train_loader = _build_data_loader(
         data_source=train_ds,
@@ -316,6 +328,7 @@ class _Tokenize(grain.MapTransform):
     def map(self, element: dict[str, Any]) -> tuple[np.ndarray, np.ndarray]:
         """Tokenize the input."""
         # TODO: it's probably about parsing the messages in the OpenAI format
+        breakpoint()
 
 
 class _BuildTrainInput(grain.MapTransform):
