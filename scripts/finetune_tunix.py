@@ -21,6 +21,7 @@ from tunix.sft import metrics_logger, peft_trainer, utils
 from tunix.models.gemma3 import model as gemma_lib
 from tunix.models.gemma3 import params_safetensors as params_safetensors_lib
 from tunix.models.gemma3 import params as gemma_params
+from huggingface_hub import HfApi
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -46,8 +47,8 @@ def get_args():
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--input_dataset", type=str, required=True, help="HuggingFace dataset to use for finetuning. Must contain a 'messages' field in the OpenAI format.")
     parser.add_argument("--base_model", type=str, default="google/gemma-3-270m", help="Base model to use for finetuning.")
-    parser.add_argument("--use_tokenizer", type=str, default="gs://gemma-data/tokenizers/tokenizer_gemma3.model", help="Path to tokenizer to use. If not set, will use the tokenizer associated with --base_model.")
     parser.add_argument("--run_name", type=str, required=True, help="Name of the run. This will be used to identify the model in TrackIO and also as a revision to the HuggingFace model in --output_model_name. Will be added as a suffix to a timestamp.")
+    parser.add_argument("--use_tokenizer", type=str, default="gs://gemma-data/tokenizers/tokenizer_gemma3.model", help="Path to tokenizer to use. If not set, will use the tokenizer associated with --base_model.")
     parser.add_argument("--output_model_name", type=str, default="ljvmiranda921/msde-sft-dev", help="Name of the output model (HuggingFace ID) to save after finetuning.")
     parser.add_argument("--learning_rate", type=float, default=5e-6, help="Learning rate for finetuning.")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size for finetuning.")
@@ -56,6 +57,8 @@ def get_args():
     parser.add_argument("--eval_steps", type=int, default=20, help="Number of steps between evaluations.")
     parser.add_argument("--max_seq_length", type=int, default=2048, help="Maximum sequence length for the model.")
     parser.add_argument("--validation_split", default=None, help="Name of the validation split in the dataset. If not set, will use 5%% of the training set as validation.")
+    parser.add_argument("--lora_r", type=int, default=16, help="LoRA rank to use for finetuning.")
+    parser.add_argument("--lora_alpha", type=float, default=2.0, help="LoRA alpha to use for finetuning.")
     parser.add_argument("--quantize", action="store_true", help="If set, will quantize the model to 4-bit using QWIX.")
     parser.add_argument("--use_lora", action="store_true", help="If set, will use LoRA for finetuning.")
     parser.add_argument("--checkpoints_dir", type=str, default="./checkpoints", help="Directory to save checkpoints.")
@@ -67,10 +70,23 @@ def get_args():
 
 def main():
     args = get_args()
-
     hf_token = os.environ.get("HF_TOKEN", None)
     if hf_token is None:
         raise ValueError("HuggingFace token not found in HF_TOKEN environment variable.")  # fmt: skip
+
+    # Set-up the run name
+    run_name = f"{datetime.now().strftime('%Y%m%dT%H%M%S')}-msde-{args.base_model.replace('/', '___')}"
+    if args.use_lora:
+        run_name += "-lora"
+    elif args.quantize:
+        run_name += "-qlora-nf4"
+    if args.run_name:
+        # Append custom run name suffix
+        run_name += f"-{args.run_name}"
+    logging.info(f"Starting finetuning run: {run_name}")
+
+    if not args.use_lora:
+        logging.warning("Finetuning without LoRA is not recommended due to high memory usage.")  # fmt: skip
 
     # Setup checkpoints and sharding mesh
     checkpoints_dir = {
@@ -86,7 +102,7 @@ def main():
     mesh: jax.sharding.Mesh = jax.make_mesh(*mesh_config, axis_types=(jax.sharding.AxisType.Auto,) * len(mesh_config[0]))  # fmt: skip
 
     # Initialize the model and tokenizer
-    base_model, tokenizer, eos_tokens = get_model_and_tokenizer(
+    base_model, tokenizer, eos_tokens, local_model_path = get_model_and_tokenizer(
         model_name=args.base_model,
         mesh=mesh,
         tokenizer_path=args.use_tokenizer if args.use_tokenizer else args.base_model,
@@ -94,7 +110,13 @@ def main():
         hf_token=hf_token,
     )
     model = (
-        get_lora_model(base_model, mesh=mesh, quantize=args.quantize)
+        get_lora_model(
+            base_model,
+            mesh=mesh,
+            quantize=args.quantize,
+            lora_r=args.lora_r,
+            lora_alpha=args.lora_alpha,
+        )
         if args.use_lora
         else base_model
     )
@@ -133,7 +155,15 @@ def main():
     with mesh:
         trainer.train(train_ds, eval_ds)
 
-    # TODO: Save the model to HuggingFace Hub
+    save_finetuned_model(
+        run_name=run_name,
+        model=model,
+        local_model_path=local_model_path,
+        output_hf_name=args.output_model_name,
+        token=hf_token,
+        lora_r=args.lora_r if args.use_lora else None,
+        lora_alpha=args.lora_alpha if args.use_lora else None,
+    )
 
 
 def get_device_info() -> list:
@@ -216,7 +246,7 @@ def get_model_and_tokenizer(
         eos_tokens.append(tokenizer.eos_id())
         print(f"Using EOS token IDs: {eos_tokens}")
 
-    return base_model, tokenizer, eos_tokens
+    return base_model, tokenizer, eos_tokens, local_model_path
 
 
 def get_lora_model(
@@ -421,6 +451,66 @@ def gen_model_input_fn(x: peft_trainer.TrainingInput) -> dict[str, Any]:
         "positions": positions,
         "attention_mask": attention_mask,
     }
+
+
+def save_finetuned_model(
+    run_name: str,
+    *,
+    model,
+    local_model_path: str,
+    output_hf_name: str,
+    token: str,
+    lora_r: Optional[int] = None,
+    lora_alpha: Optional[float] = None,
+):
+    output_dir = Path("tunix-models") / run_name
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    gemma_params.save_lora_merged_model_as_safetensors(
+        local_model_path=str(output_dir),
+        output_dir=str(output_dir),
+        lora_model=model,
+        rank=lora_r,
+        alpha=lora_alpha,
+    )
+    print("\n" + "=" * 60)
+    print("Model saved successfully!")
+    print(f"Output directory: {output_dir}")
+    print("=" * 60)
+
+    print("\nSaved files:")
+    for f in os.listdir(output_dir):
+        size = os.path.getsize(os.path.join(output_dir, f)) / (1024 * 1024)
+        print(f"  {f:<30} {size:>10.2f} MB")
+
+    commit_message = f"ckpt for {run_name}"
+    try:
+        api = HfApi()
+        api.create_branch(
+            repo_id=output_hf_name,
+            branch=run_name,
+            repo_type="model",
+            exist_ok=True,
+            token=token,
+        )
+        api.upload_folder(
+            folder_path=local_save_dir,
+            repo_id=output_hf_name,
+            repo_type="model",
+            path_in_repo=".",
+            revision=run_name,
+            commit_message=commit_message,
+            token=token,
+        )
+    except Exception as e:
+        logging.error(f"Upload failed, keeping local directory: {e}")
+        raise
+    else:
+        # Delete local directory to save some space in the cluster
+        shutil.rmtree(local_save_dir)
+        logging.info(
+            f"Successfully uploaded and deleted local directory: {local_save_dir}"
+        )
 
 
 if __name__ == "__main__":
