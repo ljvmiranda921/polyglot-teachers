@@ -21,7 +21,6 @@ from tunix.sft import metrics_logger, peft_trainer, utils
 from tunix.models.gemma3 import model as gemma_lib
 from tunix.models.gemma3 import params_safetensors as params_safetensors_lib
 from tunix.models.gemma3 import params as gemma_params
-from tunix.sft.peft_trainer import TrainingInput
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -102,7 +101,7 @@ def main():
 
     # Load the dataset
     dataset_filter = json.loads(args.input_dataset_filter) if args.input_dataset_filter else None  # fmt: skip
-    train_loader, eval_loader = get_dataset(
+    train_ds, eval_ds = get_dataset(
         dataset_name=args.input_dataset,
         tokenizer=tokenizer,
         batch_size=args.batch_size,
@@ -344,7 +343,7 @@ class _BuildTrainInput(grain.MapTransform):
         self._max_seq_len = max_seq_len
         self._pad_value = pad_value
 
-    def map(self, tokens: tuple[np.ndarray, np.ndarray]) -> TrainingInput:
+    def map(self, tokens: tuple[np.ndarray, np.ndarray]) -> peft_trainer.TrainingInput:
         src_tokens, dst_tokens = tokens
 
         # The input sequence fed to the model is simply the concatenation of the
@@ -364,7 +363,7 @@ class _BuildTrainInput(grain.MapTransform):
         # Don't want to perform the backward pass on the pad tokens.
         mask = self._pad_up_to_max_len(mask, 0)
 
-        return TrainingInput(input_tokens=tokens, input_mask=mask)
+        return peft_trainer.TrainingInput(input_tokens=tokens, input_mask=mask)
 
     def _pad_up_to_max_len(
         self, input_tensor: np.ndarray, pad_value: int
@@ -386,8 +385,20 @@ class _FilterOverlength(grain.FilterTransform):
     def __init__(self, max_seq_len: int):
         self._max_seq_len = max_seq_len
 
-    def filter(self, element: TrainingInput) -> bool:
+    def filter(self, element: peft_trainer.TrainingInput) -> bool:
         return element.input_tokens.shape[0] <= self._max_seq_len
+
+
+def gen_model_input_fn(x: peft_trainer.TrainingInput) -> dict[str, Any]:
+    pad_mask = x.input_tokens != tokenizer.pad_id
+    positions = utils.build_positions_from_mask(pad_mask)
+    attention_mask = utils.make_causal_attn_mask(pad_mask)
+    return {
+        "input_tokens": x.input_tokens,
+        "input_mask": x.input_mask,
+        "positions": positions,
+        "attention_mask": attention_mask,
+    }
 
 
 if __name__ == "__main__":
