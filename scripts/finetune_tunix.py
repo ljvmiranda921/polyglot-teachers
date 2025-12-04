@@ -133,6 +133,8 @@ def main():
     with mesh:
         trainer.train(train_ds, eval_ds)
 
+    # TODO: Save the model to HuggingFace Hub
+
 
 def get_device_info() -> list:
     """Get TPU device information and set up mesh configuration."""
