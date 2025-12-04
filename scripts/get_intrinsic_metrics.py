@@ -1,7 +1,6 @@
 import argparse
 import json
 import logging
-import os
 import sys
 import time
 from pathlib import Path
@@ -362,13 +361,20 @@ def _compute_perplexity(
                 torch.cuda.empty_cache()
 
     # Filter out NaN values when computing average
-    valid_perplexities = [r["perplexity"] for r in results if not (isinstance(r["perplexity"], float) and torch.isnan(torch.tensor(r["perplexity"])))]
+    valid_perplexities = [
+        r["perplexity"]
+        for r in results
+        if not (
+            isinstance(r["perplexity"], float)
+            and torch.isnan(torch.tensor(r["perplexity"]))
+        )
+    ]
     num_nan_values = len(results) - len(valid_perplexities)
 
     if valid_perplexities:
         average_perplexity = sum(valid_perplexities) / len(valid_perplexities)
     else:
-        average_perplexity = float('nan')
+        average_perplexity = float("nan")
 
     metrics = {"average_perplexity": average_perplexity}
     if save_all_results:
