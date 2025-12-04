@@ -77,6 +77,7 @@ def main():
         "full_ckpt": Path(args.checkpoints_dir) / "full_ckpts",
         "lora_ckpt": Path(args.checkpoints_dir) / "lora_ckpts",
         "profiling": Path(args.checkpoints_dir) / "profiling",
+        "log_dir": Path(args.checkpoints_dir) / "train-logs" / f"train-{datetime.now().strftime('%Y%m%dT%H%M%S')}",  # fmt: skip
     }
     for _, ckpt_path in checkpoints_dir.items():
         ckpt_path.mkdir(parents=True, exist_ok=True)
@@ -112,6 +113,25 @@ def main():
         input_dataset_filter=dataset_filter,
         seed=args.seed,
     )
+
+    # Setup training options
+    full_logging_options = metrics_logger.MetricsLoggerOptions(
+        log_dir=checkpoints_dir["log_dir"], flush_every_n_steps=20
+    )
+    training_config = peft_trainer.TrainingConfig(
+        eval_every_n_steps=args.eval_steps,
+        max_steps=args.max_steps,
+        metrics_logging_options=full_logging_options,
+        checkpoint_root_directory=checkpoints_dir["lora_ckpt"] if args.use_lora else checkpoints_dir["full_ckpt"],  # fmt: skip
+    )
+    trainer = peft_trainer.PeftTrainer(
+        model=model,
+        optimizer=optax.adamw(learning_rate=args.learning_rate),
+        training_config=training_config,
+    ).with_gen_model_input_fn(gen_model_input_fn)
+
+    with mesh:
+        trainer.train(train_ds, eval_ds)
 
 
 def get_device_info() -> list:
