@@ -16,7 +16,7 @@ dependencies = [
     "matplotlib>=3.10.7",
     "mistral-common>=1.8.5",
     "more-itertools>=10.8.0",
-    "outlines>=1.2.8",
+    "outlines>=0.0.46",
     "prometheus-eval",
     "python-dotenv>=1.2.1",
     "sentence-transformers>=5.1.2",
@@ -25,7 +25,6 @@ dependencies = [
     "transformers>=4.57.1",
     "trl>=0.23.0",
     "unsloth>=2025.11.1 ; sys_platform == 'linux'",
-    "vllm>=0.11.0",
     "wheel>=0.45.1",
 ]
 
@@ -33,7 +32,10 @@ dependencies = [
 tpu = [
     "google-tunix",
 ]
-eval = ["lighteval>=0.10.0"]
+eval = [
+    "lighteval>=0.10.0",
+    "vllm>=0.10.0,<0.10.2",
+]
 
 
 [tool.ruff]
