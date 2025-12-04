@@ -322,13 +322,19 @@ class _Tokenize(grain.MapTransform):
     def __init__(
         self, tokenizer: tokenizer_lib.Tokenizer, input_template: dict[str, str]
     ):
-        self._tokenizer = tokenizer
+        self._tokenizer: tokenizer_lib.Tokenizer = tokenizer
         self._input_template = input_template
 
     def map(self, element: dict[str, Any]) -> tuple[np.ndarray, np.ndarray]:
         """Tokenize the input."""
-        # TODO: it's probably about parsing the messages in the OpenAI format
-        breakpoint()
+        src_tokens = self._tokenizer.tokenize(
+            example=element["prompt"],
+            prefix=self._input_template["prefix"],
+            suffix=self._input_template["suffix"],
+            add_eos=False,
+        )
+        dst_tokens = self._tokenizer.tokenize(element["response"], add_eos=True)
+        return src_tokens, dst_tokens
 
 
 class _BuildTrainInput(grain.MapTransform):
