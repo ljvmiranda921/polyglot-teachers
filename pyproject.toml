@@ -31,6 +31,7 @@ dependencies = [
 
 [project.optional-dependencies]
 tpu = [
+    "gcsfs>=2025.3.0",
     "google-tunix",
 ]
 eval = ["lighteval>=0.10.0"]
