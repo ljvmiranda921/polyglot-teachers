@@ -506,8 +506,7 @@ name = "black"
 version = "25.11.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "click", version = "8.2.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
-    { name = "click", version = "8.3.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "click" },
     { name = "mypy-extensions" },
     { name = "packaging" },
     { name = "pathspec" },
@@ -907,68 +906,12 @@ wheels = [
 name = "click"
 version = "8.2.1"
 source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.14' and sys_platform == 'darwin'",
-    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux'",
-    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux')",
-    "python_full_version == '3.13.*' and sys_platform == 'darwin'",
-    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
-    "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
-    "python_full_version == '3.12.*' and sys_platform == 'darwin'",
-    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
-    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
-    "python_full_version < '3.12' and sys_platform == 'darwin'",
-    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux'",
-    "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux')",
-]
 dependencies = [
-    { name = "colorama", marker = "(sys_platform == 'win32' and extra == 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/60/6c/8ca2efa64cf75a977a0d7fac081354553ebe483345c734fb6b6515d96bbc/click-8.2.1.tar.gz", hash = "sha256:27c491cc05d968d271d5a1db13e3b5a184636d9d930f148c50b038f0d0646202", size = 286342, upload-time = "2025-05-20T23:19:49.832Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/85/32/10bb5764d90a8eee674e9dc6f4db6a0ab47c8c4d0d83c27f7c39ac415a4d/click-8.2.1-py3-none-any.whl", hash = "sha256:61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b", size = 102215, upload-time = "2025-05-20T23:19:47.796Z" },
-]
-
-[[package]]
-name = "click"
-version = "8.3.1"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
-    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
-    "python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
-    "python_full_version == '3.13.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "python_full_version == '3.13.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
-    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
-    "python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
-    "python_full_version == '3.12.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "python_full_version == '3.12.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
-    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
-    "python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
-    "python_full_version < '3.12' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "python_full_version < '3.12' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
-    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
-    "python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
-    "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
-]
-dependencies = [
-    { name = "colorama", marker = "(sys_platform == 'win32' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/3d/fa/656b739db8587d7b5dfa22e22ed02566950fbfbcdc20311993483657a5c0/click-8.3.1.tar.gz", hash = "sha256:12ff4785d337a1bb490bb7e9c2b1ee5da3112e94a8622f26a6c77f5d2fc6842a", size = 295065, upload-time = "2025-11-15T20:45:42.706Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/98/78/01c019cdb5d6498122777c1a43056ebb3ebfeef2076d9d026bfe15583b2b/click-8.3.1-py3-none-any.whl", hash = "sha256:981153a64e25f12d547d3426c367a4857371575ee7ad18df2a6183ab0545b2a6", size = 108274, upload-time = "2025-11-15T20:45:41.139Z" },
 ]
 
 [[package]]
@@ -1035,14 +978,73 @@ wheels = [
 name = "compressed-tensors"
 version = "0.10.2"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14' and sys_platform == 'darwin'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version < '3.12' and sys_platform == 'darwin'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux')",
+]
 dependencies = [
-    { name = "pydantic" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://pypi.org/simple" } },
-    { name = "transformers" },
+    { name = "pydantic", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "transformers", marker = "extra == 'extra-4-mtep-eval'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c0/86/d43d369abc81ec63ec7b8f6f27fc8b113ea0fd18a4116ae12063387b8b34/compressed_tensors-0.10.2.tar.gz", hash = "sha256:6de13ac535d7ffdd8890fad3d229444c33076170acaa8fab6bab8ecfa96c1d8f", size = 173459, upload-time = "2025-06-23T13:19:06.135Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/43/ac/56bb4b6b3150783119479e2f05e32ebfc39ca6ff8e6fcd45eb178743b39e/compressed_tensors-0.10.2-py3-none-any.whl", hash = "sha256:e1b4d9bc2006e3fd3a938e59085f318fdb280c5af64688a4792bf1bc263e579d", size = 169030, upload-time = "2025-06-23T13:19:03.487Z" },
+]
+
+[[package]]
+name = "compressed-tensors"
+version = "0.11.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version < '3.12' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+]
+dependencies = [
+    { name = "frozendict", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "pydantic", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "torch", version = "2.8.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "transformers", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b8/99/3fdabfc95609d6efdf02fa7f1ed0245524cb1209d3d4a17109d3205d2eed/compressed_tensors-0.11.0.tar.gz", hash = "sha256:95ddf19699f775df6494dd864e5f52e8a24f8015496520190c1a22c6cfc44b1f", size = 187566, upload-time = "2025-08-19T18:59:31.854Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d2/81/e3073017a8f5c75169e79108eda209e6089e3f96c9f197d307cbda7df71c/compressed_tensors-0.11.0-py3-none-any.whl", hash = "sha256:e1cbc46e1ae032b7ceea915fe18c8d2de5a54d3a50a607969b6bdfe703b6cb83", size = 179951, upload-time = "2025-08-19T18:59:29.308Z" },
 ]
 
 [[package]]
@@ -1234,7 +1236,8 @@ version = "13.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fastrlock", marker = "sys_platform != 'darwin'" },
-    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform != 'darwin'" },
+    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'darwin' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/54/64/71c6e08f76c06639e5112f69ee3bc1129be00054ad5f906d7fd3138af579/cupy_cuda12x-13.6.0-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:c790d012fd4d86872b9c89af9f5f15d91c30b8e3a4aa4dd04c2610f45f06ac44", size = 128016458, upload-time = "2025-08-18T08:24:26.394Z" },
@@ -1553,11 +1556,11 @@ wheels = [
 [package.optional-dependencies]
 standard = [
     { name = "email-validator" },
-    { name = "fastapi-cli", extra = ["standard"], marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "fastapi-cli", extra = ["standard"] },
     { name = "httpx" },
     { name = "jinja2" },
     { name = "python-multipart" },
-    { name = "uvicorn", extra = ["standard"], marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "uvicorn", extra = ["standard"] },
 ]
 
 [[package]]
@@ -1567,7 +1570,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "rich-toolkit" },
     { name = "typer" },
-    { name = "uvicorn", extra = ["standard"], marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "uvicorn", extra = ["standard"] },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/99/75/9407a6b452be4c988feacec9c9d2f58d8f315162a6c7258d5a649d933ebe/fastapi_cli-0.0.16.tar.gz", hash = "sha256:e8a2a1ecf7a4e062e3b2eec63ae34387d1e142d4849181d936b23c4bdfe29073", size = 19447, upload-time = "2025-11-10T19:01:07.856Z" }
 wheels = [
@@ -1577,7 +1580,7 @@ wheels = [
 [package.optional-dependencies]
 standard = [
     { name = "fastapi-cloud-cli" },
-    { name = "uvicorn", extra = ["standard"], marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "uvicorn", extra = ["standard"] },
 ]
 
 [[package]]
@@ -1587,12 +1590,12 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fastar" },
     { name = "httpx" },
-    { name = "pydantic", extra = ["email"], marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "pydantic", extra = ["email"] },
     { name = "rich-toolkit" },
     { name = "rignore" },
     { name = "sentry-sdk" },
     { name = "typer" },
-    { name = "uvicorn", extra = ["standard"], marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "uvicorn", extra = ["standard"] },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/27/6c/32527a1fd7eee91dd0c52bbe6b7c21e3272b24beb436b142b2c9c01f922d/fastapi_cloud_cli-0.5.2.tar.gz", hash = "sha256:34d04ffadb2562c3ebb39e6f5a599c47353750f75a2ef0a2d9c1442ed09f3308", size = 30744, upload-time = "2025-11-25T11:06:14.583Z" }
 wheels = [
@@ -1820,6 +1823,15 @@ wheels = [
 ]
 
 [[package]]
+name = "frozendict"
+version = "2.4.7"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/90/b2/2a3d1374b7780999d3184e171e25439a8358c47b481f68be883c14086b4c/frozendict-2.4.7.tar.gz", hash = "sha256:e478fb2a1391a56c8a6e10cc97c4a9002b410ecd1ac28c18d780661762e271bd", size = 317082, upload-time = "2025-11-11T22:40:14.251Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/38/74/f94141b38a51a553efef7f510fc213894161ae49b88bffd037f8d2a7cb2f/frozendict-2.4.7-py3-none-any.whl", hash = "sha256:972af65924ea25cf5b4d9326d549e69a9a4918d8a76a9d3a7cd174d98b237550", size = 16264, upload-time = "2025-11-11T22:40:12.836Z" },
+]
+
+[[package]]
 name = "frozenlist"
 version = "1.8.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1970,7 +1982,8 @@ name = "gguf"
 version = "0.17.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
     { name = "pyyaml" },
     { name = "tqdm" },
 ]
@@ -3190,8 +3203,7 @@ version = "1.61.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
-    { name = "click", version = "8.2.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
-    { name = "click", version = "8.3.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "click" },
     { name = "httpx" },
     { name = "importlib-metadata" },
     { name = "jinja2" },
@@ -3262,15 +3274,74 @@ wheels = [
 name = "lm-format-enforcer"
 version = "0.10.12"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14' and sys_platform == 'darwin'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version < '3.12' and sys_platform == 'darwin'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux')",
+]
 dependencies = [
-    { name = "interegular" },
-    { name = "packaging" },
-    { name = "pydantic" },
-    { name = "pyyaml" },
+    { name = "interegular", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "packaging", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "pydantic", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "pyyaml", marker = "extra == 'extra-4-mtep-eval'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/eb/e0/bdbfad8f5d319de5d05cc2b70d579b49eb8ce3a09989cd0999b8c138c068/lm_format_enforcer-0.10.12.tar.gz", hash = "sha256:130bd7ce8a6b224f25b6314ba9ae78ee4b48594db1767c74391c9182e2902a6c", size = 39481, upload-time = "2025-08-04T21:13:45.727Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/57/1c/7bb80fe2dff9a9c38b180571ca867f518eb9110f79d4b670ea124e153680/lm_format_enforcer-0.10.12-py3-none-any.whl", hash = "sha256:267c2b421c77f7cd51ac2e0e3af8db278a373704d834b49ff55f18a2c05e9800", size = 44327, upload-time = "2025-08-04T21:13:44.492Z" },
+]
+
+[[package]]
+name = "lm-format-enforcer"
+version = "0.11.3"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version < '3.12' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+]
+dependencies = [
+    { name = "interegular", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "packaging", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "pydantic", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "pyyaml", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/84/d5/41cd417ba7dfdbbcfe46cebf81fb3dfd7c591b89897560ad05bb410a465d/lm_format_enforcer-0.11.3.tar.gz", hash = "sha256:e68081c108719cce284a9bcc889709b26ffb085a1945b5eba3a12cfa96d528da", size = 40258, upload-time = "2025-08-24T19:37:47.527Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a0/ef/11292bb0b85cf4c93447cab5a29f64576ed14d3ab4280e35ddd23486594a/lm_format_enforcer-0.11.3-py3-none-any.whl", hash = "sha256:cf586350875def1ae7a8fba84fcbbfc8371424b6c9d05c1fcba70aa233fbf06f", size = 45418, upload-time = "2025-08-24T19:37:46.325Z" },
 ]
 
 [[package]]
@@ -3752,7 +3823,8 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jinja2", marker = "sys_platform == 'darwin'" },
     { name = "mlx", marker = "sys_platform == 'darwin'" },
-    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'darwin'" },
+    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'darwin' and extra == 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'darwin' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "protobuf", marker = "sys_platform == 'darwin'" },
     { name = "pyyaml", marker = "sys_platform == 'darwin'" },
     { name = "sentencepiece", marker = "sys_platform == 'darwin'" },
@@ -3905,13 +3977,15 @@ dependencies = [
     { name = "transformers" },
     { name = "trl" },
     { name = "unsloth", marker = "sys_platform == 'linux' or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "vllm", version = "0.10.1.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "vllm", version = "0.11.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
     { name = "wheel" },
 ]
 
 [package.optional-dependencies]
 eval = [
     { name = "lighteval" },
-    { name = "vllm" },
+    { name = "vllm", version = "0.10.1.1", source = { registry = "https://pypi.org/simple" } },
 ]
 tpu = [
     { name = "gcsfs" },
@@ -3950,6 +4024,7 @@ requires-dist = [
     { name = "transformers", specifier = ">=4.57.1" },
     { name = "trl", specifier = ">=0.23.0" },
     { name = "unsloth", marker = "sys_platform == 'linux'", specifier = ">=2025.11.1" },
+    { name = "vllm", specifier = ">=0.10.1.1" },
     { name = "vllm", marker = "extra == 'eval'", specifier = ">=0.10.0,<0.10.2" },
     { name = "wheel", specifier = ">=0.45.1" },
 ]
@@ -4165,7 +4240,7 @@ name = "nltk"
 version = "3.9.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "click", version = "8.2.1", source = { registry = "https://pypi.org/simple" } },
+    { name = "click" },
     { name = "joblib" },
     { name = "regex" },
     { name = "tqdm" },
@@ -4189,9 +4264,9 @@ name = "numba"
 version = "0.61.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "llvmlite", marker = "extra == 'extra-4-mtep-eval' or extra == 'extra-4-mtep-tpu'" },
+    { name = "llvmlite" },
     { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/1c/a0/e21f57604304aa03ebb8e098429222722ad99176a4f979d34af1d1ee80da/numba-0.61.2.tar.gz", hash = "sha256:8750ee147940a6637b80ecf7f95062185ad8726c8c28a2295b8ec1160a196f7d", size = 2820615, upload-time = "2025-04-09T02:58:07.659Z" }
 wheels = [
@@ -4939,7 +5014,8 @@ name = "opencv-python-headless"
 version = "4.11.0.86"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/36/2f/5b2b3ba52c864848885ba988f24b7f105052f68da9ab0e693cc7c25b0b30/opencv-python-headless-4.11.0.86.tar.gz", hash = "sha256:996eb282ca4b43ec6a3972414de0e2331f5d9cda2b41091a49739c19fb843798", size = 95177929, upload-time = "2025-01-16T13:53:40.22Z" }
 wheels = [
@@ -6363,7 +6439,7 @@ name = "ray"
 version = "2.52.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "click", version = "8.2.1", source = { registry = "https://pypi.org/simple" } },
+    { name = "click" },
     { name = "filelock" },
     { name = "jsonschema" },
     { name = "msgpack" },
@@ -6543,7 +6619,7 @@ name = "rich-toolkit"
 version = "0.17.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "click", version = "8.2.1", source = { registry = "https://pypi.org/simple" } },
+    { name = "click" },
     { name = "rich" },
     { name = "typing-extensions" },
 ]
@@ -7318,7 +7394,8 @@ version = "0.13.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cffi" },
-    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e1/41/9b873a8c055582859b239be17902a85339bec6a30ad162f98c9b0288a2cc/soundfile-0.13.1.tar.gz", hash = "sha256:b2c68dab1e30297317080a5b43df57e302584c49e2942defdde0acccc53f0e5b", size = 46156, upload-time = "2025-01-25T09:17:04.831Z" }
 wheels = [
@@ -7336,7 +7413,8 @@ name = "soxr"
 version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/7e/f4b461944662ad75036df65277d6130f9411002bfb79e9df7dff40a31db9/soxr-1.0.0.tar.gz", hash = "sha256:e07ee6c1d659bc6957034f4800c60cb8b98de798823e34d2a2bba1caa85a4509", size = 171415, upload-time = "2025-09-07T13:22:21.317Z" }
 wheels = [
@@ -7839,8 +7917,22 @@ wheels = [
 name = "torchaudio"
 version = "2.7.1"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14' and sys_platform == 'darwin'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version < '3.12' and sys_platform == 'darwin'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux')",
+]
 dependencies = [
-    { name = "torch", version = "2.7.1", source = { registry = "https://pypi.org/simple" } },
+    { name = "torch", version = "2.7.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/85/a2/52e6760d352584ae1ab139d97647bdc51d1eb7d480b688fe69c72616c956/torchaudio-2.7.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:d5a62f88c629035913f506df03f710c48fc8bb9637191933f27c67088d5ca136", size = 1849254, upload-time = "2025-06-04T17:44:05.392Z" },
@@ -7859,6 +7951,62 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/f7/16/9d03dc62613f276f9666eb0609164287df23986b67d20b53e78d21a3d8d8/torchaudio-2.7.1-cp313-cp313t-manylinux_2_28_aarch64.whl", hash = "sha256:1850475ef9101ea0b3593fe93ff6ee4e7a20598f6da6510761220b9fe56eb7fa", size = 1700436, upload-time = "2025-06-04T17:43:55.589Z" },
     { url = "https://files.pythonhosted.org/packages/83/45/57a437fe41b302fc79b4eb78fdb3e480ff42c66270e7505eedf0b000969c/torchaudio-2.7.1-cp313-cp313t-manylinux_2_28_x86_64.whl", hash = "sha256:98257fc14dd493ba5a3258fb6d61d27cd64a48ee79537c3964c4da26b9bf295f", size = 3521631, upload-time = "2025-06-04T17:43:50.628Z" },
     { url = "https://files.pythonhosted.org/packages/91/5e/9262a7e41e47bc87eb245c4fc485eb26ff41a05886b241c003440c9e0107/torchaudio-2.7.1-cp313-cp313t-win_amd64.whl", hash = "sha256:c802e0dcbf38669007327bb52f065573cc5cac106eaca987f6e1a32e6282263a", size = 2534956, upload-time = "2025-06-04T17:43:42.324Z" },
+]
+
+[[package]]
+name = "torchaudio"
+version = "2.8.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version < '3.12' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+]
+dependencies = [
+    { name = "torch", version = "2.8.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/dd/bf/6b01ef3defb8d0a772c863588711e9b2b011c27d6b37c1b9d15a359c8442/torchaudio-2.8.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:c9276857d241c6de257af765c0f51fc011af38cb725401495121b280913007cf", size = 1859094, upload-time = "2025-08-06T14:58:35.078Z" },
+    { url = "https://files.pythonhosted.org/packages/75/ca/da5d0a3bb7d114a8b590ecce14859ea0a05102bb4de68cdd1ed7a90634d6/torchaudio-2.8.0-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:4573c6042950c20278e3608a9a38050ba0bc72e0049e1bbfd249caf859a8029b", size = 1692033, upload-time = "2025-08-06T14:58:37.393Z" },
+    { url = "https://files.pythonhosted.org/packages/b6/ef/62ac736d8f906cc414181050e08a495a637dab985186c34bd76ea37efbc0/torchaudio-2.8.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:776c0b4ba84b9e3ddf6304b9c47cd63549d7896a6f3d5184ece074cc3d76ed6b", size = 4011716, upload-time = "2025-08-06T14:58:40.138Z" },
+    { url = "https://files.pythonhosted.org/packages/14/86/015337c8434abc604b8680371df783f66c421a7f211cbe40a374b0540b6d/torchaudio-2.8.0-cp311-cp311-win_amd64.whl", hash = "sha256:078105bf80f725c0215a0bebac8cb2fb1b3993ab32bdc3fcd50145a5b4127001", size = 2505194, upload-time = "2025-08-06T14:58:57.301Z" },
+    { url = "https://files.pythonhosted.org/packages/ac/cc/c2e2a3eb6ee956f73c68541e439916f8146170ea9cc61e72adea5c995312/torchaudio-2.8.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:ddef94bf181e6447cbb05f38beaca8f6c5bb8d2b9ddced1aa3452025b9fc70d3", size = 1856736, upload-time = "2025-08-06T14:58:36.3Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/0d/24dad878784f1edd62862f27173781669f0c71eb46368636787d1e364188/torchaudio-2.8.0-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:862e2e40bf09d865e5df080a84c1a39bbcef40e43140f4b1737eb3a389d3b38f", size = 1692930, upload-time = "2025-08-06T14:58:41.312Z" },
+    { url = "https://files.pythonhosted.org/packages/c2/a6/84d80f34472503e9eb82245d7df501c59602d75d7360e717fb9b84f91c5e/torchaudio-2.8.0-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:93a8583f280fe83ba021aa713319381ea71362cc87b67ee38e97a43cb2254aee", size = 4014607, upload-time = "2025-08-06T14:58:47.234Z" },
+    { url = "https://files.pythonhosted.org/packages/43/ab/96ad33afa320738a7cfb4b51ba97e2f3cfb1e04ae3115d5057655103ba4f/torchaudio-2.8.0-cp312-cp312-win_amd64.whl", hash = "sha256:4b82cacd1b8ccd543b1149d8cab257a40dfda8119023d2e3a96c66349c84bffb", size = 2499890, upload-time = "2025-08-06T14:58:55.066Z" },
+    { url = "https://files.pythonhosted.org/packages/3b/ea/2a68259c4dbb5fe44ebfdcfa40b115010d8c677221a7ef0f5577f3c4f5f1/torchaudio-2.8.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:f851d32e94ca05e470f0c60e25726ec1e0eb71cb2ca5a0206b7fd03272ccc3c8", size = 1857045, upload-time = "2025-08-06T14:58:51.984Z" },
+    { url = "https://files.pythonhosted.org/packages/0d/a3/1c79a8ef29fe403b83bdfc033db852bc2a888b80c406325e5c6fb37a7f2d/torchaudio-2.8.0-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:09535a9b727c0793cd07c1ace99f3f353626281bcc3e30c2f2314e3ebc9d3f96", size = 1692755, upload-time = "2025-08-06T14:58:50.868Z" },
+    { url = "https://files.pythonhosted.org/packages/49/df/61941198e9ac6bcebfdd57e1836e4f3c23409308e3d8d7458f0198a6a366/torchaudio-2.8.0-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:d2a85b124494736241884372fe1c6dd8c15e9bc1931bd325838c5c00238c7378", size = 4013897, upload-time = "2025-08-06T14:59:01.66Z" },
+    { url = "https://files.pythonhosted.org/packages/c3/ab/7175d35a4bbc4a465a9f1388571842f16eb6dec5069d7ea9c8c2d7b5b401/torchaudio-2.8.0-cp313-cp313-win_amd64.whl", hash = "sha256:c1b5139c840367a7855a062a06688a416619f6fd2ca46d9b9299b49a7d133dfd", size = 2500085, upload-time = "2025-08-06T14:58:44.95Z" },
+    { url = "https://files.pythonhosted.org/packages/34/1a/69b9f8349d9d57953d5e7e445075cbf74000173fb5f5d5d9e9d59415fc63/torchaudio-2.8.0-cp313-cp313t-macosx_11_0_arm64.whl", hash = "sha256:68df9c9068984edff8065c2b6656725e6114fe89281b0cf122c7505305fc98a4", size = 1935600, upload-time = "2025-08-06T14:58:46.051Z" },
+    { url = "https://files.pythonhosted.org/packages/71/76/40fec21b65bccfdc5c8cdb9d511033ab07a7ad4b05f0a5b07f85c68279fc/torchaudio-2.8.0-cp313-cp313t-manylinux_2_28_aarch64.whl", hash = "sha256:1951f10ed092f2dda57634f6a3950ef21c9d9352551aa84a9fccd51bbda18095", size = 1704199, upload-time = "2025-08-06T14:58:43.594Z" },
+    { url = "https://files.pythonhosted.org/packages/8e/53/95c3363413c2f2009f805144160b093a385f641224465fbcd717449c71fb/torchaudio-2.8.0-cp313-cp313t-manylinux_2_28_x86_64.whl", hash = "sha256:4f7d97494698d98854129349b12061e8c3398d33bd84c929fa9aed5fd1389f73", size = 4020596, upload-time = "2025-08-06T14:59:03.031Z" },
+    { url = "https://files.pythonhosted.org/packages/52/27/7fc2d7435af044ffbe0b9b8e98d99eac096d43f128a5cde23c04825d5dcf/torchaudio-2.8.0-cp313-cp313t-win_amd64.whl", hash = "sha256:d4a715d09ac28c920d031ee1e60ecbc91e8a5079ad8c61c0277e658436c821a6", size = 2549553, upload-time = "2025-08-06T14:59:00.019Z" },
 ]
 
 [[package]]
@@ -7908,27 +8056,39 @@ name = "torchvision"
 version = "0.23.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
+    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
     "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
     "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
     "python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
     "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
     "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
     "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
     "python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
     "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
     "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
     "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
     "python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
     "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version < '3.12' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
     "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
     "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
     "python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
     "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
 ]
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'linux' and extra != 'extra-4-mtep-eval') or (sys_platform != 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
-    { name = "pillow", marker = "(sys_platform == 'linux' and extra != 'extra-4-mtep-eval') or (sys_platform != 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
-    { name = "torch", version = "2.8.0", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'linux' and extra != 'extra-4-mtep-eval') or (sys_platform != 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "pillow", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "torch", version = "2.8.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f0/d7/15d3d7bd8d0239211b21673d1bac7bc345a4ad904a8e25bb3fd8a9cf1fbc/torchvision-0.23.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:49aa20e21f0c2bd458c71d7b449776cbd5f16693dd5807195a820612b8a229b7", size = 1856884, upload-time = "2025-08-06T14:58:00.237Z" },
@@ -8184,8 +8344,7 @@ name = "typer"
 version = "0.20.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "click", version = "8.2.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
-    { name = "click", version = "8.3.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "click" },
     { name = "rich" },
     { name = "shellingham" },
     { name = "typing-extensions" },
@@ -8347,8 +8506,7 @@ name = "uvicorn"
 version = "0.38.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "click", version = "8.2.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
-    { name = "click", version = "8.3.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "click" },
     { name = "h11" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/cb/ce/f06b84e2697fef4688ca63bdb2fdf113ca0a3be33f94488f2cadb690b0cf/uvicorn-0.38.0.tar.gz", hash = "sha256:fd97093bdd120a2609fc0d3afe931d4d4ad688b6e75f0f929fde1bc36fe0e91d", size = 80605, upload-time = "2025-10-18T13:46:44.63Z" }
@@ -8435,66 +8593,177 @@ wheels = [
 name = "vllm"
 version = "0.10.1.1"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14' and sys_platform == 'darwin'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version < '3.12' and sys_platform == 'darwin'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux')",
+]
 dependencies = [
-    { name = "aiohttp" },
-    { name = "blake3" },
-    { name = "cachetools" },
-    { name = "cbor2" },
-    { name = "cloudpickle" },
-    { name = "compressed-tensors" },
-    { name = "depyf" },
-    { name = "diskcache" },
-    { name = "einops" },
+    { name = "aiohttp", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "blake3", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "cachetools", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "cbor2", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "cloudpickle", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "compressed-tensors", version = "0.10.2", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "depyf", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "diskcache", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "einops", marker = "extra == 'extra-4-mtep-eval'" },
     { name = "fastapi", extra = ["standard"], marker = "extra == 'extra-4-mtep-eval'" },
-    { name = "filelock" },
-    { name = "gguf" },
-    { name = "lark" },
-    { name = "llguidance", marker = "platform_machine == 'aarch64' or platform_machine == 'arm64' or platform_machine == 'x86_64'" },
-    { name = "lm-format-enforcer" },
+    { name = "filelock", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "gguf", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "lark", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "llguidance", marker = "(platform_machine == 'aarch64' and extra == 'extra-4-mtep-eval') or (platform_machine == 'arm64' and extra == 'extra-4-mtep-eval') or (platform_machine == 'x86_64' and extra == 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "lm-format-enforcer", version = "0.10.12", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
     { name = "mistral-common", extra = ["audio", "image"], marker = "extra == 'extra-4-mtep-eval'" },
-    { name = "msgspec" },
-    { name = "ninja" },
-    { name = "numba" },
-    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" } },
-    { name = "openai" },
-    { name = "openai-harmony" },
-    { name = "opencv-python-headless" },
-    { name = "outlines-core", version = "0.2.10", source = { registry = "https://pypi.org/simple" } },
-    { name = "partial-json-parser" },
-    { name = "pillow" },
-    { name = "prometheus-client" },
-    { name = "prometheus-fastapi-instrumentator" },
-    { name = "protobuf" },
-    { name = "psutil" },
-    { name = "py-cpuinfo" },
-    { name = "pybase64" },
-    { name = "pydantic" },
-    { name = "python-json-logger" },
-    { name = "pyyaml" },
-    { name = "pyzmq" },
+    { name = "msgspec", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "ninja", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "numba", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "openai", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "openai-harmony", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "opencv-python-headless", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "outlines-core", version = "0.2.10", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "partial-json-parser", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "pillow", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "prometheus-client", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "prometheus-fastapi-instrumentator", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "protobuf", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "psutil", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "py-cpuinfo", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "pybase64", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "pydantic", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "python-json-logger", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "pyyaml", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "pyzmq", marker = "extra == 'extra-4-mtep-eval'" },
     { name = "ray", extra = ["cgraph"], marker = "extra == 'extra-4-mtep-eval'" },
-    { name = "regex" },
-    { name = "requests" },
-    { name = "scipy" },
-    { name = "sentencepiece" },
-    { name = "setproctitle" },
-    { name = "setuptools", marker = "python_full_version >= '3.12'" },
-    { name = "six", marker = "python_full_version >= '3.12'" },
-    { name = "tiktoken" },
-    { name = "tokenizers" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://pypi.org/simple" } },
-    { name = "torchaudio" },
-    { name = "torchvision", version = "0.22.1", source = { registry = "https://pypi.org/simple" } },
-    { name = "tqdm" },
-    { name = "transformers" },
-    { name = "typing-extensions" },
-    { name = "watchfiles" },
-    { name = "xformers", version = "0.0.31", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "xgrammar", marker = "platform_machine == 'aarch64' or platform_machine == 'arm64' or platform_machine == 'x86_64'" },
+    { name = "regex", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "requests", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "scipy", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "sentencepiece", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "setproctitle", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "setuptools", marker = "(python_full_version >= '3.12' and extra == 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "six", marker = "(python_full_version >= '3.12' and extra == 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "tiktoken", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "tokenizers", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "torchaudio", version = "2.7.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "torchvision", version = "0.22.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "tqdm", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "transformers", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "typing-extensions", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "watchfiles", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "xformers", version = "0.0.31", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-4-mtep-eval') or (platform_machine != 'x86_64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform != 'linux' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "xgrammar", version = "0.1.21", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'aarch64' and extra == 'extra-4-mtep-eval') or (platform_machine == 'arm64' and extra == 'extra-4-mtep-eval') or (platform_machine == 'x86_64' and extra == 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ae/a8/b53e7950c05bf8e6ef4438603a70c8992e7bc90fcad5a7a4f360c7d748a6/vllm-0.10.1.1.tar.gz", hash = "sha256:3099824ee4bdaa14c4c4f7178a092101a0ec206d4c9371edf295849b2b730a39", size = 10510801, upload-time = "2025-08-20T23:17:16.776Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3b/14/6fac6c3f6be5657a70911c8c48062c4749925dc5e24d254b1ec493add7a0/vllm-0.10.1.1-cp38-abi3-manylinux1_x86_64.whl", hash = "sha256:8ca0dd985e1ceac8540e7719c654f1553b3ba8a43c685ac8d3fa1366ffb6443a", size = 414400912, upload-time = "2025-08-20T23:17:09.179Z" },
+]
+
+[[package]]
+name = "vllm"
+version = "0.11.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version < '3.12' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+]
+dependencies = [
+    { name = "aiohttp", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "blake3", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "cachetools", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "cbor2", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "cloudpickle", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "compressed-tensors", version = "0.11.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "depyf", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "diskcache", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "einops", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "fastapi", extra = ["standard"], marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "filelock", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "gguf", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "lark", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "llguidance", marker = "(platform_machine == 'aarch64' and extra != 'extra-4-mtep-eval') or (platform_machine == 'arm64' and extra != 'extra-4-mtep-eval') or (platform_machine == 'x86_64' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "lm-format-enforcer", version = "0.11.3", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "mistral-common", extra = ["audio", "image"], marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "msgspec", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "ninja", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "numba", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "openai", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "openai-harmony", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "opencv-python-headless", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "outlines-core", version = "0.2.11", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "partial-json-parser", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "pillow", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "prometheus-client", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "prometheus-fastapi-instrumentator", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "protobuf", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "psutil", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "py-cpuinfo", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "pybase64", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "pydantic", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "python-json-logger", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "pyyaml", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "pyzmq", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "ray", extra = ["cgraph"], marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "regex", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "requests", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "scipy", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "sentencepiece", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "setproctitle", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "setuptools", marker = "(python_full_version >= '3.12' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "six", marker = "(python_full_version >= '3.12' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "tiktoken", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "tokenizers", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "torch", version = "2.8.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "torchaudio", version = "2.8.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "torchvision", version = "0.23.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "tqdm", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "transformers", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "typing-extensions", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "watchfiles", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "xformers", version = "0.0.32.post1", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "xgrammar", version = "0.1.25", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'aarch64' and extra != 'extra-4-mtep-eval') or (platform_machine == 'arm64' and extra != 'extra-4-mtep-eval') or (platform_machine == 'x86_64' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/82/5a/36d2351206f4d8d871b10780f874d03957985e08298d430cc837723e07af/vllm-0.11.0.tar.gz", hash = "sha256:f435a64c24e9c4178d657a76f8edd8548ddc444012f7d06a9f79ac3a6392bfae", size = 10822208, upload-time = "2025-10-04T01:39:57.798Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/47/33/d19e0763c34392ec956534536fa837c060495bfff31ed83452135ea7608d/vllm-0.11.0-cp38-abi3-manylinux1_x86_64.whl", hash = "sha256:3861c75ff2b12e24f6d179ff5c084d791b42ded8675d76c8706697c79f68cd62", size = 438217982, upload-time = "2025-10-04T01:39:32.382Z" },
+    { url = "https://files.pythonhosted.org/packages/d7/bf/973444bb959fc7acbbeb3d226bd4d135dcd49b6af174b29aab1b50e2d710/vllm-0.11.0-cp38-abi3-manylinux2014_aarch64.whl", hash = "sha256:52369c9ee949944354bdc7afc88ded2d1ed02b098bf90db06cf80098a19787b7", size = 401003969, upload-time = "2025-10-04T01:39:50.251Z" },
 ]
 
 [[package]]
@@ -8782,13 +9051,27 @@ wheels = [
 name = "xgrammar"
 version = "0.1.21"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14' and sys_platform == 'darwin'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "python_full_version < '3.12' and sys_platform == 'darwin'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux')",
+]
 dependencies = [
-    { name = "mlx-lm", marker = "platform_machine == 'arm64' and sys_platform == 'darwin'" },
-    { name = "ninja" },
-    { name = "pydantic" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://pypi.org/simple" } },
-    { name = "transformers" },
-    { name = "triton", version = "3.3.1", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "mlx-lm", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin' and extra == 'extra-4-mtep-eval') or (platform_machine != 'arm64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform != 'darwin' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "ninja", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "pydantic", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "transformers", marker = "extra == 'extra-4-mtep-eval'" },
+    { name = "triton", version = "3.3.1", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-4-mtep-eval') or (platform_machine != 'x86_64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform != 'linux' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e3/52/ea664a56674f21c401b45f124c207a16ca4b2318364687172edbcf255375/xgrammar-0.1.21.tar.gz", hash = "sha256:2ce1e81417ff46aa7ef26d8c0627275cb20dd1f2e8ead5bb261aecde1cc8ba57", size = 2242013, upload-time = "2025-07-10T19:34:14.336Z" }
 wheels = [
@@ -8805,6 +9088,67 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/e7/ce/4d2892701f1e009c40e30f75dbaed85cd1a476797e241310c5e586d1061f/xgrammar-0.1.21-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:a1f128511bf354f6e3a027fedb3eb38e8749e2eefbb3874a7edefd054e2b677a", size = 4533053, upload-time = "2025-07-10T19:34:00.267Z" },
     { url = "https://files.pythonhosted.org/packages/af/fb/429e9c32d6dbd4d1199d218a5d7d1e63f658c280ad915747d344b53d3e9f/xgrammar-0.1.21-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6f5936ea42b8005a963f0f51e713fb94f6766159f4380f339f504f3f1bd6b489", size = 11811209, upload-time = "2025-07-10T19:34:01.765Z" },
     { url = "https://files.pythonhosted.org/packages/1d/c2/b3547fa466e5fa2134f0a408994a250ad17cd99595f845db0215ddd8bcaf/xgrammar-0.1.21-cp313-cp313-win_amd64.whl", hash = "sha256:20a217a760fd0633a704929320ad2004ff90951fdcf758351f54a9271ab36a6c", size = 4250310, upload-time = "2025-07-10T19:34:03.896Z" },
+]
+
+[[package]]
+name = "xgrammar"
+version = "0.1.25"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version < '3.12' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+]
+dependencies = [
+    { name = "mlx-lm", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "ninja", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "pydantic", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "torch", version = "2.8.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "transformers", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+    { name = "triton", version = "3.4.0", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "typing-extensions", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f2/a9/dc3c63cf7f082d183711e46ef34d10d8a135c2319dc581905d79449f52ea/xgrammar-0.1.25.tar.gz", hash = "sha256:70ce16b27e8082f20808ed759b0733304316facc421656f0f30cfce514b5b77a", size = 2297187, upload-time = "2025-09-21T05:58:58.942Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9e/b7/ca0ff7c91f24b2302e94b0e6c2a234cc5752b10da51eb937e7f2aa257fde/xgrammar-0.1.25-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:27d7ac4be05cf9aa258c109a8647092ae47cb1e28df7d27caced6ab44b72b799", size = 678801, upload-time = "2025-09-21T05:58:29.936Z" },
+    { url = "https://files.pythonhosted.org/packages/43/cd/fdf4fb1b5f9c301d381656a600ad95255a76fa68132978af6f06e50a46e1/xgrammar-0.1.25-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:151c1636188bc8c5cdf318cefc5ba23221c9c8cc07cb392317fb3f7635428150", size = 622565, upload-time = "2025-09-21T05:58:31.185Z" },
+    { url = "https://files.pythonhosted.org/packages/55/04/55a87e814bcab771d3e4159281fa382b3d5f14a36114f2f9e572728da831/xgrammar-0.1.25-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:35fc135650aa204bf84db7fe9c0c0f480b6b11419fe47d89f4bd21602ac33be9", size = 8517238, upload-time = "2025-09-21T05:58:32.835Z" },
+    { url = "https://files.pythonhosted.org/packages/31/f6/3c5210bc41b61fb32b66bf5c9fd8ec5edacfeddf9860e95baa9caa9a2c82/xgrammar-0.1.25-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:fc19d6d7e8e51b6c9a266e949ac7fb3d2992447efeec7df32cca109149afac18", size = 8709514, upload-time = "2025-09-21T05:58:34.727Z" },
+    { url = "https://files.pythonhosted.org/packages/21/de/85714f307536b328cc16cc6755151865e8875378c8557c15447ca07dff98/xgrammar-0.1.25-cp311-cp311-win_amd64.whl", hash = "sha256:8fcb24f5a7acd5876165c50bd51ce4bf8e6ff897344a5086be92d1fe6695f7fe", size = 698722, upload-time = "2025-09-21T05:58:36.411Z" },
+    { url = "https://files.pythonhosted.org/packages/bf/d7/a7bdb158afa88af7e6e0d312e9677ba5fb5e423932008c9aa2c45af75d5d/xgrammar-0.1.25-cp312-cp312-macosx_10_14_x86_64.whl", hash = "sha256:96500d7578c46e8551253b9211b02e02f54e147bc290479a64717d80dcf4f7e3", size = 678250, upload-time = "2025-09-21T05:58:37.936Z" },
+    { url = "https://files.pythonhosted.org/packages/10/9d/b20588a3209d544a3432ebfcf2e3b1a455833ee658149b08c18eef0c6f59/xgrammar-0.1.25-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:73ba9031e359447af53ce89dfb0775e7b9f4b358d513bcc28a6b4deace661dd5", size = 621550, upload-time = "2025-09-21T05:58:39.464Z" },
+    { url = "https://files.pythonhosted.org/packages/99/9c/39bb38680be3b6d6aa11b8a46a69fb43e2537d6728710b299fa9fc231ff0/xgrammar-0.1.25-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c519518ebc65f75053123baaf23776a21bda58f64101a64c2fc4aa467c9cd480", size = 8519097, upload-time = "2025-09-21T05:58:40.831Z" },
+    { url = "https://files.pythonhosted.org/packages/c6/c2/695797afa9922c30c45aa94e087ad33a9d87843f269461b622a65a39022a/xgrammar-0.1.25-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:47fdbfc6007df47de2142613220292023e88e4a570546b39591f053e4d9ec33f", size = 8712184, upload-time = "2025-09-21T05:58:43.142Z" },
+    { url = "https://files.pythonhosted.org/packages/e4/7f/aa80d1d4c4632cd3d8d083f1de8b470fcb3df23d9165992a3ced019f1b93/xgrammar-0.1.25-cp312-cp312-win_amd64.whl", hash = "sha256:c9b3defb6b45272e896da401f43b513f5ac12104ec3101bbe4d3a7d02bcf4a27", size = 698264, upload-time = "2025-09-21T05:58:44.787Z" },
+    { url = "https://files.pythonhosted.org/packages/b2/5b/4090c73d3e04ff96a1464a8695dc12bde4cc83bb4b9c2f06d2e02a744828/xgrammar-0.1.25-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:2d80d4bfe65d1a3334536c804b6471f32e6759f1972c9abe0ae49d5e21462c0b", size = 621445, upload-time = "2025-09-21T05:58:46.331Z" },
+    { url = "https://files.pythonhosted.org/packages/e1/48/df8c52a22f47f1e3237d9457fd6fefe8b9bca75a13a81d1901690260c86b/xgrammar-0.1.25-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7a1a6a638167d704a22a0c9670e2176104c38e38c351286a07a77143e22f9053", size = 8710998, upload-time = "2025-09-21T05:58:47.731Z" },
+    { url = "https://files.pythonhosted.org/packages/5f/82/e48284c5061550ff682b1096c43146244207c64541cf36fcce88c66a0407/xgrammar-0.1.25-cp313-cp313-win_amd64.whl", hash = "sha256:ffadeba0b704667a7eb6202d409533e9d1e80af15a10add107684e0cde45b8e4", size = 698260, upload-time = "2025-09-21T05:58:49.44Z" },
 ]
 
 [[package]]
