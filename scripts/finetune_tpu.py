@@ -9,15 +9,13 @@ from typing import Any, Optional
 
 import datasets
 import jax
-import jax.numpy as jnp  # numpy commands in TPU
 import numpy as np
-import optax  # gradient and optimization library
-import qwix  # quantization
+import optax
+import qwix
 from dotenv import load_dotenv
-from flax import nnx  # neural network lib for jax
+from flax import nnx
 from grain import python as grain
 from huggingface_hub import HfApi, snapshot_download
-from orbax import checkpoint as ocp  # checkpointing
 from tunix.generate import tokenizer_adapter as tokenizer_lib
 from tunix.models.gemma3 import model as gemma_lib
 from tunix.models.gemma3 import params as gemma_params
