@@ -3,6 +3,7 @@ import sys
 import os
 import json
 import logging
+import shutil
 from pathlib import Path
 from typing import Optional, Any
 
@@ -467,7 +468,7 @@ def save_finetuned_model(
     output_dir.mkdir(parents=True, exist_ok=True)
 
     gemma_params.save_lora_merged_model_as_safetensors(
-        local_model_path=str(output_dir),
+        local_model_path=str(local_model_path),
         output_dir=str(output_dir),
         lora_model=model,
         rank=lora_r,
@@ -494,7 +495,7 @@ def save_finetuned_model(
             token=token,
         )
         api.upload_folder(
-            folder_path=local_save_dir,
+            folder_path=output_dir,
             repo_id=output_hf_name,
             repo_type="model",
             path_in_repo=".",
@@ -507,10 +508,8 @@ def save_finetuned_model(
         raise
     else:
         # Delete local directory to save some space in the cluster
-        shutil.rmtree(local_save_dir)
-        logging.info(
-            f"Successfully uploaded and deleted local directory: {local_save_dir}"
-        )
+        shutil.rmtree(output_dir)
+        logging.info(f"Successfully uploaded and deleted local directory: {output_dir}")
 
 
 if __name__ == "__main__":
