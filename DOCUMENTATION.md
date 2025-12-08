@@ -111,4 +111,4 @@ lighteval vllm "model_name=<model_name>,tensor_parallel_size=2,gpu_memory_utiliz
     --save-details 
 ```
 
-## Step 5: Compute PolyTeacher Score
+## Step 5: Compute PG-Score
