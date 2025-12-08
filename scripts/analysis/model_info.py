@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, Literal
+from typing import Optional, Literal, Any
 
 
 class ModelInfo(BaseModel):
@@ -24,7 +24,7 @@ class ModelInfo(BaseModel):
     cost_out_mtok: Optional[float] = None  # Cost per million output tokens (USD)
 
     # Performance
-    benchmark_scores: Optional[dict[str, float]] = None
+    benchmark_scores: Optional[dict[str, Any]] = None
 
     # Metadata
     release_date: Optional[str] = None  # YYYY-MM format
@@ -38,6 +38,11 @@ MODEL_INFORMATION: list[ModelInfo] = [
         parameter_size=32.0,
         context_length=128_000,
         num_languages_supported=23,
+        benchmark_scores={
+            "global_mmlu_lite:es": {"acc": 0.5625, "acc_stderr": 0.02483498169496957},
+            "global_mmlu_lite:ja": {"acc": 0.635, "acc_stderr": 0.0241016539745881},
+            "global_mmlu_lite:de": {"acc": 0.6425, "acc_stderr": 0.02399319817984352},
+        },
     ),
     ModelInfo(
         name="cohere-command-a",
@@ -51,6 +56,11 @@ MODEL_INFORMATION: list[ModelInfo] = [
         parameter_size=27.0,
         context_length=128_000,
         num_languages_supported=140,
+        benchmark_scores={
+            "global_mmlu_lite:ja": {"acc": 0.5725, "acc_stderr": 0.024766769210836766},
+            "global_mmlu_lite:es": {"acc": 0.5825, "acc_stderr": 0.024688218756390913},
+            "global_mmlu_lite:de": {"acc": 0.525, "acc_stderr": 0.02499999999999999},
+        },
     ),
     ModelInfo(
         name="google/gemma-3-12b-it",
@@ -58,6 +68,11 @@ MODEL_INFORMATION: list[ModelInfo] = [
         parameter_size=12.0,
         context_length=128_000,
         num_languages_supported=140,
+        benchmark_scores={
+            "global_mmlu_lite:es": {"acc": 0.5675, "acc_stderr": 0.024802162065186352},
+            "global_mmlu_lite:de": {"acc": 0.58, "acc_stderr": 0.02470883072485368},
+            "global_mmlu_lite:ja": {"acc": 0.4075, "acc_stderr": 0.024599231297971983},
+        },
     ),
     ModelInfo(
         name="google/gemma-3-4b-it",
@@ -65,6 +80,11 @@ MODEL_INFORMATION: list[ModelInfo] = [
         parameter_size=4.0,
         context_length=128_000,
         num_languages_supported=140,
+        benchmark_scores={
+            "global_mmlu_lite:de": {"acc": 0.4775, "acc_stderr": 0.025005951672504308},
+            "global_mmlu_lite:es": {"acc": 0.3725, "acc_stderr": 0.024203800008203095},
+            "global_mmlu_lite:ja": {"acc": 0.3925, "acc_stderr": 0.024445927747963326},
+        },
     ),
     ModelInfo(
         name="gpt-4o-mini-2024-07-18",
@@ -77,6 +97,11 @@ MODEL_INFORMATION: list[ModelInfo] = [
         model_family="Granite",
         parameter_size=1.0,
         context_length=128_000,
+        benchmark_scores={
+            "global_mmlu_lite:es": {"acc": 0.48, "acc_stderr": 0.02501127565268187},
+            "global_mmlu_lite:de": {"acc": 0.4475, "acc_stderr": 0.0248929411943076},
+            "global_mmlu_lite:ja": {"acc": 0.4175, "acc_stderr": 0.024688218756390913},
+        },
     ),
     ModelInfo(
         name="ibm-granite/granite-4.0-micro",
@@ -84,6 +109,11 @@ MODEL_INFORMATION: list[ModelInfo] = [
         parameter_size=3.0,
         context_length=128_000,
         num_languages_supported=12,
+        benchmark_scores={
+            "global_mmlu_lite:es": {"acc": 0.59, "acc_stderr": 0.02462246259333947},
+            "global_mmlu_lite:de": {"acc": 0.54, "acc_stderr": 0.02495107995613509},
+            "global_mmlu_lite:ja": {"acc": 0.4725, "acc_stderr": 0.024993420186752734},
+        },
     ),
     ModelInfo(
         name="meta-llama/Llama-3.1-70B-Instruct",
@@ -96,5 +126,10 @@ MODEL_INFORMATION: list[ModelInfo] = [
         model_family="Llama",
         parameter_size=8.0,
         context_length=8_000,
+        benchmark_scores={
+            "global_mmlu_lite:de": {"acc": 0.42, "acc_stderr": 0.02470883072485368},
+            "global_mmlu_lite:es": {"acc": 0.505, "acc_stderr": 0.02503005711936146},
+            "global_mmlu_lite:ja": {"acc": 0.5, "acc_stderr": 0.02503130871608794},
+        },
     ),
 ]
