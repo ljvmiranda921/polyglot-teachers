@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, Literal
+from typing import Optional, Literal, Any
 
 
 class ModelInfo(BaseModel):
@@ -24,7 +24,7 @@ class ModelInfo(BaseModel):
     cost_out_mtok: Optional[float] = None  # Cost per million output tokens (USD)
 
     # Performance
-    benchmark_scores: Optional[dict[str, float]] = None
+    benchmark_scores: Optional[dict[str, Any]] = None
 
     # Metadata
     release_date: Optional[str] = None  # YYYY-MM format
