@@ -15,11 +15,8 @@ From: nvcr.io/nvidia/pytorch:25.05-py3
         build-essential \
         && rm -rf /var/lib/apt/lists/*
 
-    # Install uv (Python package installer) system-wide
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-
-    # Move uv to system-wide location so it's accessible regardless of user
-    mv /root/.local/bin/uv /usr/local/bin/uv
+    # Install uv via pip
+    pip install uv
 
     # Install Python dependencies
     cd /app
