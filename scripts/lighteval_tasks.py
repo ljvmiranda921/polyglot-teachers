@@ -8,8 +8,12 @@ import numpy as np
 from langcodes import standardize_tag
 from lighteval.metrics.dynamic_metrics import LogLikelihoodAccMetric
 from lighteval.metrics.normalizations import LogProbCharNorm, LogProbPMINorm, LogProbTokenNorm  # fmt: skip
-from lighteval.metrics.metrics_sample import SampleLevelMetric
-from lighteval.metrics.metrics_corpus import CorpusLevelMetric, MetricCategory, MetricUseCase  # fmt: skip
+from lighteval.metrics.metrics_sample import SampleLevelComputation
+from lighteval.metrics.metrics_corpus import CorpusLevelComputation
+from lighteval.metrics.sample_preparator import GenerativeCorpusMetricInput, LogprobCorpusMetricInput, LoglikelihoodPreparator
+from lighteval.metrics.utils.metric_utils import SampleLevelMetric, CorpusLevelMetric
+from lighteval.models.model_output import ModelResponse  # fmt: skip
+from lighteval.tasks.requests import Doc, SamplingMethod  # fmt: skip
 from lighteval.tasks.lighteval_task import LightevalTaskConfig
 from lighteval.tasks.multilingual.utils.task_utils import get_metrics_for_formulation
 from lighteval.tasks.templates.multichoice import get_mcq_prompt_function
@@ -191,44 +195,93 @@ def compute_mrewardbench_weighted_acc(items: list) -> float:
 
 
 # Sample-level metric for parsing generative responses (A or B)
-def parse_choice_from_response(prediction: str, gold_index: int) -> dict:
-    """Parse 'A' or 'B' from the generated response and check if correct."""
-    prediction = prediction.strip().upper()
+class GenerativeAccuracy(SampleLevelComputation):
+    """Computes accuracy for generative M-RewardBench by parsing A/B choices."""
 
-    # Extract the first occurrence of A or B
-    predicted_choice = None
-    for char in prediction:
-        if char in ["A", "B"]:
-            predicted_choice = char
-            break
+    def compute(self, doc: Doc, model_response: ModelResponse, **kwargs) -> float:
+        """Parse 'A' or 'B' from the generated response and check if correct."""
+        prediction = model_response.final_text[0].strip().upper()
+        gold_index = doc.gold_index[0] if isinstance(doc.gold_index, list) else doc.gold_index
 
-    # Map to index (A=0, B=1)
-    pred_idx = 0 if predicted_choice == "A" else 1 if predicted_choice == "B" else -1
+        # Extract the first occurrence of A or B
+        predicted_choice = None
+        for char in prediction:
+            if char in ["A", "B"]:
+                predicted_choice = char
+                break
 
-    return {
-        "acc": 1.0 if pred_idx == gold_index else 0.0,
-        "pred_idx": pred_idx,
-    }
+        # Map to index (A=0, B=1)
+        pred_idx = 0 if predicted_choice == "A" else 1 if predicted_choice == "B" else -1
+
+        return 1.0 if pred_idx == gold_index else 0.0
+
+
+# Corpus-level metric for M-RewardBench weighted accuracy
+class MRewardBenchWeightedAccuracy(CorpusLevelComputation):
+    """Computes weighted accuracy by category for M-RewardBench."""
+
+    def compute_corpus(self, items: list[LogprobCorpusMetricInput]) -> float:
+        """Computes weighted accuracy by category for M-RewardBench.
+
+        This follows m-rewardbench's approach:
+        1. Groups items by subset (source field)
+        2. Computes accuracy per subset
+        3. Weights subsets by EXAMPLE_COUNTS within each category
+        4. Averages across categories with equal weights
+        """
+        subset_accuracies = {}
+        subset_items: dict[str, list[tuple[Any, Any]]] = {}
+
+        for item in items:
+            # Note: We need to access the source from the item metadata
+            # For now, using a simple implementation
+            subset = getattr(item, "source", "Unknown")
+
+            if subset not in subset_items:
+                subset_items[subset] = []
+            subset_items[subset].append((item.golds, item.preds))
+
+        for subset, pairs in subset_items.items():
+            correct = sum(1 for gold, pred in pairs if gold == pred)
+            total = len(pairs)
+            subset_accuracies[subset] = correct / total if total > 0 else 0.0
+
+        category_accuracies = {}
+        for category, subsets in SUBSET_MAPPING.items():
+            weighted_sum = 0.0
+            total_examples = 0
+
+            for subset in subsets:
+                if subset in subset_accuracies:
+                    count = EXAMPLE_COUNTS.get(subset, 0)
+                    weighted_sum += subset_accuracies[subset] * count
+                    total_examples += count
+
+            category_accuracies[category] = (
+                weighted_sum / total_examples if total_examples > 0 else 0.0
+            )
+
+        # Average across categories
+        return (
+            sum(category_accuracies.values()) / len(category_accuracies)
+            if category_accuracies
+            else 0.0
+        )
 
 
 generative_acc_metric = SampleLevelMetric(
     metric_name="acc",
-    higher_is_better=True,
-    category=MetricCategory.GENERATIVE,
-    use_case=MetricUseCase.ACCURACY,
-    sample_level_fn=lambda predictions, golds, **kwargs: parse_choice_from_response(
-        predictions[0], golds[0]
-    ),
+    sample_level_fn=GenerativeAccuracy(),
+    category=SamplingMethod.GENERATIVE,
     corpus_level_fn=np.mean,
+    higher_is_better=True,
 )
 
-# Corpus-level metric for M-RewardBench weighted accuracy
 mrewardbench_weighted_acc_metric = CorpusLevelMetric(
     metric_name="weighted_acc",
-    sample_level_fn=None,
-    corpus_level_fn=compute_mrewardbench_weighted_acc,
-    category=MetricCategory.MULTICHOICE,
-    use_case=MetricUseCase.ACCURACY,
+    sample_level_fn=LoglikelihoodPreparator(is_single_token=True),
+    category=SamplingMethod.LOGPROBS,
+    corpus_level_fn=MRewardBenchWeightedAccuracy(),
     higher_is_better=True,
 )
 
