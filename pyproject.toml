@@ -62,6 +62,10 @@ conflicts = [
       { extra = "eval" },
     ],
 ]
+# Skip triton on ARM64 - PyTorch in container already has it
+override-dependencies = [
+    "triton; platform_machine != 'aarch64'",
+]
 
 [tool.uv.sources]
 bespokelabs-curator = { git = "https://github.com/ljvmiranda921/curator" }
