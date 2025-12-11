@@ -1,0 +1,35 @@
+#!/bin/bash
+#SBATCH --job-name=isambard-job
+#SBATCH --gpus=2
+#SBATCH --output=gpu-%j.log
+#SBATCH --time=10:00:00
+
+# Generic SLURM submission wrapper for Isambard
+# Usage: sbatch slurm_submit.ltl <job_script> [args...]
+#
+# Example:
+#   sbatch slurm_submit.isambard jobs/create_synthetic_datasets.sh
+#   sbatch slurm_submit.isambard jobs/get_intrinsic_metrics.sh
+#   sbatch slurm_submit.isambard jobs/finetune_student_model_unsloth.sh
+#
+# Note: Adjust --array parameter manually in this script based on the job
+
+export OMP_NUM_THREADS=16
+
+# Get job script from arguments
+JOB_SCRIPT=$1
+shift
+
+if [ -z "$JOB_SCRIPT" ]; then
+    echo "Error: No job script specified"
+    echo "Usage: sbatch slurm_submit.ltl <job_script> [args...]"
+    exit 1
+fi
+
+if [ ! -f "$JOB_SCRIPT" ]; then
+    echo "Error: Job script '$JOB_SCRIPT' not found"
+    exit 1
+fi
+
+# Execute the job script with remaining arguments
+bash "$JOB_SCRIPT" "$@"
