@@ -4,3 +4,6 @@
 [submodule "prometheus-eval"]
 	path = prometheus-eval
 	url = git@github.com:ljvmiranda921/prometheus-eval.git
+[submodule "lighteval"]
+	path = lighteval
+	url = git@github.com:ljvmiranda921/lighteval.git
