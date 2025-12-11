@@ -5,9 +5,8 @@ import random
 
 import numpy as np
 from langcodes import standardize_tag
-from lighteval.metrics.dynamic_metrics import loglikelihood_acc_metric
-from lighteval.metrics.normalizations import LogProbCharNorm  # fmt: skip
-from lighteval.metrics.normalizations import LogProbPMINorm, LogProbTokenNorm
+from lighteval.src.lighteval.metrics.dynamic_metrics import LogLikelihoodAccMetric
+from lighteval.src.lighteval.metrics.normalizations import LogProbCharNorm, LogProbPMINorm, LogProbTokenNorm  # fmt: skip
 from lighteval.metrics.utils.metric_utils import SampleLevelMetric
 from lighteval.metrics.utils.metric_utils import CorpusLevelMetric, MetricCategory, MetricUseCase  # fmt: skip
 from lighteval.tasks.default_prompts import LETTER_INDICES
