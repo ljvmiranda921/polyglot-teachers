@@ -42,7 +42,6 @@ lighteval vllm "model_name=${MODEL},tensor_parallel_size=2,gpu_memory_utilizatio
     --custom-tasks scripts/lighteval_tasks.py \
     --output-dir lighteval-results \
     --results-path-template '{output_dir}/{org}___{model}' \
-    --use-chat-template \
     --no-public-run \
     --results-org "ljvmiranda921" \
     --push-to-hub \
