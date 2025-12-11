@@ -27,7 +27,7 @@ fi
 # The login node doesn't have the CUDA libraries available.
 source .venv/bin/activate
 uv pip install --reinstall torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
-uv pip install triton
+uv pip install --reinstall triton
 python -c "import torch; print(torch.cuda.is_available())"
 
 # Execute the job script with remaining arguments
