@@ -23,8 +23,11 @@ if [ ! -f "$JOB_SCRIPT" ]; then
     exit 1
 fi
 
-# Execute the job script with remaining arguments
+# Patch the installation of torch in the compute node (so that it downloads the CUDA version).
+# The login node doesn't have the CUDA libraries available.
 source .venv/bin/activate
 uv pip install --reinstall torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 python -c "import torch; print(torch.cuda.is_available())"
+
+# Execute the job script with remaining arguments
 bash "$JOB_SCRIPT" "$@"
