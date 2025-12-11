@@ -16,13 +16,15 @@ From: nvcr.io/nvidia/pytorch:25.05-py3
         build-essential \
         && rm -rf /var/lib/apt/lists/*
 
-    # Install uv (Python package installer)
+    # Install uv (Python package installer) system-wide
     curl -LsSf https://astral.sh/uv/install.sh | sh
-    export PATH="/root/.local/bin:$PATH"
+
+    # Move uv to system-wide location so it's accessible regardless of user
+    mv /root/.local/bin/uv /usr/local/bin/uv
 
     # Install Python dependencies
     cd /app
-    /root/.local/bin/uv sync --frozen
+    uv sync --frozen
 
     # Create necessary directories
     mkdir -p /app/scripts
@@ -32,8 +34,6 @@ From: nvcr.io/nvidia/pytorch:25.05-py3
     mkdir -p /app/models
 
 %environment
-    # Add uv to PATH
-    export PATH="/root/.local/bin:$PATH"
     export PYTHONUNBUFFERED=1
 
     # HuggingFace configuration
