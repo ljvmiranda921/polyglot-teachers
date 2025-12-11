@@ -9,7 +9,6 @@ LIMIT=${4:-10000}
 LANGUAGES=(ar cs de es id ja)
 LANGUAGE=${LANGUAGES[SLURM_ARRAY_TASK_ID]}
 
-source .venv/bin/activate
 python -m scripts.synthesize_data --help
 python -m scripts.synthesize_data --input_dataset ljvmiranda921/msde-seed-S1 \
     --output_dataset ljvmiranda921/msde-S1-${LANGUAGE} \

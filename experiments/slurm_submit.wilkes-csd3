@@ -58,4 +58,5 @@ echo -e "\nnumtasks=$numtasks, numnodes=$numnodes, mpi_tasks_per_node=$mpi_tasks
 # =========================
 
 # Execute the job script with remaining arguments
+source .venv/bin/activate
 bash "$JOB_SCRIPT" "$@"

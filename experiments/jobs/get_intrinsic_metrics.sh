@@ -22,7 +22,6 @@ LANGUAGE=${LANGUAGES[SLURM_ARRAY_TASK_ID / ${#MODELS[@]}]}
 
 echo "Computing intrinsic metrics for model: ${MODEL} and language: ${LANGUAGE}"
 
-source .venv/bin/activate
 python -m scripts.get_intrinsic_metrics --help
 
 # Compute across models (get 3.5k samples for each strategy)

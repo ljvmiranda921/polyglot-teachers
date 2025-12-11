@@ -23,4 +23,5 @@ if [ ! -f "$JOB_SCRIPT" ]; then
 fi
 
 # Execute the job script with remaining arguments
+source .venv/bin/activate
 bash "$JOB_SCRIPT" "$@"
