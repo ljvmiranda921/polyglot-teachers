@@ -2,19 +2,19 @@ import logging
 import sys
 from typing import Any
 import random
+from string import ascii_uppercase
 
 import numpy as np
 from langcodes import standardize_tag
 from lighteval.src.lighteval.metrics.dynamic_metrics import LogLikelihoodAccMetric
 from lighteval.src.lighteval.metrics.normalizations import LogProbCharNorm, LogProbPMINorm, LogProbTokenNorm  # fmt: skip
-from lighteval.metrics.utils.metric_utils import SampleLevelMetric
-from lighteval.metrics.utils.metric_utils import CorpusLevelMetric, MetricCategory, MetricUseCase  # fmt: skip
-from lighteval.tasks.default_prompts import LETTER_INDICES
-from lighteval.tasks.lighteval_task import LightevalTaskConfig
-from lighteval.tasks.multilingual.utils.task_utils import get_metrics_for_formulation
-from lighteval.tasks.templates.multichoice import get_mcq_prompt_function
-from lighteval.tasks.templates.utils.formulation import CFFormulation, MCFFormulation
-from lighteval.utils.language import Language
+from lighteval.src.lighteval.metrics.metrics_sample import SampleLevelMetric
+from lighteval.src.lighteval.metrics.metrics_corpus import CorpusLevelMetric, MetricCategory, MetricUseCase  # fmt: skip
+from lighteval.src.lighteval.tasks.lighteval_task import LightevalTaskConfig
+from lighteval.src.lighteval.tasks.multilingual.utils.task_utils import get_metrics_for_formulation
+from lighteval.src.lighteval.tasks.templates.multichoice import get_mcq_prompt_function
+from lighteval.src.lighteval.tasks.templates.utils.formulation import CFFormulation, MCFFormulation
+from lighteval.src.lighteval.utils.language import Language
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -24,7 +24,7 @@ logging.basicConfig(
 )
 
 
-# ==== Global-MMU-Lite ====
+# ==== Global-MMLU-Lite ====
 
 GLOBAL_MMLU_LITE = [
     LightevalTaskConfig(
@@ -39,21 +39,20 @@ GLOBAL_MMLU_LITE = [
                     line["option_c"],
                     line["option_d"],
                 ],
-                "gold_idx": LETTER_INDICES.index(line["answer"]),
+                "gold_idx": ascii_uppercase.index(line["answer"]),
             },
             formulation=MCFFormulation(),
         ),
-        suite=("lighteval",),
         hf_repo="CohereForAI/Global-MMLU-Lite",
         hf_subset=standardize_tag(language.value),
         evaluation_splits=("test",),
         few_shots_split="dev",
-        metric=get_metrics_for_formulation(
+        metrics=get_metrics_for_formulation(
             MCFFormulation(),
             [
-                loglikelihood_acc_metric(normalization=LogProbTokenNorm()),
-                loglikelihood_acc_metric(normalization=LogProbCharNorm()),
-                loglikelihood_acc_metric(normalization=LogProbPMINorm()),
+                LogLikelihoodAccMetric(normalization=LogProbTokenNorm()),
+                LogLikelihoodAccMetric(normalization=LogProbCharNorm()),
+                LogLikelihoodAccMetric(normalization=LogProbPMINorm()),
             ],
         ),
     )
@@ -301,8 +300,8 @@ M_REWARDBENCH_MCF = [
         hf_subset=iso2_to_extended.get(standardize_tag(language.value)),
         evaluation_splits=("test",),
         few_shots_split="test",
-        metric=[
-            loglikelihood_acc_metric(normalization=LogProbTokenNorm()),
+        metrics=[
+            LogLikelihoodAccMetric(normalization=LogProbTokenNorm()),
             mrewardbench_weighted_acc_metric,
         ],
     )
@@ -331,7 +330,7 @@ M_REWARDBENCH_CF = [
         hf_subset=iso2_to_extended.get(standardize_tag(language.value)),
         evaluation_splits=("test",),
         few_shots_split="test",
-        metric=[
+        metrics=[
             generative_acc_metric,
             mrewardbench_weighted_acc_metric,
         ],
