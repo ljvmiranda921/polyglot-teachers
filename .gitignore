@@ -232,3 +232,4 @@ notebooks/**/data/*
 
 # Checkpoints
 .checkpoints
+lighteval-results
