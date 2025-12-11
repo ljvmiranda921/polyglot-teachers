@@ -3,20 +3,20 @@
 
 # Run those with all languages available first
 TASKS=(
-    "lighteval|global_mmlu_lite:de|0|0"
-    "lighteval|global_mmlu_lite:es|0|0"
-    "lighteval|global_mmlu_lite:ja|0|0"
-    "lighteval|mrewardbench_mcf:de|0|0"
-    "lighteval|mrewardbench_mcf:es|0|0"
-    "lighteval|mrewardbench_mcf:ja|0|0"
-    "lighteval|mgsm:de|5|0"
-    "lighteval|mgsm:es|5|0"
-    "lighteval|mgsm:ja|5|0"
-    "lighteval|global_mmlu_lite:ar|0|0"
-    "lighteval|mrewardbench_mcf:ar|0|0"
-    "lighteval|global_mmlu_lite:id|0|0"
-    "lighteval|mrewardbench_mcf:id|0|0"
-    "lighteval|mrewardbench_mcf:cs|0|0"
+    "global_mmlu_lite:de"
+    "global_mmlu_lite:es"
+    "global_mmlu_lite:ja"
+    "mrewardbench_mcf:de"
+    "mrewardbench_mcf:es"
+    "mrewardbench_mcf:ja"
+    "mgsm:de|5"
+    "mgsm:es|5"
+    "mgsm:ja|5"
+    "global_mmlu_lite:ar"
+    "mrewardbench_mcf:ar"
+    "global_mmlu_lite:id"
+    "mrewardbench_mcf:id"
+    "mrewardbench_mcf:cs"
 )
 
 MODELS=(
