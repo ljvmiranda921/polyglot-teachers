@@ -24,7 +24,7 @@ uv sync --dev
 source .venv/bin/activate
 ```
 
-Isambard is a bit different because the login node doesn't have a GPU. Instead you should run these commands:
+Isambard is a bit different because the login node doesn't have a GPU (if you sync normally, it will install the CPU versions of pytorch which will mess up your virtual environment). Instead you should run these commands:
 
 ```sh
 uv sync --no-install-package triton --no-install-package torch --no-install-package torchaudio --no-install-package torchvision --no-install-package vllm
