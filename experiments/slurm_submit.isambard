@@ -25,6 +25,8 @@ fi
 
 # Execute the job script with remaining arguments
 source .venv/bin/activate
-uv remove torch torchvision torchaudio
+uv remove torch
+uv remove torchvision
+uv remove torchaudio
 uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 bash "$JOB_SCRIPT" "$@"
