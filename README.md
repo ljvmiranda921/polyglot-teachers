@@ -32,17 +32,16 @@ For information on running experiments on the cluster, see the [experiment docum
 If you're running on an HPC cluster that uses Singularity, you can build and use the provided container:
 
 ```sh
-# Within your workspace in an Isambard login node
 singularity build --fakeroot mtep.sif mtep.def
 ```
 
 Once the container is built on the cluster, you can run these scripts:
 
 ```sh
-# Interactive shell with GPU support
+# Run as interactive shell
 srun -N 1 --gpus 1 --pty singularity shell --nv mtep.sif
 
-# With bind mounts for data directories
+# Run directly
 singularity exec --nv \
     --bind data:/app/data \
     --bind outputs:/app/outputs \
@@ -50,6 +49,6 @@ singularity exec --nv \
     mtep.sif \
     python scripts/get_intrinsic_metrics.py --model-name meta-llama/Llama-3.2-1B-Instruct
 
-# Submit a batch job (wrapper + job script pattern)
+# Run as a batch job (see experiments/*)
 sbatch experiments/slurm_submit_sif.isambard experiments/jobs/get_intrinsic_metrics_sif.sh
 ```
