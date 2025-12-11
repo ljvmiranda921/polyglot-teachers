@@ -4,7 +4,7 @@
 # Parse arguments
 INPUT_DATASET=${1:-"ljvmiranda921/msde-S1-es"}
 BASE_MODEL=${2:-"unsloth/gemma-3-1b-pt"}
-CHAT_TEMPLATE=${3:-"gemma-3n"}
+CHAT_TEMPLATE=${3:-"gemma-3"}
 
 source .venv/bin/activate
 python -m scripts.finetune_unsloth --help
