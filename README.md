@@ -24,5 +24,12 @@ uv sync --dev
 source .venv/bin/activate
 ```
 
+Isambard is a bit different because the login node doesn't have a GPU. Instead you should run these commands:
+
+```sh
+uv sync --no-install-package triton --no-install-package torch --no-install-package torchaudio --no-install-package torchvision --no-install-package vllm
+sbatch experiments/slurm_submit.isambard experiments/jobs/sync_isambard.sh
+```
+
 For more information on how to use this codebase, please refer to the [documentation](DOCUMENTATION.md).
 For information on running experiments on the cluster, see the [experiment documentation](experiments/README.md).
