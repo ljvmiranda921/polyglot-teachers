@@ -22,7 +22,7 @@ shift
 
 if [ -z "$JOB_SCRIPT" ]; then
     echo "Error: No job script specified"
-    echo "Usage: sbatch slurm_submit.ltl <job_script> [args...]"
+    echo "Usage: sbatch slurm_submit.isambard <job_script> [args...]"
     exit 1
 fi
 
