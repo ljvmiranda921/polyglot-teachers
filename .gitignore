@@ -233,3 +233,7 @@ notebooks/**/data/*
 # Checkpoints
 .checkpoints
 lighteval-results
+
+# Singularity containers
+*.sif
+*.simg
