@@ -62,9 +62,9 @@ conflicts = [
       { extra = "eval" },
     ],
 ]
-# Skip triton on ARM64 - PyTorch in container already has it
+# Skip triton on ARM64 and macOS - not needed or incompatible
 override-dependencies = [
-    "triton; platform_machine != 'aarch64'",
+    "triton; platform_machine != 'aarch64' and sys_platform != 'darwin'",
 ]
 
 [tool.uv.sources]
