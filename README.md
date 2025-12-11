@@ -50,6 +50,6 @@ singularity exec --nv \
     mtep.sif \
     python scripts/get_intrinsic_metrics.py --model-name meta-llama/Llama-3.2-1B-Instruct
 
-# Submit a batch job
-sbatch run_container.slurm
+# Submit a batch job (wrapper + job script pattern)
+sbatch experiments/slurm_submit_sif.isambard experiments/jobs/get_intrinsic_metrics_sif.sh
 ```

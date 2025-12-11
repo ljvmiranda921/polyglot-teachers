@@ -1,0 +1,65 @@
+#!/bin/bash
+#SBATCH --job-name=isambard-sif-job
+#SBATCH --gpus=2
+#SBATCH --output=gpu-%j.log
+#SBATCH --time=10:00:00
+
+# Generic SLURM submission wrapper for Isambard using Singularity containers
+# Usage: sbatch slurm_submit_sif.isambard <job_script> [args...]
+#
+# Example:
+#   sbatch slurm_submit_sif.isambard jobs/get_intrinsic_metrics_sif.sh
+#   sbatch slurm_submit_sif.isambard jobs/create_synthetic_datasets_sif.sh
+#
+# Note: Adjust --array parameter manually in this script based on the job
+
+export OMP_NUM_THREADS=16
+
+# Configuration
+CONTAINER_IMAGE="${CONTAINER_IMAGE:-mtep.sif}"
+BIND_PATHS="${BIND_PATHS:-data:/app/data,outputs:/app/outputs,metrics:/app/metrics,models:/app/models}"
+
+# Create necessary directories
+mkdir -p data outputs metrics models
+
+# Check if container exists
+if [ ! -f "$CONTAINER_IMAGE" ]; then
+    echo "Error: Container image '$CONTAINER_IMAGE' not found!"
+    echo "Build it first with: singularity build --fakeroot mtep.sif mtep.def"
+    exit 1
+fi
+
+# Get job script from arguments
+JOB_SCRIPT=$1
+shift
+
+if [ -z "$JOB_SCRIPT" ]; then
+    echo "Error: No job script specified"
+    echo "Usage: sbatch slurm_submit_sif.isambard <job_script> [args...]"
+    exit 1
+fi
+
+if [ ! -f "$JOB_SCRIPT" ]; then
+    echo "Error: Job script '$JOB_SCRIPT' not found"
+    exit 1
+fi
+
+echo "=========================================="
+echo "Job started at: $(date)"
+echo "Job ID: $SLURM_JOB_ID"
+echo "Node: $SLURM_NODELIST"
+echo "Container: $CONTAINER_IMAGE"
+echo "=========================================="
+
+# Execute the job script inside the container with remaining arguments
+srun singularity exec \
+    --nv \
+    --bind "$BIND_PATHS" \
+    --env HF_TOKEN="$HF_TOKEN" \
+    --pwd /app \
+    "$CONTAINER_IMAGE" \
+    bash "$JOB_SCRIPT" "$@"
+
+echo "=========================================="
+echo "Job finished at: $(date)"
+echo "=========================================="
