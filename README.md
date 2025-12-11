@@ -27,12 +27,16 @@ source .venv/bin/activate
 For more information on how to use this codebase, please refer to the [documentation](DOCUMENTATION.md).
 For information on running experiments on the cluster, see the [experiment documentation](experiments/README.md).
 
-### Running on Isambard using Singularity 
+### Running on Isambard using Singularity
 
 If you're running on an HPC cluster that uses Singularity, you can build and use the provided container:
 
 ```sh
-singularity build --fakeroot mtep.sif mtep.def
+# Base container (no extras)
+singularity build --fakeroot mtep.sif singularity/mtep.def
+
+# Or with eval extra for lighteval
+singularity build --fakeroot mtep_eval.sif singularity/mtep_eval.def
 ```
 
 Once the container is built on the cluster, you can run these scripts:
