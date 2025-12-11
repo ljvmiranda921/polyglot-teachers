@@ -6,15 +6,15 @@ from string import ascii_uppercase
 
 import numpy as np
 from langcodes import standardize_tag
-from lighteval.src.lighteval.metrics.dynamic_metrics import LogLikelihoodAccMetric
-from lighteval.src.lighteval.metrics.normalizations import LogProbCharNorm, LogProbPMINorm, LogProbTokenNorm  # fmt: skip
-from lighteval.src.lighteval.metrics.metrics_sample import SampleLevelMetric
-from lighteval.src.lighteval.metrics.metrics_corpus import CorpusLevelMetric, MetricCategory, MetricUseCase  # fmt: skip
-from lighteval.src.lighteval.tasks.lighteval_task import LightevalTaskConfig
-from lighteval.src.lighteval.tasks.multilingual.utils.task_utils import get_metrics_for_formulation
-from lighteval.src.lighteval.tasks.templates.multichoice import get_mcq_prompt_function
-from lighteval.src.lighteval.tasks.templates.utils.formulation import CFFormulation, MCFFormulation
-from lighteval.src.lighteval.utils.language import Language
+from lighteval.metrics.dynamic_metrics import LogLikelihoodAccMetric
+from lighteval.metrics.normalizations import LogProbCharNorm, LogProbPMINorm, LogProbTokenNorm  # fmt: skip
+from lighteval.metrics.metrics_sample import SampleLevelMetric
+from lighteval.metrics.metrics_corpus import CorpusLevelMetric, MetricCategory, MetricUseCase  # fmt: skip
+from lighteval.tasks.lighteval_task import LightevalTaskConfig
+from lighteval.tasks.multilingual.utils.task_utils import get_metrics_for_formulation
+from lighteval.tasks.templates.multichoice import get_mcq_prompt_function
+from lighteval.tasks.templates.utils.formulation import CFFormulation, MCFFormulation
+from lighteval.utils.language import Language
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
