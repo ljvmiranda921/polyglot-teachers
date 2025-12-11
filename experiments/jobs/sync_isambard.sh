@@ -3,5 +3,5 @@
 uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 uv pip install triton
 uv pip install -U vllm --torch-backend=auto --extra-index-url https://wheels.vllm.ai/0.10.2/vllm
-uv pip install lighteval
+uv pip install lighteval==0.10.0 datasets==3.6.0
 python -c "import torch; print(torch.cuda.is_available())"
