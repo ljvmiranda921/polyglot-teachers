@@ -52,40 +52,7 @@ From: nvcr.io/nvidia/pytorch:25.05-py3
     Base nvcr.io/nvidia/pytorch:25.05-py3
 
 %help
-    This is a Singularity container for the Multilingual Teacher Evaluation Project (mtep).
+    Multilingual Teacher Evaluation Project (mtep) - Singularity Container
 
-    Building the container:
-    -----------------------
-    # Build on your local machine (requires sudo/fakeroot)
-    singularity build --fakeroot mtep.sif mtep.def
-
-    # Or build with sudo
-    sudo singularity build mtep.sif mtep.def
-
-    Using the container on Isambard:
-    --------------------------------
-    # Interactive shell with GPU support
-    srun -N 1 --gpus 1 --pty singularity shell --nv mtep.sif
-
-    # Run a Python script with GPU and environment variables
-    srun -N 1 --gpus 1 singularity exec --nv --env HF_TOKEN=$HF_TOKEN mtep.sif python scripts/your_script.py
-
-    # With bind mounts for data and outputs
-    singularity exec --nv \
-        --bind /path/to/data:/app/data \
-        --bind /path/to/outputs:/app/outputs \
-        --env HF_TOKEN=$HF_TOKEN \
-        mtep.sif python scripts/your_script.py
-
-    # Run with uv for additional packages
-    singularity exec --nv --env HF_TOKEN=$HF_TOKEN mtep.sif uv run python scripts/your_script.py
-
-    Multi-node usage:
-    ----------------
-    # For multi-GPU/multi-node jobs, use with SLURM
-    srun --gpus 8 singularity exec --nv --env HF_TOKEN=$HF_TOKEN mtep.sif python scripts/train.py
-
-    Environment variables:
-    ---------------------
-    HF_TOKEN           - HuggingFace API token for model downloads
-    HF_HUB_ENABLE_HF_TRANSFER=1 - Enable faster HF downloads (set by default)
+    For usage instructions and examples, see:
+    https://github.com/ljvmiranda921/multilingual-teacher-eval#running-on-isambard-using-singularity
