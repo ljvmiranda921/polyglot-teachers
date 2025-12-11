@@ -62,10 +62,6 @@ conflicts = [
       { extra = "eval" },
     ],
 ]
-# Skip triton on ARM64 and macOS - not needed or incompatible
-override-dependencies = [
-    "triton; platform_machine != 'aarch64' and sys_platform != 'darwin'",
-]
 
 [tool.uv.sources]
 bespokelabs-curator = { git = "https://github.com/ljvmiranda921/curator" }

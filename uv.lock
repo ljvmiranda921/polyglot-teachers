@@ -48,9 +48,6 @@ conflicts = [[
     { package = "mtep", extra = "tpu" },
 ]]
 
-[manifest]
-overrides = [{ name = "triton", marker = "platform_machine != 'aarch64' and sys_platform != 'darwin'" }]
-
 [[package]]
 name = "absl-py"
 version = "2.3.1"
@@ -1261,7 +1258,8 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "torch", version = "2.7.1", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "torch", version = "2.8.0", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'linux' and extra != 'extra-4-mtep-eval') or (sys_platform != 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
-    { name = "triton", marker = "(platform_machine != 'aarch64' and sys_platform == 'linux') or (platform_machine != 'aarch64' and sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (platform_machine != 'aarch64' and sys_platform != 'darwin' and extra != 'extra-4-mtep-tpu') or (platform_machine == 'aarch64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform == 'darwin' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "triton", version = "3.3.1", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-4-mtep-eval') or (platform_machine == 'aarch64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform != 'linux' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "triton", version = "3.4.0", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine != 'aarch64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform == 'linux' and extra != 'extra-4-mtep-eval') or (sys_platform != 'linux' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7e/97/45ff09cfcda7b200389204daa0125168e6544fba257adbbcdf728501d4f9/cut_cross_entropy-25.1.1.tar.gz", hash = "sha256:5fe5924509248b1aea5c890f8887c6a7759f7c8b1ebc0490e42c247c4f7c1e34", size = 22972, upload-time = "2025-01-07T12:21:53.896Z" }
 wheels = [
@@ -7807,7 +7805,7 @@ dependencies = [
     { name = "nvidia-nvtx-cu12", version = "12.6.77", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-4-mtep-eval') or (platform_machine != 'x86_64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform != 'linux' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "setuptools", marker = "(python_full_version >= '3.12' and extra == 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "sympy", marker = "extra == 'extra-4-mtep-eval'" },
-    { name = "triton", marker = "(platform_machine != 'aarch64' and sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (platform_machine == 'aarch64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform == 'darwin' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "triton", version = "3.3.1", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-4-mtep-eval') or (platform_machine != 'x86_64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform != 'linux' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "typing-extensions", marker = "extra == 'extra-4-mtep-eval'" },
 ]
 wheels = [
@@ -7884,7 +7882,7 @@ dependencies = [
     { name = "nvidia-nvtx-cu12", version = "12.8.90", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "setuptools", marker = "(python_full_version >= '3.12' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "sympy", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
-    { name = "triton", marker = "(platform_machine != 'aarch64' and sys_platform != 'darwin' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "triton", version = "3.4.0", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "typing-extensions", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
 ]
 wheels = [
@@ -8206,10 +8204,52 @@ wheels = [
 
 [[package]]
 name = "triton"
+version = "3.3.1"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux')",
+]
+dependencies = [
+    { name = "setuptools", marker = "(platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-4-mtep-eval') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-4-mtep-eval') or (sys_platform == 'darwin' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform == 'linux' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/21/2f/3e56ea7b58f80ff68899b1dbe810ff257c9d177d288c6b0f55bf2fe4eb50/triton-3.3.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:b31e3aa26f8cb3cc5bf4e187bf737cbacf17311e1112b781d4a059353dfd731b", size = 155689937, upload-time = "2025-05-29T23:39:44.182Z" },
+    { url = "https://files.pythonhosted.org/packages/24/5f/950fb373bf9c01ad4eb5a8cd5eaf32cdf9e238c02f9293557a2129b9c4ac/triton-3.3.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:9999e83aba21e1a78c1f36f21bce621b77bcaa530277a50484a7cb4a822f6e43", size = 155669138, upload-time = "2025-05-29T23:39:51.771Z" },
+    { url = "https://files.pythonhosted.org/packages/74/1f/dfb531f90a2d367d914adfee771babbd3f1a5b26c3f5fbc458dee21daa78/triton-3.3.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:b89d846b5a4198317fec27a5d3a609ea96b6d557ff44b56c23176546023c4240", size = 155673035, upload-time = "2025-05-29T23:40:02.468Z" },
+    { url = "https://files.pythonhosted.org/packages/28/71/bd20ffcb7a64c753dc2463489a61bf69d531f308e390ad06390268c4ea04/triton-3.3.1-cp313-cp313t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:a3198adb9d78b77818a5388bff89fa72ff36f9da0bc689db2f0a651a67ce6a42", size = 155735832, upload-time = "2025-05-29T23:40:10.522Z" },
+]
+
+[[package]]
+name = "triton"
 version = "3.4.0"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version == '3.13.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu'",
+    "python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu'",
+    "(python_full_version < '3.12' and platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu')",
+]
 dependencies = [
-    { name = "setuptools", marker = "(platform_machine != 'aarch64' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
+    { name = "setuptools", marker = "platform_machine == 'aarch64' and sys_platform == 'linux'" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7d/39/43325b3b651d50187e591eefa22e236b2981afcebaefd4f2fc0ea99df191/triton-3.4.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:7b70f5e6a41e52e48cfc087436c8a28c17ff98db369447bcaff3b887a3ab4467", size = 155531138, upload-time = "2025-07-30T19:58:29.908Z" },
@@ -8398,7 +8438,8 @@ dependencies = [
     { name = "torchvision", version = "0.23.0", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'linux' and extra != 'extra-4-mtep-eval') or (sys_platform != 'darwin' and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "tqdm", marker = "sys_platform == 'linux' or (sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (sys_platform != 'darwin' and extra != 'extra-4-mtep-tpu') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "transformers", marker = "sys_platform == 'linux' or (sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (sys_platform != 'darwin' and extra != 'extra-4-mtep-tpu') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
-    { name = "triton", marker = "(platform_machine != 'aarch64' and sys_platform == 'linux') or (platform_machine != 'aarch64' and sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (platform_machine != 'aarch64' and sys_platform != 'darwin' and extra != 'extra-4-mtep-tpu') or (platform_machine == 'aarch64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform == 'darwin' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "triton", version = "3.3.1", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine != 'aarch64' and sys_platform == 'linux' and 'linux' in sys_platform and extra == 'extra-4-mtep-eval') or (platform_machine != 'aarch64' and 'linux' not in sys_platform and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and 'linux' in sys_platform and extra == 'extra-4-mtep-eval') or (sys_platform != 'linux' and 'linux' not in sys_platform and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform == 'darwin' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "triton", version = "3.4.0", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and 'linux' in sys_platform) or (platform_machine != 'aarch64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and 'linux' in sys_platform and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (sys_platform == 'linux' and 'linux' in sys_platform and extra != 'extra-4-mtep-eval') or (sys_platform != 'linux' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform == 'darwin' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or ('linux' not in sys_platform and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "triton-windows", marker = "(platform_machine != 'AMD64' and platform_machine != 'x86_64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (platform_machine == 'AMD64' and sys_platform == 'win32' and extra == 'extra-4-mtep-eval') or (platform_machine == 'AMD64' and sys_platform == 'win32' and extra != 'extra-4-mtep-tpu') or (platform_machine == 'x86_64' and sys_platform == 'win32' and extra == 'extra-4-mtep-eval') or (platform_machine == 'x86_64' and sys_platform == 'win32' and extra != 'extra-4-mtep-tpu') or (sys_platform != 'win32' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "trl", marker = "sys_platform == 'linux' or (sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (sys_platform != 'darwin' and extra != 'extra-4-mtep-tpu') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "tyro", marker = "sys_platform == 'linux' or (sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (sys_platform != 'darwin' and extra != 'extra-4-mtep-tpu') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
@@ -8438,7 +8479,8 @@ dependencies = [
     { name = "torchao", marker = "sys_platform == 'linux' or (sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (sys_platform != 'darwin' and extra != 'extra-4-mtep-tpu') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "tqdm", marker = "sys_platform == 'linux' or (sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (sys_platform != 'darwin' and extra != 'extra-4-mtep-tpu') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "transformers", marker = "sys_platform == 'linux' or (sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (sys_platform != 'darwin' and extra != 'extra-4-mtep-tpu') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
-    { name = "triton", marker = "(platform_machine != 'aarch64' and sys_platform == 'linux') or (platform_machine != 'aarch64' and sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (platform_machine != 'aarch64' and sys_platform != 'darwin' and extra != 'extra-4-mtep-tpu') or (platform_machine == 'aarch64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform == 'darwin' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "triton", version = "3.3.1", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine != 'aarch64' and sys_platform == 'linux' and 'linux' in sys_platform and extra == 'extra-4-mtep-eval') or (platform_machine != 'aarch64' and 'linux' not in sys_platform and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and 'linux' in sys_platform and extra == 'extra-4-mtep-eval') or (sys_platform != 'linux' and 'linux' not in sys_platform and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform == 'darwin' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "triton", version = "3.4.0", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and 'linux' in sys_platform) or (platform_machine != 'aarch64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and 'linux' in sys_platform and extra != 'extra-4-mtep-eval' and extra != 'extra-4-mtep-tpu') or (sys_platform == 'linux' and 'linux' in sys_platform and extra != 'extra-4-mtep-eval') or (sys_platform != 'linux' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform == 'darwin' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or ('linux' not in sys_platform and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "triton-windows", marker = "(platform_machine != 'AMD64' and platform_machine != 'x86_64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (platform_machine == 'AMD64' and sys_platform == 'win32' and extra == 'extra-4-mtep-eval') or (platform_machine == 'AMD64' and sys_platform == 'win32' and extra != 'extra-4-mtep-tpu') or (platform_machine == 'x86_64' and sys_platform == 'win32' and extra == 'extra-4-mtep-eval') or (platform_machine == 'x86_64' and sys_platform == 'win32' and extra != 'extra-4-mtep-tpu') or (sys_platform != 'win32' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "trl", marker = "sys_platform == 'linux' or (sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (sys_platform != 'darwin' and extra != 'extra-4-mtep-tpu') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "typing-extensions", marker = "sys_platform == 'linux' or (sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (sys_platform != 'darwin' and extra != 'extra-4-mtep-tpu') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
@@ -9029,7 +9071,7 @@ dependencies = [
     { name = "pydantic", marker = "extra == 'extra-4-mtep-eval'" },
     { name = "torch", version = "2.7.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-eval'" },
     { name = "transformers", marker = "extra == 'extra-4-mtep-eval'" },
-    { name = "triton", marker = "(platform_machine != 'aarch64' and sys_platform != 'darwin' and extra == 'extra-4-mtep-eval') or (platform_machine == 'aarch64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform == 'darwin' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "triton", version = "3.3.1", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-4-mtep-eval') or (platform_machine != 'x86_64' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu') or (sys_platform != 'linux' and extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e3/52/ea664a56674f21c401b45f124c207a16ca4b2318364687172edbcf255375/xgrammar-0.1.21.tar.gz", hash = "sha256:2ce1e81417ff46aa7ef26d8c0627275cb20dd1f2e8ead5bb261aecde1cc8ba57", size = 2242013, upload-time = "2025-07-10T19:34:14.336Z" }
 wheels = [
@@ -9089,7 +9131,7 @@ dependencies = [
     { name = "pydantic", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
     { name = "torch", version = "2.8.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
     { name = "transformers", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
-    { name = "triton", marker = "(platform_machine != 'aarch64' and sys_platform != 'darwin' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
+    { name = "triton", version = "3.4.0", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-4-mtep-eval') or (extra == 'extra-4-mtep-eval' and extra == 'extra-4-mtep-tpu')" },
     { name = "typing-extensions", marker = "extra == 'extra-4-mtep-tpu' or extra != 'extra-4-mtep-eval'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f2/a9/dc3c63cf7f082d183711e46ef34d10d8a135c2319dc581905d79449f52ea/xgrammar-0.1.25.tar.gz", hash = "sha256:70ce16b27e8082f20808ed759b0733304316facc421656f0f30cfce514b5b77a", size = 2297187, upload-time = "2025-09-21T05:58:58.942Z" }
