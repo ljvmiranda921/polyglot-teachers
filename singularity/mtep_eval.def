@@ -1,0 +1,50 @@
+Bootstrap: docker
+From: nvcr.io/nvidia/pytorch:25.05-py3
+
+%files
+    # Copy project files during build
+    pyproject.toml /app/pyproject.toml
+
+%post
+    # Update and install basic utilities
+    apt-get update && apt-get install -y \
+        git \
+        curl \
+        wget \
+        vim \
+        build-essential \
+        && rm -rf /var/lib/apt/lists/*
+
+    # Install uv via pip
+    pip install uv
+
+    # Install Python dependencies with eval extra
+    cd /app
+    uv sync --extra eval
+
+    # Create necessary directories
+    mkdir -p /app/scripts
+    mkdir -p /app/data
+    mkdir -p /app/outputs
+    mkdir -p /app/metrics
+    mkdir -p /app/models
+
+%environment
+    export PYTHONUNBUFFERED=1
+    export HF_HUB_ENABLE_HF_TRANSFER=1
+    export WORKDIR=/app
+
+%runscript
+    exec /bin/bash "$@"
+
+%labels
+    Author Lester James V. Miranda
+    Version v0.1.0
+    Description Multilingual Teacher Evaluation Project (with eval extra for lighteval)
+    Base nvcr.io/nvidia/pytorch:25.05-py3
+
+%help
+    Multilingual Teacher Evaluation Project (mtep) - Singularity Container with eval extra
+
+    For usage instructions and examples, see:
+    https://github.com/ljvmiranda921/multilingual-teacher-eval#running-on-isambard-using-singularity

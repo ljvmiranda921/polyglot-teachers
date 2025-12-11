@@ -37,7 +37,6 @@ MODEL=${MODELS[SLURM_ARRAY_TASK_ID / ${#TASKS[@]}]}
 echo "Evaluating model: ${MODEL} on task: ${TASK}"
 
 # Reference for gsm8k setup: https://github.com/huggingface/lighteval/issues/686
-source .venv/bin/activate
 lighteval vllm --help
 lighteval vllm "model_name=${MODEL},tensor_parallel_size=2,gpu_memory_utilization=0.9,max_model_length=4096,dtype=bfloat16,generation_parameters={max_new_tokens:4096,temperature:0.6,top_p:0.95}" "${TASK}" \
     --custom-tasks scripts/lighteval_tasks.py \

@@ -4,16 +4,11 @@
 #SBATCH --output=gpu-%j.log
 #SBATCH --time=10:00:00
 
-# Generic SLURM submission wrapper for Isambard
-# Usage: sbatch slurm_submit.ltl <job_script> [args...]
-#
-# Example:
-#   sbatch slurm_submit.isambard jobs/create_synthetic_datasets.sh
-#   sbatch slurm_submit.isambard jobs/get_intrinsic_metrics.sh
-#   sbatch slurm_submit.isambard jobs/finetune_student_model_unsloth.sh
-#
-# Note: Adjust --array parameter manually in this script based on the job
+module load cray-python
 
+export HF_HOME=$PROJECTDIR/ljvm2/huggingface
+export HF_HUB_CACHE=$PROJECTDIR/ljvm2/hf_hub
+export VLLM_CACHE_ROOT=$PROJECTDIR/ljvm2/vllm
 export OMP_NUM_THREADS=16
 
 # Get job script from arguments
@@ -22,7 +17,7 @@ shift
 
 if [ -z "$JOB_SCRIPT" ]; then
     echo "Error: No job script specified"
-    echo "Usage: sbatch slurm_submit.ltl <job_script> [args...]"
+    echo "Usage: sbatch slurm_submit.isambard <job_script> [args...]"
     exit 1
 fi
 
@@ -31,5 +26,6 @@ if [ ! -f "$JOB_SCRIPT" ]; then
     exit 1
 fi
 
+source .venv/bin/activate
 # Execute the job script with remaining arguments
 bash "$JOB_SCRIPT" "$@"

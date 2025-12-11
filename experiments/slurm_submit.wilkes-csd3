@@ -8,16 +8,6 @@
 #SBATCH --time=10:00:00
 #SBATCH --mail-type=NONE
 
-# Generic SLURM submission wrapper for Wilkes-CSD3
-# Usage: sbatch slurm_submit.wilkes-csd3 <job_script> [args...]
-#
-# Example:
-#   sbatch slurm_submit.wilkes-csd3 jobs/create_synthetic_datasets.sh
-#   sbatch slurm_submit.wilkes-csd3 jobs/get_intrinsic_metrics.sh
-#   sbatch slurm_submit.wilkes-csd3 jobs/finetune_student_model_unsloth.sh
-#
-# Note: Adjust --array parameter manually in this script based on the job
-
 # Module setup: cluster environment and recent python
 . /etc/profile.d/modules.sh
 module purge
@@ -68,4 +58,5 @@ echo -e "\nnumtasks=$numtasks, numnodes=$numnodes, mpi_tasks_per_node=$mpi_tasks
 # =========================
 
 # Execute the job script with remaining arguments
+source .venv/bin/activate
 bash "$JOB_SCRIPT" "$@"
