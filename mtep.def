@@ -35,11 +35,7 @@ From: nvcr.io/nvidia/pytorch:25.05-py3
 
 %environment
     export PYTHONUNBUFFERED=1
-
-    # HuggingFace configuration
     export HF_HUB_ENABLE_HF_TRANSFER=1
-
-    # Set default working directory
     export WORKDIR=/app
 
 %runscript
