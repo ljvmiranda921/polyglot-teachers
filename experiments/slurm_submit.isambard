@@ -4,6 +4,8 @@
 #SBATCH --output=gpu-%j.log
 #SBATCH --time=10:00:00
 
+module load cray-python
+
 export OMP_NUM_THREADS=16
 
 # Get job script from arguments
