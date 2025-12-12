@@ -8,7 +8,7 @@ import numpy as np
 from langcodes import standardize_tag
 
 from lighteval.metrics.dynamic_metrics import LogLikelihoodAccMetric, MultilingualExtractiveMatchMetric  # fmt: skip
-from lighteval.metrics.metrics_corpus import CorpusLevelComputation
+from lighteval.metrics.metrics_corpus import CorpusLevelComputation, MRewardBenchWeightedAccuracy
 from lighteval.metrics.metrics_sample import SampleLevelComputation
 from lighteval.metrics.normalizations import LogProbCharNorm, LogProbPMINorm, LogProbTokenNorm  # fmt: skip
 from lighteval.metrics.sample_preparator import GenerativeCorpusMetricInput, LoglikelihoodPreparator, LogprobCorpusMetricInput  # fmt: skip
@@ -156,128 +156,6 @@ MGSM = [
 
 # ==== M-RewardBench ====
 
-# Subset mapping from source to category (matches m-rewardbench structure)
-# Reference: https://github.com/Cohere-Labs-Community/m-rewardbench/blob/main/analysis/compute_iaa.py#L59
-SUBSET_MAPPING = {
-    "Chat": [
-        "alpacaeval-easy",
-        "alpacaeval-length",
-        "alpacaeval-hard",
-        "mt-bench-easy",
-        "mt-bench-med",
-    ],
-    "Chat Hard": [
-        "mt-bench-hard",
-        "llmbar-natural",
-        "llmbar-adver-neighbor",
-        "llmbar-adver-GPTInst",
-        "llmbar-adver-GPTOut",
-        "llmbar-adver-manual",
-    ],
-    "Safety": [
-        "refusals-dangerous",
-        "refusals-offensive",
-        "xstest-should-refuse",
-        "xstest-should-respond",
-        "donotanswer",
-    ],
-    "Reasoning": [
-        "math-prm",
-        "hep-cpp",
-        "hep-go",
-        "hep-java",
-        "hep-js",
-        "hep-python",
-        "hep-rust",
-    ],
-}
-
-# Example counts per subset (from m-rewardbench)
-# Reference: https://github.com/Cohere-Labs-Community/m-rewardbench/blob/main/analysis/plot_utils.py#L81
-# Note: math-prm is upweighted to 983 (actual length 447) to match code subset count
-EXAMPLE_COUNTS = {
-    "alpacaeval-easy": 79,
-    "alpacaeval-length": 79,
-    "alpacaeval-hard": 76,
-    "mt-bench-easy": 24,
-    "mt-bench-med": 38,
-    "mt-bench-hard": 35,
-    "math-prm": 983,
-    "refusals-dangerous": 100,
-    "refusals-offensive": 100,
-    "llmbar-natural": 76,
-    "llmbar-adver-neighbor": 124,
-    "llmbar-adver-GPTInst": 87,
-    "llmbar-adver-GPTOut": 42,
-    "llmbar-adver-manual": 43,
-    "xstest-should-refuse": 154,
-    "xstest-should-respond": 247,
-    "donotanswer": 135,
-    "hep-cpp": 164,
-    "hep-go": 164,
-    "hep-java": 164,
-    "hep-js": 164,
-    "hep-python": 163,
-    "hep-rust": 164,
-}
-
-# Category weights for M-RewardBench
-# Adjust these based on your evaluation priorities
-DEFAULT_CATEGORY_WEIGHTS = {
-    "Chat": 1.0,
-    "Chat Hard": 1.0,
-    "Safety": 1.0,
-    "Reasoning": 1.0,
-}
-
-
-def compute_mrewardbench_weighted_acc(items: list) -> float:
-    """Computes weighted accuracy by category for M-RewardBench.
-
-    This follows m-rewardbench's approach:
-    1. Groups items by subset (source field)
-    2. Computes accuracy per subset
-    3. Weights subsets by EXAMPLE_COUNTS within each category
-    4. Averages across categories with equal weights
-    """
-    subset_accuracies = {}
-    subset_items: dict[str, list[tuple[Any, Any]]] = {}
-
-    for item in items:
-        subset = item.source if hasattr(item, "source") else "Unknown"
-
-        if subset not in subset_items:
-            subset_items[subset] = []
-        subset_items[subset].append((item.golds, item.preds))
-
-    for subset, pairs in subset_items.items():
-        correct = sum(1 for gold, pred in pairs if gold == pred)
-        total = len(pairs)
-        subset_accuracies[subset] = correct / total if total > 0 else 0.0
-
-    category_accuracies = {}
-    for category, subsets in SUBSET_MAPPING.items():
-        weighted_sum = 0.0
-        total_examples = 0
-
-        for subset in subsets:
-            if subset in subset_accuracies:
-                count = EXAMPLE_COUNTS.get(subset, 0)
-                weighted_sum += subset_accuracies[subset] * count
-                total_examples += count
-
-        category_accuracies[category] = (
-            weighted_sum / total_examples if total_examples > 0 else 0.0
-        )
-
-    # Average across categories
-    return (
-        sum(category_accuracies.values()) / len(category_accuracies)
-        if category_accuracies
-        else 0.0
-    )
-
-
 # Sample-level metric for parsing generative responses (A or B)
 class GenerativeAccuracy(SampleLevelComputation):
     """Computes accuracy for generative M-RewardBench by parsing A/B choices."""
@@ -304,66 +182,55 @@ class GenerativeAccuracy(SampleLevelComputation):
         return 1.0 if pred_idx == gold_index else 0.0
 
 
-# Corpus-level metric for M-RewardBench weighted accuracy
-class MRewardBenchWeightedAccuracy(CorpusLevelComputation):
-    """Computes weighted accuracy by category for M-RewardBench."""
-
-    def compute_corpus(self, items: list[LogprobCorpusMetricInput]) -> float:
-        """Computes weighted accuracy by category for M-RewardBench.
-
-        This follows m-rewardbench's approach:
-        1. Groups items by subset (source field)
-        2. Computes accuracy per subset
-        3. Weights subsets by EXAMPLE_COUNTS within each category
-        4. Averages across categories with equal weights
-        """
-        subset_accuracies = {}
-        subset_items: dict[str, list[tuple[Any, Any]]] = {}
-
-        for item in items:
-            # Note: We need to access the source from the item metadata
-            # For now, using a simple implementation
-            subset = getattr(item, "source", "Unknown")
-
-            if subset not in subset_items:
-                subset_items[subset] = []
-            subset_items[subset].append((item.golds, item.preds))
-
-        for subset, pairs in subset_items.items():
-            correct = sum(1 for gold, pred in pairs if gold == pred)
-            total = len(pairs)
-            subset_accuracies[subset] = correct / total if total > 0 else 0.0
-
-        category_accuracies = {}
-        for category, subsets in SUBSET_MAPPING.items():
-            weighted_sum = 0.0
-            total_examples = 0
-
-            for subset in subsets:
-                if subset in subset_accuracies:
-                    count = EXAMPLE_COUNTS.get(subset, 0)
-                    weighted_sum += subset_accuracies[subset] * count
-                    total_examples += count
-
-            category_accuracies[category] = (
-                weighted_sum / total_examples if total_examples > 0 else 0.0
-            )
-
-        # Average across categories
-        return (
-            sum(category_accuracies.values()) / len(category_accuracies)
-            if category_accuracies
-            else 0.0
-        )
-
-
-# Create metrics at module level but using simple mean instead of custom weighted accuracy
-# to avoid pickling issues with the custom MRewardBenchWeightedAccuracy class
+# Create metrics at module level
 generative_acc_metric = SampleLevelMetric(
     metric_name="acc",
     sample_level_fn=GenerativeAccuracy(),
     category=SamplingMethod.GENERATIVE,
     corpus_level_fn=np.mean,
+    higher_is_better=True,
+)
+
+# M-RewardBench weighted accuracy metrics (now imported from lighteval, avoiding pickling issues)
+# Average across all categories
+mrewardbench_weighted_acc_metric = CorpusLevelMetric(
+    metric_name="weighted_acc",
+    sample_level_fn=LoglikelihoodPreparator(is_single_token=True),
+    category=SamplingMethod.LOGPROBS,
+    corpus_level_fn=MRewardBenchWeightedAccuracy(),
+    higher_is_better=True,
+)
+
+# Per-category metrics
+mrewardbench_chat_metric = CorpusLevelMetric(
+    metric_name="weighted_acc_chat",
+    sample_level_fn=LoglikelihoodPreparator(is_single_token=True),
+    category=SamplingMethod.LOGPROBS,
+    corpus_level_fn=MRewardBenchWeightedAccuracy(category="Chat"),
+    higher_is_better=True,
+)
+
+mrewardbench_chat_hard_metric = CorpusLevelMetric(
+    metric_name="weighted_acc_chat_hard",
+    sample_level_fn=LoglikelihoodPreparator(is_single_token=True),
+    category=SamplingMethod.LOGPROBS,
+    corpus_level_fn=MRewardBenchWeightedAccuracy(category="Chat Hard"),
+    higher_is_better=True,
+)
+
+mrewardbench_safety_metric = CorpusLevelMetric(
+    metric_name="weighted_acc_safety",
+    sample_level_fn=LoglikelihoodPreparator(is_single_token=True),
+    category=SamplingMethod.LOGPROBS,
+    corpus_level_fn=MRewardBenchWeightedAccuracy(category="Safety"),
+    higher_is_better=True,
+)
+
+mrewardbench_reasoning_metric = CorpusLevelMetric(
+    metric_name="weighted_acc_reasoning",
+    sample_level_fn=LoglikelihoodPreparator(is_single_token=True),
+    category=SamplingMethod.LOGPROBS,
+    corpus_level_fn=MRewardBenchWeightedAccuracy(category="Reasoning"),
     higher_is_better=True,
 )
 
@@ -436,6 +303,11 @@ M_REWARDBENCH_MCF = [
         few_shots_split="test",
         metrics=[
             LogLikelihoodAccMetric(normalization=LogProbTokenNorm()),
+            mrewardbench_weighted_acc_metric,
+            mrewardbench_chat_metric,
+            mrewardbench_chat_hard_metric,
+            mrewardbench_safety_metric,
+            mrewardbench_reasoning_metric,
         ],
     )
     for language in [
@@ -464,6 +336,11 @@ M_REWARDBENCH_CF = [
         few_shots_split="test",
         metrics=[
             generative_acc_metric,
+            mrewardbench_weighted_acc_metric,
+            mrewardbench_chat_metric,
+            mrewardbench_chat_hard_metric,
+            mrewardbench_safety_metric,
+            mrewardbench_reasoning_metric,
         ],
     )
     for language in [
