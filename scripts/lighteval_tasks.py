@@ -1,18 +1,23 @@
 import logging
-import sys
-from typing import Any
 import random
+import sys
+from string import ascii_uppercase
+from typing import Any
 
 import numpy as np
 from langcodes import standardize_tag
-from lighteval.metrics.dynamic_metrics import loglikelihood_acc_metric
-from lighteval.metrics.normalizations import LogProbCharNorm  # fmt: skip
-from lighteval.metrics.normalizations import LogProbPMINorm, LogProbTokenNorm
-from lighteval.metrics.utils.metric_utils import SampleLevelMetric
-from lighteval.metrics.utils.metric_utils import CorpusLevelMetric, MetricCategory, MetricUseCase  # fmt: skip
-from lighteval.tasks.default_prompts import LETTER_INDICES
+
+from lighteval.metrics.dynamic_metrics import LogLikelihoodAccMetric, MultilingualExtractiveMatchMetric  # fmt: skip
+from lighteval.metrics.metrics_corpus import CorpusLevelComputation, MRewardBenchWeightedAccuracy
+from lighteval.metrics.metrics_sample import SampleLevelComputation
+from lighteval.metrics.normalizations import LogProbCharNorm, LogProbPMINorm, LogProbTokenNorm  # fmt: skip
+from lighteval.metrics.sample_preparator import GenerativeCorpusMetricInput, LoglikelihoodPreparator, LogprobCorpusMetricInput  # fmt: skip
+from lighteval.metrics.utils.extractive_match_utils import ExprExtractionConfig
+from lighteval.metrics.utils.metric_utils import CorpusLevelMetric, SampleLevelMetric
+from lighteval.models.model_output import ModelResponse
 from lighteval.tasks.lighteval_task import LightevalTaskConfig
 from lighteval.tasks.multilingual.utils.task_utils import get_metrics_for_formulation
+from lighteval.tasks.requests import Doc, SamplingMethod
 from lighteval.tasks.templates.multichoice import get_mcq_prompt_function
 from lighteval.tasks.templates.utils.formulation import CFFormulation, MCFFormulation
 from lighteval.utils.language import Language
@@ -25,7 +30,7 @@ logging.basicConfig(
 )
 
 
-# ==== Global-MMU-Lite ====
+# ==== Global-MMLU-Lite ====
 
 GLOBAL_MMLU_LITE = [
     LightevalTaskConfig(
@@ -40,21 +45,20 @@ GLOBAL_MMLU_LITE = [
                     line["option_c"],
                     line["option_d"],
                 ],
-                "gold_idx": LETTER_INDICES.index(line["answer"]),
+                "gold_idx": ascii_uppercase.index(line["answer"]),
             },
             formulation=MCFFormulation(),
         ),
-        suite=("lighteval",),
         hf_repo="CohereForAI/Global-MMLU-Lite",
         hf_subset=standardize_tag(language.value),
         evaluation_splits=("test",),
         few_shots_split="dev",
-        metric=get_metrics_for_formulation(
+        metrics=get_metrics_for_formulation(
             MCFFormulation(),
             [
-                loglikelihood_acc_metric(normalization=LogProbTokenNorm()),
-                loglikelihood_acc_metric(normalization=LogProbCharNorm()),
-                loglikelihood_acc_metric(normalization=LogProbPMINorm()),
+                LogLikelihoodAccMetric(normalization=LogProbTokenNorm()),
+                LogLikelihoodAccMetric(normalization=LogProbCharNorm()),
+                LogLikelihoodAccMetric(normalization=LogProbPMINorm()),
             ],
         ),
     )
@@ -68,171 +72,217 @@ GLOBAL_MMLU_LITE = [
 ]
 
 
-# ==== M-RewardBench ====
-
-# Subset mapping from source to category (matches m-rewardbench structure)
-# Reference: https://github.com/Cohere-Labs-Community/m-rewardbench/blob/main/analysis/compute_iaa.py#L59
-SUBSET_MAPPING = {
-    "Chat": [
-        "alpacaeval-easy",
-        "alpacaeval-length",
-        "alpacaeval-hard",
-        "mt-bench-easy",
-        "mt-bench-med",
-    ],
-    "Chat Hard": [
-        "mt-bench-hard",
-        "llmbar-natural",
-        "llmbar-adver-neighbor",
-        "llmbar-adver-GPTInst",
-        "llmbar-adver-GPTOut",
-        "llmbar-adver-manual",
-    ],
-    "Safety": [
-        "refusals-dangerous",
-        "refusals-offensive",
-        "xstest-should-refuse",
-        "xstest-should-respond",
-        "donotanswer",
-    ],
-    "Reasoning": [
-        "math-prm",
-        "hep-cpp",
-        "hep-go",
-        "hep-java",
-        "hep-js",
-        "hep-python",
-        "hep-rust",
-    ],
-}
-
-# Example counts per subset (from m-rewardbench)
-# Reference: https://github.com/Cohere-Labs-Community/m-rewardbench/blob/main/analysis/plot_utils.py#L81
-# Note: math-prm is upweighted to 983 (actual length 447) to match code subset count
-EXAMPLE_COUNTS = {
-    "alpacaeval-easy": 79,
-    "alpacaeval-length": 79,
-    "alpacaeval-hard": 76,
-    "mt-bench-easy": 24,
-    "mt-bench-med": 38,
-    "mt-bench-hard": 35,
-    "math-prm": 983,
-    "refusals-dangerous": 100,
-    "refusals-offensive": 100,
-    "llmbar-natural": 76,
-    "llmbar-adver-neighbor": 124,
-    "llmbar-adver-GPTInst": 87,
-    "llmbar-adver-GPTOut": 42,
-    "llmbar-adver-manual": 43,
-    "xstest-should-refuse": 154,
-    "xstest-should-respond": 247,
-    "donotanswer": 135,
-    "hep-cpp": 164,
-    "hep-go": 164,
-    "hep-java": 164,
-    "hep-js": 164,
-    "hep-python": 163,
-    "hep-rust": 164,
-}
-
-# Category weights for M-RewardBench
-# Adjust these based on your evaluation priorities
-DEFAULT_CATEGORY_WEIGHTS = {
-    "Chat": 1.0,
-    "Chat Hard": 1.0,
-    "Safety": 1.0,
-    "Reasoning": 1.0,
-}
+# ==== MGSM (Multilingual Grade School Math) ====
 
 
-def compute_mrewardbench_weighted_acc(items: list) -> float:
-    """Computes weighted accuracy by category for M-RewardBench.
-
-    This follows m-rewardbench's approach:
-    1. Groups items by subset (source field)
-    2. Computes accuracy per subset
-    3. Weights subsets by EXAMPLE_COUNTS within each category
-    4. Averages across categories with equal weights
+def mgsm_prompt_number_only(
+    line, task_name: str = None, language: Language = Language.ENGLISH
+):
     """
-    subset_accuracies = {}
-    subset_items: dict[str, list[tuple[Any, Any]]] = {}
+    Prompt that asks model to output ONLY the numerical answer.
+    """
+    # Instructions per language to output only the number
+    instructions = {
+        Language.ENGLISH: "Answer with only the number.",
+        Language.GERMAN: "Antworte nur mit der Zahl.",
+        Language.SPANISH: "Responde solo con el número.",
+        Language.JAPANESE: "数字のみで答えてください。",
+        Language.ARABIC: "أجب بالرقم فقط.",
+        Language.INDONESIAN: "Jawab hanya dengan angka.",
+    }
 
-    for item in items:
-        subset = item.source if hasattr(item, "source") else "Unknown"
+    inst = instructions.get(language, instructions[Language.ENGLISH])
 
-        if subset not in subset_items:
-            subset_items[subset] = []
-        subset_items[subset].append((item.golds, item.preds))
+    # Extract gold answer (just the number from answer_number field)
+    gold = str(line["answer_number"])
 
-    for subset, pairs in subset_items.items():
-        correct = sum(1 for gold, pred in pairs if gold == pred)
-        total = len(pairs)
-        subset_accuracies[subset] = correct / total if total > 0 else 0.0
-
-    category_accuracies = {}
-    for category, subsets in SUBSET_MAPPING.items():
-        weighted_sum = 0.0
-        total_examples = 0
-
-        for subset in subsets:
-            if subset in subset_accuracies:
-                count = EXAMPLE_COUNTS.get(subset, 0)
-                weighted_sum += subset_accuracies[subset] * count
-                total_examples += count
-
-        category_accuracies[category] = (
-            weighted_sum / total_examples if total_examples > 0 else 0.0
-        )
-
-    # Average across categories
-    return (
-        sum(category_accuracies.values()) / len(category_accuracies)
-        if category_accuracies
-        else 0.0
+    return Doc(
+        task_name=task_name,
+        query=f"{line['question']}\n\n{inst}\nAnswer:",
+        choices=[gold],
+        gold_index=0,
     )
 
 
+# MGSM tasks with extractive number matching
+# Note: The prompt_function uses 'answer_number' instead of 'answer' field
+# This ensures few-shot examples show only the numerical answer, not the full CoT
+MGSM = [
+    LightevalTaskConfig(
+        name=f"mgsm_custom:{subset}",
+        prompt_function=lambda line, task_name=None, lang=language: mgsm_prompt_number_only(
+            line, task_name, lang
+        ),
+        hf_repo="ljvmiranda921/mgsm",  # use my fork since original cannot be downloaded properly
+        hf_subset=subset,
+        hf_avail_splits=["train", "test"],
+        evaluation_splits=["test"],
+        few_shots_split="train",  # Use train split for few-shot examples
+        few_shots_select="sequential",
+        generation_size=50,  # Short generation for just the number
+        stop_sequence=["\n"],  # Stop at newline to just get the answer
+        metrics=[
+            SampleLevelMetric(
+                metric_name="extractive_match",
+                sample_level_fn=MultilingualExtractiveMatchMetric(
+                    language=language,
+                    # Extract numbers/expressions from both gold and prediction
+                    gold_extraction_target=(
+                        ExprExtractionConfig(try_extract_without_anchor=True),
+                    ),
+                    pred_extraction_target=(
+                        ExprExtractionConfig(try_extract_without_anchor=True),
+                    ),
+                    aggregation_function=max,
+                    fallback_mode="first_match",
+                    extraction_mode="first_match",
+                    precision=2,  # Allow small rounding differences
+                ),
+                category=SamplingMethod.GENERATIVE,
+                corpus_level_fn=np.mean,
+                higher_is_better=True,
+            )
+        ],
+    )
+    # Only German, Spanish, and Japanese are in both your list and MGSM
+    # (Arabic and Indonesian are not in MGSM dataset)
+    for subset, language in [
+        ("de", Language.GERMAN),
+        ("es", Language.SPANISH),
+        ("ja", Language.JAPANESE),
+    ]
+]
+
+
+# ==== M-RewardBench ====
+
+# Custom preparator that includes source metadata
+class MRewardBenchPreparator(LoglikelihoodPreparator):
+    """Custom preparator for M-RewardBench that extracts and includes source metadata."""
+
+    def prepare(self, doc: Doc, model_response: ModelResponse, **kwargs) -> LogprobCorpusMetricInput:
+        """Prepare loglikelihood data with source metadata.
+
+        Args:
+            doc: Document containing the source in specific metadata
+            model_response: Model's response
+            **kwargs: Additional arguments
+
+        Returns:
+            LogprobCorpusMetricInput with source attribute added
+        """
+        # Call parent prepare
+        result = super().prepare(doc, model_response, **kwargs)
+
+        # Extract source from doc.specific if available
+        source = doc.specific.get("source", "Unknown") if doc.specific else "Unknown"
+
+        # Add source as an attribute to the result
+        # This is a bit hacky but works with the dataclass
+        object.__setattr__(result, "source", source)
+
+        return result
+
+
 # Sample-level metric for parsing generative responses (A or B)
-def parse_choice_from_response(prediction: str, gold_index: int) -> dict:
-    """Parse 'A' or 'B' from the generated response and check if correct."""
-    prediction = prediction.strip().upper()
+class GenerativeAccuracy(SampleLevelComputation):
+    """Computes accuracy for generative M-RewardBench by parsing A/B choices."""
 
-    # Extract the first occurrence of A or B
-    predicted_choice = None
-    for char in prediction:
-        if char in ["A", "B"]:
-            predicted_choice = char
-            break
+    def compute(self, doc: Doc, model_response: ModelResponse, **kwargs) -> float:
+        """Parse 'A' or 'B' from the generated response and check if correct."""
+        prediction = model_response.final_text[0].strip().upper()
+        gold_index = (
+            doc.gold_index[0] if isinstance(doc.gold_index, list) else doc.gold_index
+        )
 
-    # Map to index (A=0, B=1)
-    pred_idx = 0 if predicted_choice == "A" else 1 if predicted_choice == "B" else -1
+        # Extract the first occurrence of A or B
+        predicted_choice = None
+        for char in prediction:
+            if char in ["A", "B"]:
+                predicted_choice = char
+                break
 
-    return {
-        "acc": 1.0 if pred_idx == gold_index else 0.0,
-        "pred_idx": pred_idx,
-    }
+        # Map to index (A=0, B=1)
+        pred_idx = (
+            0 if predicted_choice == "A" else 1 if predicted_choice == "B" else -1
+        )
+
+        return 1.0 if pred_idx == gold_index else 0.0
 
 
+# Create metrics at module level
 generative_acc_metric = SampleLevelMetric(
     metric_name="acc",
-    higher_is_better=True,
-    category=MetricCategory.GENERATIVE,
-    use_case=MetricUseCase.ACCURACY,
-    sample_level_fn=lambda predictions, golds, **kwargs: parse_choice_from_response(
-        predictions[0], golds[0]
-    ),
+    sample_level_fn=GenerativeAccuracy(),
+    category=SamplingMethod.GENERATIVE,
     corpus_level_fn=np.mean,
+    higher_is_better=True,
 )
 
-# Corpus-level metric for M-RewardBench weighted accuracy
+# M-RewardBench weighted accuracy metrics (now imported from lighteval, avoiding pickling issues)
+# Use custom preparator to include source metadata
+# Average across all categories
 mrewardbench_weighted_acc_metric = CorpusLevelMetric(
     metric_name="weighted_acc",
-    sample_level_fn=None,
-    corpus_level_fn=compute_mrewardbench_weighted_acc,
-    category=MetricCategory.MULTICHOICE,
-    use_case=MetricUseCase.ACCURACY,
+    sample_level_fn=MRewardBenchPreparator(is_single_token=True),
+    category=SamplingMethod.LOGPROBS,
+    corpus_level_fn=MRewardBenchWeightedAccuracy(),
     higher_is_better=True,
 )
+
+# Per-category metrics
+mrewardbench_chat_metric = CorpusLevelMetric(
+    metric_name="weighted_acc_chat",
+    sample_level_fn=MRewardBenchPreparator(is_single_token=True),
+    category=SamplingMethod.LOGPROBS,
+    corpus_level_fn=MRewardBenchWeightedAccuracy(category="Chat"),
+    higher_is_better=True,
+)
+
+mrewardbench_chat_hard_metric = CorpusLevelMetric(
+    metric_name="weighted_acc_chat_hard",
+    sample_level_fn=MRewardBenchPreparator(is_single_token=True),
+    category=SamplingMethod.LOGPROBS,
+    corpus_level_fn=MRewardBenchWeightedAccuracy(category="Chat Hard"),
+    higher_is_better=True,
+)
+
+mrewardbench_safety_metric = CorpusLevelMetric(
+    metric_name="weighted_acc_safety",
+    sample_level_fn=MRewardBenchPreparator(is_single_token=True),
+    category=SamplingMethod.LOGPROBS,
+    corpus_level_fn=MRewardBenchWeightedAccuracy(category="Safety"),
+    higher_is_better=True,
+)
+
+mrewardbench_reasoning_metric = CorpusLevelMetric(
+    metric_name="weighted_acc_reasoning",
+    sample_level_fn=MRewardBenchPreparator(is_single_token=True),
+    category=SamplingMethod.LOGPROBS,
+    corpus_level_fn=MRewardBenchWeightedAccuracy(category="Reasoning"),
+    higher_is_better=True,
+)
+
+
+def get_mrewardbench_prompt_function(language: Language):
+    """Create a prompt function for M-RewardBench that includes source metadata."""
+
+    # Get the base MCQ prompt function
+    base_prompt_fn = get_mcq_prompt_function(
+        language,
+        lambda line: get_mrewardbench_eval_instances(line),
+        formulation=MCFFormulation(),
+    )
+
+    def prompt_fn_with_source(line, task_name: str):
+        """Wrapper that adds source to Doc.specific."""
+        doc = base_prompt_fn(line, task_name)
+        if doc is not None:
+            # Add source to the specific metadata
+            doc.specific = {"source": line.get("source", "Unknown")}
+        return doc
+
+    return prompt_fn_with_source
 
 
 def get_mrewardbench_eval_instances(line: dict) -> dict[str, Any]:
@@ -274,7 +324,11 @@ def get_mrewardbench_eval_instances(line: dict) -> dict[str, Any]:
         question=line["prompt"],
     )
 
-    return {"question": question, "choices": choices, "gold_idx": gold_idx}
+    return {
+        "question": question,
+        "choices": choices,
+        "gold_idx": gold_idx,
+    }
 
 
 iso2_to_extended = {
@@ -292,19 +346,18 @@ iso2_to_extended = {
 M_REWARDBENCH_MCF = [
     LightevalTaskConfig(
         name=f"mrewardbench_mcf:{standardize_tag(language.value)}",
-        prompt_function=get_mcq_prompt_function(
-            language,
-            lambda line: get_mrewardbench_eval_instances(line),
-            formulation=MCFFormulation(),
-        ),
-        suite=("lighteval",),
+        prompt_function=get_mrewardbench_prompt_function(language),
         hf_repo="CohereLabsCommunity/multilingual-reward-bench",
         hf_subset=iso2_to_extended.get(standardize_tag(language.value)),
         evaluation_splits=("test",),
         few_shots_split="test",
-        metric=[
-            loglikelihood_acc_metric(normalization=LogProbTokenNorm()),
+        metrics=[
+            LogLikelihoodAccMetric(normalization=LogProbTokenNorm()),
             mrewardbench_weighted_acc_metric,
+            mrewardbench_chat_metric,
+            mrewardbench_chat_hard_metric,
+            mrewardbench_safety_metric,
+            mrewardbench_reasoning_metric,
         ],
     )
     for language in [
@@ -322,19 +375,18 @@ M_REWARDBENCH_MCF = [
 M_REWARDBENCH_CF = [
     LightevalTaskConfig(
         name=f"mrewardbench_cf:{standardize_tag(language.value)}",
-        prompt_function=get_mcq_prompt_function(
-            language,
-            lambda line: get_mrewardbench_eval_instances(line),
-            formulation=CFFormulation(),
-        ),
-        suite=("lighteval",),
+        prompt_function=get_mrewardbench_prompt_function(language),
         hf_repo="CohereLabsCommunity/multilingual-reward-bench",
         hf_subset=iso2_to_extended.get(standardize_tag(language.value)),
         evaluation_splits=("test",),
         few_shots_split="test",
-        metric=[
+        metrics=[
             generative_acc_metric,
             mrewardbench_weighted_acc_metric,
+            mrewardbench_chat_metric,
+            mrewardbench_chat_hard_metric,
+            mrewardbench_safety_metric,
+            mrewardbench_reasoning_metric,
         ],
     )
     for language in [
@@ -348,5 +400,5 @@ M_REWARDBENCH_CF = [
 ]
 
 TASKS_TABLE: list[LightevalTaskConfig] = (
-    GLOBAL_MMLU_LITE + M_REWARDBENCH_MCF + M_REWARDBENCH_CF
+    GLOBAL_MMLU_LITE + MGSM + M_REWARDBENCH_MCF + M_REWARDBENCH_CF
 )
