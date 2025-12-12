@@ -113,14 +113,14 @@ MGSM = [
         prompt_function=lambda line, task_name=None, lang=language: mgsm_prompt_number_only(
             line, task_name, lang
         ),
-        hf_repo="ljvmiranda921/mgsm",
+        hf_repo="ljvmiranda921/mgsm",  # use my fork since original cannot be downloaded properly
         hf_subset=subset,
         hf_avail_splits=["train", "test"],
         evaluation_splits=["test"],
         few_shots_split="train",  # Use train split for few-shot examples
-        few_shots_select="sequential",  # Or "random_sampling" if you prefer
+        few_shots_select="sequential",
         generation_size=50,  # Short generation for just the number
-        stop_sequence=["\n"],  # Stop at newline to get just the answer
+        stop_sequence=["\n"],  # Stop at newline to just get the answer
         metrics=[
             SampleLevelMetric(
                 metric_name="extractive_match",
