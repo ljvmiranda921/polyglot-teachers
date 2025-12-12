@@ -156,6 +156,34 @@ MGSM = [
 
 # ==== M-RewardBench ====
 
+# Custom preparator that includes source metadata
+class MRewardBenchPreparator(LoglikelihoodPreparator):
+    """Custom preparator for M-RewardBench that extracts and includes source metadata."""
+
+    def prepare(self, doc: Doc, model_response: ModelResponse, **kwargs) -> LogprobCorpusMetricInput:
+        """Prepare loglikelihood data with source metadata.
+
+        Args:
+            doc: Document containing the source in specific metadata
+            model_response: Model's response
+            **kwargs: Additional arguments
+
+        Returns:
+            LogprobCorpusMetricInput with source attribute added
+        """
+        # Call parent prepare
+        result = super().prepare(doc, model_response, **kwargs)
+
+        # Extract source from doc.specific if available
+        source = doc.specific.get("source", "Unknown") if doc.specific else "Unknown"
+
+        # Add source as an attribute to the result
+        # This is a bit hacky but works with the dataclass
+        object.__setattr__(result, "source", source)
+
+        return result
+
+
 # Sample-level metric for parsing generative responses (A or B)
 class GenerativeAccuracy(SampleLevelComputation):
     """Computes accuracy for generative M-RewardBench by parsing A/B choices."""
@@ -192,10 +220,11 @@ generative_acc_metric = SampleLevelMetric(
 )
 
 # M-RewardBench weighted accuracy metrics (now imported from lighteval, avoiding pickling issues)
+# Use custom preparator to include source metadata
 # Average across all categories
 mrewardbench_weighted_acc_metric = CorpusLevelMetric(
     metric_name="weighted_acc",
-    sample_level_fn=LoglikelihoodPreparator(is_single_token=True),
+    sample_level_fn=MRewardBenchPreparator(is_single_token=True),
     category=SamplingMethod.LOGPROBS,
     corpus_level_fn=MRewardBenchWeightedAccuracy(),
     higher_is_better=True,
@@ -204,7 +233,7 @@ mrewardbench_weighted_acc_metric = CorpusLevelMetric(
 # Per-category metrics
 mrewardbench_chat_metric = CorpusLevelMetric(
     metric_name="weighted_acc_chat",
-    sample_level_fn=LoglikelihoodPreparator(is_single_token=True),
+    sample_level_fn=MRewardBenchPreparator(is_single_token=True),
     category=SamplingMethod.LOGPROBS,
     corpus_level_fn=MRewardBenchWeightedAccuracy(category="Chat"),
     higher_is_better=True,
@@ -212,7 +241,7 @@ mrewardbench_chat_metric = CorpusLevelMetric(
 
 mrewardbench_chat_hard_metric = CorpusLevelMetric(
     metric_name="weighted_acc_chat_hard",
-    sample_level_fn=LoglikelihoodPreparator(is_single_token=True),
+    sample_level_fn=MRewardBenchPreparator(is_single_token=True),
     category=SamplingMethod.LOGPROBS,
     corpus_level_fn=MRewardBenchWeightedAccuracy(category="Chat Hard"),
     higher_is_better=True,
@@ -220,7 +249,7 @@ mrewardbench_chat_hard_metric = CorpusLevelMetric(
 
 mrewardbench_safety_metric = CorpusLevelMetric(
     metric_name="weighted_acc_safety",
-    sample_level_fn=LoglikelihoodPreparator(is_single_token=True),
+    sample_level_fn=MRewardBenchPreparator(is_single_token=True),
     category=SamplingMethod.LOGPROBS,
     corpus_level_fn=MRewardBenchWeightedAccuracy(category="Safety"),
     higher_is_better=True,
@@ -228,11 +257,32 @@ mrewardbench_safety_metric = CorpusLevelMetric(
 
 mrewardbench_reasoning_metric = CorpusLevelMetric(
     metric_name="weighted_acc_reasoning",
-    sample_level_fn=LoglikelihoodPreparator(is_single_token=True),
+    sample_level_fn=MRewardBenchPreparator(is_single_token=True),
     category=SamplingMethod.LOGPROBS,
     corpus_level_fn=MRewardBenchWeightedAccuracy(category="Reasoning"),
     higher_is_better=True,
 )
+
+
+def get_mrewardbench_prompt_function(language: Language):
+    """Create a prompt function for M-RewardBench that includes source metadata."""
+
+    # Get the base MCQ prompt function
+    base_prompt_fn = get_mcq_prompt_function(
+        language,
+        lambda line: get_mrewardbench_eval_instances(line),
+        formulation=MCFFormulation(),
+    )
+
+    def prompt_fn_with_source(line, task_name: str):
+        """Wrapper that adds source to Doc.specific."""
+        doc = base_prompt_fn(line, task_name)
+        if doc is not None:
+            # Add source to the specific metadata
+            doc.specific = {"source": line.get("source", "Unknown")}
+        return doc
+
+    return prompt_fn_with_source
 
 
 def get_mrewardbench_eval_instances(line: dict) -> dict[str, Any]:
@@ -274,7 +324,11 @@ def get_mrewardbench_eval_instances(line: dict) -> dict[str, Any]:
         question=line["prompt"],
     )
 
-    return {"question": question, "choices": choices, "gold_idx": gold_idx}
+    return {
+        "question": question,
+        "choices": choices,
+        "gold_idx": gold_idx,
+    }
 
 
 iso2_to_extended = {
@@ -292,11 +346,7 @@ iso2_to_extended = {
 M_REWARDBENCH_MCF = [
     LightevalTaskConfig(
         name=f"mrewardbench_mcf:{standardize_tag(language.value)}",
-        prompt_function=get_mcq_prompt_function(
-            language,
-            lambda line: get_mrewardbench_eval_instances(line),
-            formulation=MCFFormulation(),
-        ),
+        prompt_function=get_mrewardbench_prompt_function(language),
         hf_repo="CohereLabsCommunity/multilingual-reward-bench",
         hf_subset=iso2_to_extended.get(standardize_tag(language.value)),
         evaluation_splits=("test",),
@@ -325,11 +375,7 @@ M_REWARDBENCH_MCF = [
 M_REWARDBENCH_CF = [
     LightevalTaskConfig(
         name=f"mrewardbench_cf:{standardize_tag(language.value)}",
-        prompt_function=get_mcq_prompt_function(
-            language,
-            lambda line: get_mrewardbench_eval_instances(line),
-            formulation=CFFormulation(),
-        ),
+        prompt_function=get_mrewardbench_prompt_function(language),
         hf_repo="CohereLabsCommunity/multilingual-reward-bench",
         hf_subset=iso2_to_extended.get(standardize_tag(language.value)),
         evaluation_splits=("test",),
