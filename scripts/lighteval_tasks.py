@@ -89,12 +89,8 @@ def mgsm_prompt_number_only(line, task_name: str = None, language: Language = La
 
     inst = instructions.get(language, instructions[Language.ENGLISH])
 
-    # Extract gold answer (just the number)
-    if line["answer"] is not None:
-        # The answer field contains "#### number" format
-        gold = line["answer"].split("####")[-1].strip()
-    else:
-        gold = str(line["answer_number"])
+    # Extract gold answer (just the number from answer_number field)
+    gold = str(line["answer_number"])
 
     return Doc(
         task_name=task_name,
@@ -102,6 +98,17 @@ def mgsm_prompt_number_only(line, task_name: str = None, language: Language = La
         choices=[gold],
         gold_index=0,
     )
+
+
+def mgsm_few_shot_formatter(sample, language: Language = Language.ENGLISH):
+    """
+    Format few-shot examples to show question and numerical answer only.
+    The 'answer' field contains full CoT, but we only want the final number.
+    """
+    question = sample.get("question", "")
+    answer_number = str(sample.get("answer_number", ""))
+
+    return f"{question}\nAnswer: {answer_number}"
 
 
 # MGSM tasks with extractive number matching
@@ -116,7 +123,8 @@ MGSM = [
         hf_subset=subset,
         hf_avail_splits=["train", "test"],
         evaluation_splits=["test"],
-        few_shots_split=None,
+        few_shots_split="train",  # Use train split for few-shot examples
+        few_shots_select="sequential",  # Or "random_sampling" if you prefer
         generation_size=50,  # Short generation for just the number
         stop_sequence=["\n"],  # Stop at newline to get just the answer
         metrics=[
