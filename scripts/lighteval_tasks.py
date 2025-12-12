@@ -6,12 +6,13 @@ from string import ascii_uppercase
 
 import numpy as np
 from langcodes import standardize_tag
-from lighteval.metrics.dynamic_metrics import LogLikelihoodAccMetric
+from lighteval.metrics.dynamic_metrics import LogLikelihoodAccMetric, MultilingualExtractiveMatchMetric
 from lighteval.metrics.normalizations import LogProbCharNorm, LogProbPMINorm, LogProbTokenNorm  # fmt: skip
 from lighteval.metrics.metrics_sample import SampleLevelComputation
 from lighteval.metrics.metrics_corpus import CorpusLevelComputation
 from lighteval.metrics.sample_preparator import GenerativeCorpusMetricInput, LogprobCorpusMetricInput, LoglikelihoodPreparator
 from lighteval.metrics.utils.metric_utils import SampleLevelMetric, CorpusLevelMetric
+from lighteval.metrics.utils.extractive_match_utils import ExprExtractionConfig
 from lighteval.models.model_output import ModelResponse  # fmt: skip
 from lighteval.tasks.requests import Doc, SamplingMethod  # fmt: skip
 from lighteval.tasks.lighteval_task import LightevalTaskConfig
@@ -66,6 +67,83 @@ GLOBAL_MMLU_LITE = [
         Language.SPANISH,
         Language.INDONESIAN,
         Language.JAPANESE,
+    ]
+]
+
+
+# ==== MGSM (Multilingual Grade School Math) ====
+
+def mgsm_prompt_number_only(line, task_name: str = None, language: Language = Language.ENGLISH):
+    """
+    Prompt that asks model to output ONLY the numerical answer.
+    """
+    # Instructions per language to output only the number
+    instructions = {
+        Language.ENGLISH: "Answer with only the number.",
+        Language.GERMAN: "Antworte nur mit der Zahl.",
+        Language.SPANISH: "Responde solo con el número.",
+        Language.JAPANESE: "数字のみで答えてください。",
+        Language.ARABIC: "أجب بالرقم فقط.",
+        Language.INDONESIAN: "Jawab hanya dengan angka.",
+    }
+
+    inst = instructions.get(language, instructions[Language.ENGLISH])
+
+    # Extract gold answer (just the number)
+    if line["answer"] is not None:
+        # The answer field contains "#### number" format
+        gold = line["answer"].split("####")[-1].strip()
+    else:
+        gold = str(line["answer_number"])
+
+    return Doc(
+        task_name=task_name,
+        query=f"{line['question']}\n\n{inst}\nAnswer:",
+        choices=[gold],
+        gold_index=0,
+    )
+
+
+# MGSM tasks with extractive number matching
+# Only languages that are in both MGSM dataset and your target languages
+MGSM = [
+    LightevalTaskConfig(
+        name=f"mgsm_custom:{subset}",
+        prompt_function=lambda line, task_name=None, lang=language: mgsm_prompt_number_only(
+            line, task_name, lang
+        ),
+        hf_repo="juletxara/mgsm",
+        hf_subset=subset,
+        hf_avail_splits=["train", "test"],
+        evaluation_splits=["test"],
+        few_shots_split=None,
+        generation_size=50,  # Short generation for just the number
+        stop_sequence=["\n"],  # Stop at newline to get just the answer
+        metrics=[
+            SampleLevelMetric(
+                metric_name="extractive_match",
+                sample_level_fn=MultilingualExtractiveMatchMetric(
+                    language=language,
+                    # Extract numbers/expressions from both gold and prediction
+                    gold_extraction_target=(ExprExtractionConfig(try_extract_without_anchor=True),),
+                    pred_extraction_target=(ExprExtractionConfig(try_extract_without_anchor=True),),
+                    aggregation_function=max,
+                    fallback_mode="first_match",
+                    extraction_mode="first_match",
+                    precision=2,  # Allow small rounding differences
+                ),
+                category=SamplingMethod.GENERATIVE,
+                corpus_level_fn=np.mean,
+                higher_is_better=True,
+            )
+        ],
+    )
+    # Only German, Spanish, and Japanese are in both your list and MGSM
+    # (Arabic and Indonesian are not in MGSM dataset)
+    for subset, language in [
+        ("de", Language.GERMAN),
+        ("es", Language.SPANISH),
+        ("ja", Language.JAPANESE),
     ]
 ]
 
@@ -397,5 +475,5 @@ M_REWARDBENCH_CF = [
 ]
 
 TASKS_TABLE: list[LightevalTaskConfig] = (
-    GLOBAL_MMLU_LITE + M_REWARDBENCH_MCF + M_REWARDBENCH_CF
+    GLOBAL_MMLU_LITE + MGSM + M_REWARDBENCH_MCF + M_REWARDBENCH_CF
 )
