@@ -1,29 +1,23 @@
 import logging
-import sys
-from typing import Any
 import random
+import sys
 from string import ascii_uppercase
+from typing import Any
 
 import numpy as np
 from langcodes import standardize_tag
-from lighteval.metrics.dynamic_metrics import (
-    LogLikelihoodAccMetric,
-    MultilingualExtractiveMatchMetric,
-)
-from lighteval.metrics.normalizations import LogProbCharNorm, LogProbPMINorm, LogProbTokenNorm  # fmt: skip
-from lighteval.metrics.metrics_sample import SampleLevelComputation
+
+from lighteval.metrics.dynamic_metrics import LogLikelihoodAccMetric, MultilingualExtractiveMatchMetric  # fmt: skip
 from lighteval.metrics.metrics_corpus import CorpusLevelComputation
-from lighteval.metrics.sample_preparator import (
-    GenerativeCorpusMetricInput,
-    LogprobCorpusMetricInput,
-    LoglikelihoodPreparator,
-)
-from lighteval.metrics.utils.metric_utils import SampleLevelMetric, CorpusLevelMetric
+from lighteval.metrics.metrics_sample import SampleLevelComputation
+from lighteval.metrics.normalizations import LogProbCharNorm, LogProbPMINorm, LogProbTokenNorm  # fmt: skip
+from lighteval.metrics.sample_preparator import GenerativeCorpusMetricInput, LoglikelihoodPreparator, LogprobCorpusMetricInput  # fmt: skip
 from lighteval.metrics.utils.extractive_match_utils import ExprExtractionConfig
-from lighteval.models.model_output import ModelResponse  # fmt: skip
-from lighteval.tasks.requests import Doc, SamplingMethod  # fmt: skip
+from lighteval.metrics.utils.metric_utils import CorpusLevelMetric, SampleLevelMetric
+from lighteval.models.model_output import ModelResponse
 from lighteval.tasks.lighteval_task import LightevalTaskConfig
 from lighteval.tasks.multilingual.utils.task_utils import get_metrics_for_formulation
+from lighteval.tasks.requests import Doc, SamplingMethod
 from lighteval.tasks.templates.multichoice import get_mcq_prompt_function
 from lighteval.tasks.templates.utils.formulation import CFFormulation, MCFFormulation
 from lighteval.utils.language import Language
