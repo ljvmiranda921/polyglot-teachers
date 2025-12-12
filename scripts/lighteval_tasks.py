@@ -113,7 +113,7 @@ MGSM = [
         prompt_function=lambda line, task_name=None, lang=language: mgsm_prompt_number_only(
             line, task_name, lang
         ),
-        hf_repo="juletxara/mgsm",
+        hf_repo="ljvmiranda921/mgsm",
         hf_subset=subset,
         hf_avail_splits=["train", "test"],
         evaluation_splits=["test"],
