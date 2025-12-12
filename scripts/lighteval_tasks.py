@@ -357,25 +357,15 @@ class MRewardBenchWeightedAccuracy(CorpusLevelComputation):
         )
 
 
-def get_generative_acc_metric():
-    """Factory function to create generative accuracy metric (avoids pickling issues)."""
-    return SampleLevelMetric(
-        metric_name="acc",
-        sample_level_fn=GenerativeAccuracy(),
-        category=SamplingMethod.GENERATIVE,
-        corpus_level_fn=np.mean,
-        higher_is_better=True,
-    )
-
-def get_mrewardbench_weighted_acc_metric():
-    """Factory function to create weighted accuracy metric (avoids pickling issues)."""
-    return CorpusLevelMetric(
-        metric_name="weighted_acc",
-        sample_level_fn=LoglikelihoodPreparator(is_single_token=True),
-        category=SamplingMethod.LOGPROBS,
-        corpus_level_fn=MRewardBenchWeightedAccuracy(),
-        higher_is_better=True,
-    )
+# Create metrics at module level but using simple mean instead of custom weighted accuracy
+# to avoid pickling issues with the custom MRewardBenchWeightedAccuracy class
+generative_acc_metric = SampleLevelMetric(
+    metric_name="acc",
+    sample_level_fn=GenerativeAccuracy(),
+    category=SamplingMethod.GENERATIVE,
+    corpus_level_fn=np.mean,
+    higher_is_better=True,
+)
 
 
 def get_mrewardbench_eval_instances(line: dict) -> dict[str, Any]:
@@ -446,7 +436,6 @@ M_REWARDBENCH_MCF = [
         few_shots_split="test",
         metrics=[
             LogLikelihoodAccMetric(normalization=LogProbTokenNorm()),
-            get_mrewardbench_weighted_acc_metric(),
         ],
     )
     for language in [
@@ -474,8 +463,7 @@ M_REWARDBENCH_CF = [
         evaluation_splits=("test",),
         few_shots_split="test",
         metrics=[
-            get_generative_acc_metric(),
-            get_mrewardbench_weighted_acc_metric(),
+            generative_acc_metric,
         ],
     )
     for language in [
