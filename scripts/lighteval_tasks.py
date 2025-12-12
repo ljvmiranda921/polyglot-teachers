@@ -6,11 +6,18 @@ from string import ascii_uppercase
 
 import numpy as np
 from langcodes import standardize_tag
-from lighteval.metrics.dynamic_metrics import LogLikelihoodAccMetric, MultilingualExtractiveMatchMetric
+from lighteval.metrics.dynamic_metrics import (
+    LogLikelihoodAccMetric,
+    MultilingualExtractiveMatchMetric,
+)
 from lighteval.metrics.normalizations import LogProbCharNorm, LogProbPMINorm, LogProbTokenNorm  # fmt: skip
 from lighteval.metrics.metrics_sample import SampleLevelComputation
 from lighteval.metrics.metrics_corpus import CorpusLevelComputation
-from lighteval.metrics.sample_preparator import GenerativeCorpusMetricInput, LogprobCorpusMetricInput, LoglikelihoodPreparator
+from lighteval.metrics.sample_preparator import (
+    GenerativeCorpusMetricInput,
+    LogprobCorpusMetricInput,
+    LoglikelihoodPreparator,
+)
 from lighteval.metrics.utils.metric_utils import SampleLevelMetric, CorpusLevelMetric
 from lighteval.metrics.utils.extractive_match_utils import ExprExtractionConfig
 from lighteval.models.model_output import ModelResponse  # fmt: skip
@@ -73,7 +80,10 @@ GLOBAL_MMLU_LITE = [
 
 # ==== MGSM (Multilingual Grade School Math) ====
 
-def mgsm_prompt_number_only(line, task_name: str = None, language: Language = Language.ENGLISH):
+
+def mgsm_prompt_number_only(
+    line, task_name: str = None, language: Language = Language.ENGLISH
+):
     """
     Prompt that asks model to output ONLY the numerical answer.
     """
@@ -100,19 +110,9 @@ def mgsm_prompt_number_only(line, task_name: str = None, language: Language = La
     )
 
 
-def mgsm_few_shot_formatter(sample, language: Language = Language.ENGLISH):
-    """
-    Format few-shot examples to show question and numerical answer only.
-    The 'answer' field contains full CoT, but we only want the final number.
-    """
-    question = sample.get("question", "")
-    answer_number = str(sample.get("answer_number", ""))
-
-    return f"{question}\nAnswer: {answer_number}"
-
-
 # MGSM tasks with extractive number matching
-# Only languages that are in both MGSM dataset and your target languages
+# Note: The prompt_function uses 'answer_number' instead of 'answer' field
+# This ensures few-shot examples show only the numerical answer, not the full CoT
 MGSM = [
     LightevalTaskConfig(
         name=f"mgsm_custom:{subset}",
@@ -133,8 +133,12 @@ MGSM = [
                 sample_level_fn=MultilingualExtractiveMatchMetric(
                     language=language,
                     # Extract numbers/expressions from both gold and prediction
-                    gold_extraction_target=(ExprExtractionConfig(try_extract_without_anchor=True),),
-                    pred_extraction_target=(ExprExtractionConfig(try_extract_without_anchor=True),),
+                    gold_extraction_target=(
+                        ExprExtractionConfig(try_extract_without_anchor=True),
+                    ),
+                    pred_extraction_target=(
+                        ExprExtractionConfig(try_extract_without_anchor=True),
+                    ),
                     aggregation_function=max,
                     fallback_mode="first_match",
                     extraction_mode="first_match",
@@ -287,7 +291,9 @@ class GenerativeAccuracy(SampleLevelComputation):
     def compute(self, doc: Doc, model_response: ModelResponse, **kwargs) -> float:
         """Parse 'A' or 'B' from the generated response and check if correct."""
         prediction = model_response.final_text[0].strip().upper()
-        gold_index = doc.gold_index[0] if isinstance(doc.gold_index, list) else doc.gold_index
+        gold_index = (
+            doc.gold_index[0] if isinstance(doc.gold_index, list) else doc.gold_index
+        )
 
         # Extract the first occurrence of A or B
         predicted_choice = None
@@ -297,7 +303,9 @@ class GenerativeAccuracy(SampleLevelComputation):
                 break
 
         # Map to index (A=0, B=1)
-        pred_idx = 0 if predicted_choice == "A" else 1 if predicted_choice == "B" else -1
+        pred_idx = (
+            0 if predicted_choice == "A" else 1 if predicted_choice == "B" else -1
+        )
 
         return 1.0 if pred_idx == gold_index else 0.0
 
