@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=isambard-job
-#SBATCH --gpus=2
+#SBATCH --gpus=1
 #SBATCH --output=gpu-%j.log
 #SBATCH --time=10:00:00
 

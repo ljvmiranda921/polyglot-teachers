@@ -110,6 +110,8 @@ def main():
             trackio_space_id="msde-logging",
             run_name=run_name,
             hub_private_repo=True,
+            # Multi-GPU training
+            ddp_find_unused_parameters=False,
         ),
     )
 
@@ -144,7 +146,6 @@ def get_model_and_tokenizer(
         max_seq_length=max_seq_length,
         dtype=dtype,
         load_in_4bit=load_in_4bit,
-        device_map={"": local_rank},
         token=token,
     )
 
@@ -165,7 +166,7 @@ def get_model_and_tokenizer(
             lora_alpha=16,
             lora_dropout=0,  # Supports any, but = 0 is optimized
             bias="none",  # Supports any, but = "none" is optimized
-            use_gradient_checkpointing=True,  # True or "unsloth" for very long context
+            use_gradient_checkpointing="unsloth",  # True or "unsloth" for very long context
             random_state=3407,
             use_rslora=False,
             loftq_config=None,
