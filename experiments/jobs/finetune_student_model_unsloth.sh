@@ -14,7 +14,6 @@ MODELS=(
     "gpt-4o-mini-2024-07-18"
     "ibm-granite/granite-4.0-1b"
     "ibm-granite/granite-4.0-micro"
-    "mistralai/Mistral-Small-24B-Instruct-2501"
 )
 
 LANGUAGES=(ar cs de es id ja)
