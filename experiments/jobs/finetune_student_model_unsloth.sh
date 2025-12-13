@@ -27,5 +27,6 @@ torchrun --nproc_per_node=2 --module scripts.finetune_unsloth \
     --use_lora \
     --load_in_4bit \
     --apply_subsampling \
+    --max_train_samples 10000 \
     --save_mode merged_16bit \
     --input_dataset_filter "${INPUT_DATASET_FILTER}"
