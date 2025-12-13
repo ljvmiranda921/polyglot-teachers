@@ -138,12 +138,13 @@ def get_model_and_tokenizer(
     lora_r: int = 16,
     token: str = None,
 ):
+    local_rank = int(os.environ.get("LOCAL_RANK", 0))
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=model_name,
         max_seq_length=max_seq_length,
         dtype=dtype,
         load_in_4bit=load_in_4bit,
-        device_map={"": torch.cuda.current_device()},
+        device_map={"": local_rank},
         token=token,
     )
 
