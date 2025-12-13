@@ -165,7 +165,7 @@ def get_model_and_tokenizer(
             lora_alpha=16,
             lora_dropout=0,  # Supports any, but = 0 is optimized
             bias="none",  # Supports any, but = "none" is optimized
-            use_gradient_checkpointing="unsloth",  # True or "unsloth" for very long context
+            use_gradient_checkpointing=True,  # True or "unsloth" for very long context
             random_state=3407,
             use_rslora=False,
             loftq_config=None,
