@@ -16,7 +16,7 @@ RUN_NAME="${DATASET_NAME}_${TEACHER_MODEL}"
 INPUT_DATASET_FILTER="{\"model\": \"${TEACHER_MODEL_FULL}\"}"
 
 python -m scripts.finetune_unsloth --help
-torchrun --nproc_per_node=2 --module scripts.finetune_unsloth \
+accelerate launch --module scripts.finetune_unsloth \
     --input_dataset ${INPUT_DATASET} \
     --run_name ${RUN_NAME} \
     --base_model ${BASE_MODEL} \
