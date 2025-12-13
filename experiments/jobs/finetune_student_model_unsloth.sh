@@ -1,5 +1,11 @@
 #!/bin/bash
 # Job execution script for finetuning student model with unsloth
+# Task IDs 0-9: All 10 models with language ar (Arabic)
+# Task IDs 10-19: All 10 models with language cs (Czech)
+# Task IDs 20-29: All 10 models with language de (German)
+# Task IDs 30-39: All 10 models with language es (Spanish)
+# Task IDs 40-49: All 10 models with language id (Indonesian)
+# Task IDs 50-59: All 10 models with language ja (Japanese)
 
 OMP_NUM_THREADS=16
 
