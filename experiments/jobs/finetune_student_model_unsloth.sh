@@ -3,11 +3,32 @@
 
 OMP_NUM_THREADS=16
 
-# Parse arguments
-INPUT_DATASET=${1:-"ljvmiranda921/msde-S1-es"}
-BASE_MODEL=${2:-"allenai/Olmo-3-1025-7B"}
-CHAT_TEMPLATE=${3:-"llama-3.1"}
-TEACHER_MODEL_FULL=${4:-"meta-llama/Llama-3.1-8B-Instruct"}
+MODELS=(
+    "meta-llama/Llama-3.1-70B-Instruct"
+    "meta-llama/Llama-3.1-8B-Instruct"
+    "CohereLabs/aya-expanse-32b"
+    "cohere-command-a"
+    "google/gemma-3-12b-it"
+    "google/gemma-3-27b-it"
+    "google/gemma-3-4b-it"
+    "gpt-4o-mini-2024-07-18"
+    "ibm-granite/granite-4.0-1b"
+    "ibm-granite/granite-4.0-micro"
+    "mistralai/Mistral-Small-24B-Instruct-2501"
+)
+
+LANGUAGES=(ar cs de es id ja)
+
+MODEL=${MODELS[SLURM_ARRAY_TASK_ID % ${#MODELS[@]}]}
+LANGUAGE=${LANGUAGES[SLURM_ARRAY_TASK_ID / ${#MODELS[@]}]}
+
+echo "Finetuning student model with teacher: ${MODEL} and language: ${LANGUAGE}"
+
+# Set parameters based on arrays
+INPUT_DATASET="ljvmiranda921/msde-S1-${LANGUAGE}"
+BASE_MODEL=${1:-"allenai/Olmo-3-1025-7B"}
+CHAT_TEMPLATE=${2:-"llama-3.1"}
+TEACHER_MODEL_FULL="${MODEL}"
 
 # Extract dataset name and teacher model for run_name
 DATASET_NAME=$(basename ${INPUT_DATASET})
