@@ -120,6 +120,9 @@ MODEL_INFORMATION: list[ModelInfo] = [
         model_family="Llama",
         parameter_size=70.0,
         context_length=8_000,
+        benchmark_scores={
+            "mgsm_custom:de": {"extractive_match": 0.3, "extractive_match_stderr": 0.014491376746189437},
+        },
     ),
     ModelInfo(
         name="meta-llama/Llama-3.1-8B-Instruct",
@@ -130,6 +133,15 @@ MODEL_INFORMATION: list[ModelInfo] = [
             "global_mmlu_lite:de": {"acc": 0.42, "acc_stderr": 0.02470883072485368},
             "global_mmlu_lite:es": {"acc": 0.505, "acc_stderr": 0.02503005711936146},
             "global_mmlu_lite:ja": {"acc": 0.5, "acc_stderr": 0.02503130871608794},
+        },
+    ),
+    ModelInfo(
+        name="mistralai/Mistral-Small-24B-Instruct-2501",
+        model_family="Mistral",
+        parameter_size=24.0,
+        context_length=128_000,
+        benchmark_scores={
+            "global_mmlu_lite:de": {"acc": 0.57, "acc_stderr": 0.024769873817356935},
         },
     ),
 ]
