@@ -1,6 +1,8 @@
 #!/bin/bash
 # Job execution script for finetuning student model with unsloth
 
+OMP_NUM_THREADS=16
+
 # Parse arguments
 INPUT_DATASET=${1:-"ljvmiranda921/msde-S1-es"}
 BASE_MODEL=${2:-"allenai/Olmo-3-1025-7B"}
