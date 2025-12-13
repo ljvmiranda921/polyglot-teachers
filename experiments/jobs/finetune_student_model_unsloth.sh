@@ -24,5 +24,6 @@ python -m scripts.finetune_unsloth \
     --max_seq_length 16384 \
     --use_lora \
     --load_in_4bit \
+    --apply_subsampling \
     --save_mode merged_16bit \
     --input_dataset_filter "${INPUT_DATASET_FILTER}"
