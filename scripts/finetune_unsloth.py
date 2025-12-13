@@ -143,6 +143,7 @@ def get_model_and_tokenizer(
         max_seq_length=max_seq_length,
         dtype=dtype,
         load_in_4bit=load_in_4bit,
+        device_map={"": torch.cuda.current_device()},
         token=token,
     )
 
