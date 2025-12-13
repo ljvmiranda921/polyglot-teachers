@@ -6,10 +6,12 @@
 
 module load cray-python
 
+hostname
+nvidia-smi --list-gpus
+
 export HF_HOME=$PROJECTDIR/ljvm2/huggingface
 export HF_HUB_CACHE=$PROJECTDIR/ljvm2/hf_hub
 export VLLM_CACHE_ROOT=$PROJECTDIR/ljvm2/vllm
-export OMP_NUM_THREADS=16
 
 # Get job script from arguments
 JOB_SCRIPT=$1
