@@ -58,7 +58,7 @@ def main():
         raise ValueError("Please set the HF_TOKEN env variable!")
 
     # Set-up the run name
-    run_name = f"{datetime.now().strftime('%Y%m%dT%H%M%S')}-msde-{args.base_model.replace('/', '___')}"
+    run_name = f"{datetime.now().strftime('%Y%m%dT%H%M%S')}-msde-{args.base_model.replace('/', '_')}"
     if args.use_lora:
         run_name += "-lora"
     if args.load_in_4bit:
