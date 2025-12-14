@@ -110,6 +110,8 @@ def main():
             trackio_space_id="msde-logging",
             run_name=run_name,
             hub_private_repo=True,
+            # Multi-GPU training
+            ddp_find_unused_parameters=False,
         ),
     )
 
@@ -138,6 +140,7 @@ def get_model_and_tokenizer(
     lora_r: int = 16,
     token: str = None,
 ):
+    local_rank = int(os.environ.get("LOCAL_RANK", 0))
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=model_name,
         max_seq_length=max_seq_length,
