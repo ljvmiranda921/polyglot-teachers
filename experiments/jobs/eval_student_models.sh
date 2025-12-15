@@ -33,7 +33,7 @@ for TASK in "${TASKS[@]}"; do
         --custom-tasks scripts/lighteval_tasks.py \
         --output-dir lighteval-results \
         --results-path-template '{output_dir}/{org}___{model}' \
-        --no-public-run \
+        --public-run \
         --results-org "ljvmiranda921" \
         --push-to-hub \
         --save-details
