@@ -22,6 +22,14 @@ SEARCH_STR="Olmo"
 # Get all revisions matching the search string
 REVISIONS=($(python scripts/utils/get_model_rev.py --hf_model_id "${BASE_MODEL}" --search_str="${SEARCH_STR}"))
 
+# Print revision mapping for array job submission
+echo "=== Available Revisions ==="
+echo "To run all revisions, use: sbatch --array=0-$((${#REVISIONS[@]}-1)) ..."
+for i in "${!REVISIONS[@]}"; do
+    echo "  Array index $i: ${REVISIONS[$i]}"
+done
+echo "==========================="
+
 REVISION=${REVISIONS[$SLURM_ARRAY_TASK_ID]}
 echo "SLURM_ARRAY_TASK_ID: ${SLURM_ARRAY_TASK_ID}"
 echo "Selected revision: ${REVISION}"
