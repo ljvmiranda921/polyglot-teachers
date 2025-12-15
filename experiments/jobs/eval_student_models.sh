@@ -37,4 +37,7 @@ for TASK in "${TASKS[@]}"; do
         --results-org "ljvmiranda921" \
         --push-to-hub \
         --save-details
+
+    echo "Sleeping for 30 seconds before next task..."
+    sleep 30
 done 
