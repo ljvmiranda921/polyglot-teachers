@@ -37,7 +37,7 @@ echo "Evaluating model: ${BASE_MODEL} (revision: ${REVISION})"
 
 for TASK in "${TASKS[@]}"; do
     echo "Evaluating task: ${TASK}"
-    lighteval vllm "model_name=${BASE_MODEL},revision=${REVISION},tensor_parallel_size=1,gpu_memory_utilization=0.9,max_model_length=4096,dtype=bfloat16,generation_parameters={max_new_tokens:4096,temperature:0.6,top_p:0.95}" "${TASK}" \
+    lighteval vllm "model_name=${BASE_MODEL},revision=${REVISION},tensor_parallel_size=1,gpu_memory_utilization=0.9,max_model_length=8192,dtype=bfloat16,generation_parameters={max_new_tokens:4096,temperature:0.6,top_p:0.95}" "${TASK}" \
         --custom-tasks scripts/lighteval_tasks.py \
         --output-dir lighteval-results \
         --results-path-template '{output_dir}/{org}___{model}' \
