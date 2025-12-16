@@ -1,14 +1,16 @@
 """Get the PG-Score for a given dataset."""
 
+import os
 import argparse
 import logging
 import sys
 import json
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 from huggingface_hub import list_datasets, snapshot_download
-from datasets import load_dataset
+from datasets import load_dataset, DownloadMode
 
 
 logging.basicConfig(
@@ -17,6 +19,9 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
     level=logging.INFO,
 )
+
+# https://huggingface.co/docs/huggingface_hub/en/package_reference/environment_variables#hfxethighperformance
+os.environ["HF_XET_HIGH_PERFORMANCE"] = "1"
 
 # Setup cache
 CACHE_DIR = Path("data/mtep-cache")
@@ -117,16 +122,54 @@ def get_intrinsic_metrics(
 
 
 def get_extrinsic_metrics(
-    repo_search_str: str, *, use_cache: bool = False, hf_org: str = "ljvmiranda921"
+    repo_search_str: str,
+    *,
+    use_cache: bool = False,
+    hf_org: str = "ljvmiranda921",
+    force_redownload: bool = False,
 ):
     if not use_cache:
         hf_dataset_ids = [dataset.id for dataset in list_datasets(search=repo_search_str, author=hf_org)]  # fmt: skip
         logging.info(f"Found {len(hf_dataset_ids)} datasets using search string: '{repo_search_str}'")  # fmt: skip
+
+        for hf_dataset_id in hf_dataset_ids:
+            _process_results(hf_dataset_id, force_redownload=force_redownload)
+
         breakpoint()
     else:
         df = pd.read_json(CACHE_EXT, lines=True)
 
     return df
+
+
+def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[str, Any]:
+    """Parse a dataset ID and output a dataframe containing the relevant fields
+
+    Based from: https://huggingface.co/docs/lighteval/en/saving-and-reading-results
+    """
+    logging.info(f"Parsing results from dataset {dataset_id}")
+    ds = load_dataset(
+        dataset_id,
+        "results",
+        trust_remote_code=True,
+        download_mode=DownloadMode.REUSE_CACHE_IF_EXISTS,
+    )
+
+    # Save all metrics and versions for each task
+
+    def _parse_eval_str(task_str: str) -> dict[str, str | int]:
+        task_lang, n_shots = task_str.split("|")
+        task, lang = task_lang.split(":")
+        return {"task": task, "lang": lang, "n_shots": int(n_shots)}
+
+    metrics = []
+    for eval_run in ds.keys():
+        df = ds[eval_run].to_pandas()
+        for task, result in json.loads(df.results.iloc[0]).items():
+            task_dict = _parse_eval_str(task)
+            metrics.append(task_dict.update({"result": result}))
+
+    breakpoint()
 
 
 if __name__ == "__main__":
