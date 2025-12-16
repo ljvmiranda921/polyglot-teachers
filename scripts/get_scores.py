@@ -234,5 +234,13 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
     }
 
 
+def get_base_model_results(dataset_id: str):
+    pass
+
+
+def get_ref_model_results(dataset_id: str):
+    pass
+
+
 if __name__ == "__main__":
     main()
