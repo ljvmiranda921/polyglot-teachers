@@ -61,7 +61,8 @@ def main():
         **json.loads(args.extrinsic_kwargs),
     )
 
-    get_ref_model_results(args.ref_model_results)
+    base_model = get_base_model_results(args.base_model_results)
+    ref_model = get_ref_model_results(args.ref_model_results)
     breakpoint()
 
 
