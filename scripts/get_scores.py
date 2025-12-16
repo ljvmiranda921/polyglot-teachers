@@ -180,6 +180,7 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[st
 
     metrics_df = pd.DataFrame(metrics)
     model_info = _parse_model_info(dataset_id)
+    metrics_df = metrics_df.assign(**model_info)
 
     breakpoint()
 
