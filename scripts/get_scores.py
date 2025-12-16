@@ -141,7 +141,6 @@ def get_extrinsic_metrics(
         logging.info(f"Found {len(hf_dataset_ids)} datasets using search string: '{repo_search_str}'")  # fmt: skip
 
         for hf_dataset_id in hf_dataset_ids:
-            breakpoint()
             _process_results(hf_dataset_id, force_redownload=force_redownload)
 
         breakpoint()
@@ -191,32 +190,34 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[st
             dataset_id.split(prefix, 1)[1] if prefix in dataset_id else dataset_id
         )
 
-        parts = relevant_part.split("_msde-S1-")
+        # Split by '-msde-S1-' to separate model info from language
+        parts = relevant_part.split("-msde-S1-")
         model_info_raw = parts[0] if len(parts) >= 1 else relevant_part
         lang_and_teacher = parts[1] if len(parts) >= 2 else ""
 
+        # Extract language (everything before the next underscore)
         language = lang_and_teacher.split("_")[0] if lang_and_teacher else ""
 
-        model_parts = model_info_raw.split("_")
+        # Check for lora/qlora in the model info
+        is_lora_model = "lora" in model_info_raw.lower()
+        is_qlora_model = is_lora_model and (
+            "4bit" in model_info_raw.lower() or "8bit" in model_info_raw.lower()
+        )
 
-        is_lora_model = False
-        is_qlora_model = False
-        model_name_parts = []
+        # Remove lora/qlora suffix to get clean model name
+        # Split on -lora or -qlora to separate the base model name
+        model_name_raw = model_info_raw
+        if "-lora" in model_name_raw.lower():
+            # Find the index and cut everything after -lora
+            idx = model_name_raw.lower().find("-lora")
+            model_name_raw = model_name_raw[:idx]
 
-        for part in model_parts:
-            if "lora" in part.lower():
-                is_lora_model = True
-                # Check if it's quantized (4bit/8bit indicates qlora)
-                if "4bit" in part.lower() or "8bit" in part.lower():
-                    is_qlora_model = True
-            else:
-                model_name_parts.append(part)
-
-        # Reconstruct model name with slashes
-        model_name = "/".join(model_name_parts)
+        # Replace underscores with slashes for model name
+        model_name = model_name_raw.replace("_", "/")
 
         return {
-            "model_name": model_name,
+            "base_model": base_model,
+            "teacher_model": teacher_model,
             "lora": is_lora_model,
             "qlora": is_qlora_model,
             "lang": language,
