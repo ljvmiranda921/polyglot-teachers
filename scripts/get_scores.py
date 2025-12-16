@@ -59,13 +59,6 @@ def main():
         repo_search_str=args.extrinsic,
         **json.loads(args.extrinsic_kwargs),
     )
-
-    # ext_metrics = (
-    #     pd.read_json(CACHE_EXT, lines=True)
-    #     if args.use_cache
-    #     else get_extrinsic_metrics(repo_search_str=args.extrinsic, **json.loads(args.extrinsic_kwargs))  # fmt: skip
-    # )
-
     breakpoint()
 
 
