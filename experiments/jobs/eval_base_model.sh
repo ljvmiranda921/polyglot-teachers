@@ -2,20 +2,20 @@
 
 # Run those with all languages available first
 TASKS=(
-    "global_mmlu_lite:de|3"
-    "global_mmlu_lite:es|3"
-    "global_mmlu_lite:ja|3"
-    "mrewardbench_mcf:de|3"
-    "mrewardbench_mcf:es|3"
-    "mrewardbench_mcf:ja|3"
+    "global_mmlu_lite:de"
+    "global_mmlu_lite:es"
+    "global_mmlu_lite:ja"
+    "mrewardbench_mcf:de"
+    "mrewardbench_mcf:es"
+    "mrewardbench_mcf:ja"
     "mgsm_custom:de|5"
     "mgsm_custom:es|5"
     "mgsm_custom:ja|5"
-    "global_mmlu_lite:ar|3"
-    "mrewardbench_mcf:ar|3"
-    "global_mmlu_lite:id|3"
-    "mrewardbench_mcf:id|3"
-    "mrewardbench_mcf:cs|3"
+    "global_mmlu_lite:ar"
+    "mrewardbench_mcf:ar"
+    "global_mmlu_lite:id"
+    "mrewardbench_mcf:id"
+    "mrewardbench_mcf:cs"
 )
 
 TASK=${TASKS[$SLURM_ARRAY_TASK_ID % ${#TASKS[@]}]}
