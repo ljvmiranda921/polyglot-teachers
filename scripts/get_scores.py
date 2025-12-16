@@ -6,7 +6,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import pandas as pd
 from datasets import DownloadMode, load_dataset
@@ -60,6 +60,8 @@ def main():
         repo_search_str=args.extrinsic,
         **json.loads(args.extrinsic_kwargs),
     )
+
+    get_ref_model_results(args.ref_model_results)
     breakpoint()
 
 
@@ -146,19 +148,24 @@ def get_extrinsic_metrics(
             logging.info(f"Saved extrinsic metrics to {CACHE_EXT}")
 
     else:
+        logging.info(f"Using cache from {CACHE_EXT}. Ignoring other kwargs...")
         df = pd.read_json(CACHE_EXT, lines=True)
 
     return df
 
 
-def _process_results(dataset_id: str, force_redownload: bool = False) -> pd.DataFrame:
+def _process_results(
+    dataset_id: str,
+    force_redownload: bool = False,
+    model_info: Optional[dict] = {},
+) -> pd.DataFrame:
     """Parse a dataset ID and output a dataframe containing the relevant fields
 
     Based from: https://huggingface.co/docs/lighteval/en/saving-and-reading-results
     """
     logging.info(f"Parsing results from dataset {dataset_id}")
-    model_info = _parse_model_info(dataset_id)
-    logging.info(model_info)
+    _model_info = model_info if model_info else _parse_model_info(dataset_id)
+    logging.info(_model_info)
 
     ds = load_dataset(
         dataset_id,
@@ -190,7 +197,7 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> pd.Data
                     metrics.append(task_dict)
 
     metrics_df = pd.DataFrame(metrics)
-    metrics_df = metrics_df.assign(**model_info)
+    metrics_df = metrics_df.assign(**_model_info)
     return metrics_df
 
 
@@ -239,12 +246,29 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
 def get_base_model_results(
     dataset_id: str = "ljvmiranda921/details_allenai__Olmo-3-1025-7B_private",
 ) -> pd.DataFrame:
-    pass
+    df = _process_results(
+        dataset_id,
+        model_info={
+            "model_name": "allenai/OLMo-3-1025-7B",
+            "lora": False,
+            "qlora": False,
+        },
+    )
+    breakpoint()
 
 
 def get_ref_model_results(
     dataset_id: str = "ljvmiranda921/details_allenai__Olmo-3-7B-Instruct-SFT_private",
 ) -> pd.DataFrame:
+    df = _process_results(
+        dataset_id,
+        model_info={
+            "model_name": "allenai/OLMo-3-7B-Instruct-SFT",
+            "lora": False,
+            "qlora": False,
+        },
+    )
+    breakpoint()
     pass
 
 
