@@ -141,6 +141,7 @@ def get_extrinsic_metrics(
         logging.info(f"Found {len(hf_dataset_ids)} datasets using search string: '{repo_search_str}'")  # fmt: skip
 
         for hf_dataset_id in hf_dataset_ids:
+            breakpoint()
             _process_results(hf_dataset_id, force_redownload=force_redownload)
 
         breakpoint()
@@ -183,14 +184,45 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[st
                 task_dict.update({"raw_result": result})
                 metrics.append(task_dict)
 
-    def parse_teacher_model_and_target_lang(dataset_id: str) -> str:
-        breakpoint()
-        parts = dataset_id.split("_")
-        model_parts = parts[parts.index("details") + 1 :]
-        model_name = "_".join(model_parts).replace("__", "/")
-        return model_name
+    def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
+        # Extract the part after 'details_msde-'
+        prefix = "details_msde-"
+        relevant_part = (
+            dataset_id.split(prefix, 1)[1] if prefix in dataset_id else dataset_id
+        )
 
-    parse_teacher_model_and_target_lang(dataset_id)
+        parts = relevant_part.split("_msde-S1-")
+        model_info_raw = parts[0] if len(parts) >= 1 else relevant_part
+        lang_and_teacher = parts[1] if len(parts) >= 2 else ""
+
+        language = lang_and_teacher.split("_")[0] if lang_and_teacher else ""
+
+        model_parts = model_info_raw.split("_")
+
+        is_lora_model = False
+        is_qlora_model = False
+        model_name_parts = []
+
+        for part in model_parts:
+            if "lora" in part.lower():
+                is_lora_model = True
+                # Check if it's quantized (4bit/8bit indicates qlora)
+                if "4bit" in part.lower() or "8bit" in part.lower():
+                    is_qlora_model = True
+            else:
+                model_name_parts.append(part)
+
+        # Reconstruct model name with slashes
+        model_name = "/".join(model_name_parts)
+
+        return {
+            "model_name": model_name,
+            "lora": is_lora_model,
+            "qlora": is_qlora_model,
+            "lang": language,
+        }
+
+    x = _parse_model_info(dataset_id)
 
     breakpoint()
 
