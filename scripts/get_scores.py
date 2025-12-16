@@ -30,6 +30,13 @@ CACHE_DIR.mkdir(parents=True, exist_ok=True)
 CACHE_INT = CACHE_DIR / "intrinsic_metrics.jsonl"
 CACHE_EXT = CACHE_DIR / "extrinsic_metrics.jsonl"
 
+# Define metrics to track for each benchmark
+METRICS_TASK_MAP = {
+    "global_mmlu_lite": "acc",
+    "mrewardbench_mcf": "weighted_acc",
+    "mgsm_custom": "extractive_match",
+}
+
 
 def get_args():
     # fmt: off
@@ -153,7 +160,11 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[st
         dataset_id,
         "results",
         trust_remote_code=True,
-        download_mode=DownloadMode.REUSE_CACHE_IF_EXISTS,
+        download_mode=(
+            DownloadMode.FORCE_REDOWNLOAD
+            if force_redownload
+            else DownloadMode.REUSE_CACHE_IF_EXISTS
+        ),
     )
 
     def _parse_eval_str(task_str: str) -> dict[str, str | int]:
@@ -167,8 +178,19 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[st
         for task, result in json.loads(df.results.iloc[0]).items():
             if task != "all":
                 task_dict = _parse_eval_str(task)
-                task_dict.update({"result": result})
+                task_dict.update({"result": result.get(METRICS_TASK_MAP.get(task_dict.get("task")))})  # fmt: skip
+                task_dict.update({"result_stderr": result.get(METRICS_TASK_MAP.get(task_dict.get("task")) + "_stderr")})  # fmt: skip
+                task_dict.update({"raw_result": result})
                 metrics.append(task_dict)
+
+    def parse_teacher_model_and_target_lang(dataset_id: str) -> str:
+        breakpoint()
+        parts = dataset_id.split("_")
+        model_parts = parts[parts.index("details") + 1 :]
+        model_name = "_".join(model_parts).replace("__", "/")
+        return model_name
+
+    parse_teacher_model_and_target_lang(dataset_id)
 
     breakpoint()
 
