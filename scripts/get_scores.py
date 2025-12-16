@@ -159,6 +159,9 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> pd.Data
     Based from: https://huggingface.co/docs/lighteval/en/saving-and-reading-results
     """
     logging.info(f"Parsing results from dataset {dataset_id}")
+    model_info = _parse_model_info(dataset_id)
+    logging.info(model_info)
+
     ds = load_dataset(
         dataset_id,
         "results",
@@ -182,7 +185,6 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> pd.Data
                 metrics.append(task_dict)
 
     metrics_df = pd.DataFrame(metrics)
-    model_info = _parse_model_info(dataset_id)
     metrics_df = metrics_df.assign(**model_info)
     return df
 
