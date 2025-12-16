@@ -11,6 +11,7 @@ from typing import Any
 import pandas as pd
 from huggingface_hub import list_datasets, snapshot_download
 from datasets import load_dataset, DownloadMode
+from tqdm import tqdm
 
 
 logging.basicConfig(
@@ -155,19 +156,19 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[st
         download_mode=DownloadMode.REUSE_CACHE_IF_EXISTS,
     )
 
-    # Save all metrics and versions for each task
-
     def _parse_eval_str(task_str: str) -> dict[str, str | int]:
         task_lang, n_shots = task_str.split("|")
         task, lang = task_lang.split(":")
         return {"task": task, "lang": lang, "n_shots": int(n_shots)}
 
     metrics = []
-    for eval_run in ds.keys():
+    for eval_run in tqdm(ds.keys(), desc="Processing eval runs"):
         df = ds[eval_run].to_pandas()
         for task, result in json.loads(df.results.iloc[0]).items():
-            task_dict = _parse_eval_str(task)
-            metrics.append(task_dict.update({"result": result}))
+            if task != "all":
+                task_dict = _parse_eval_str(task)
+                task_dict.update({"result": result})
+                metrics.append(task_dict)
 
     breakpoint()
 
