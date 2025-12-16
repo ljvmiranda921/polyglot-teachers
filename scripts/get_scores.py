@@ -140,17 +140,20 @@ def get_extrinsic_metrics(
         hf_dataset_ids = [dataset.id for dataset in list_datasets(search=repo_search_str, author=hf_org)]  # fmt: skip
         logging.info(f"Found {len(hf_dataset_ids)} datasets using search string: '{repo_search_str}'")  # fmt: skip
 
+        _dfs = []
         for hf_dataset_id in hf_dataset_ids:
-            _process_results(hf_dataset_id, force_redownload=force_redownload)
-
+            _dfs.append(
+                _process_results(hf_dataset_id, force_redownload=force_redownload)
+            )
         breakpoint()
+
     else:
         df = pd.read_json(CACHE_EXT, lines=True)
 
     return df
 
 
-def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[str, Any]:
+def _process_results(dataset_id: str, force_redownload: bool = False) -> pd.DataFrame:
     """Parse a dataset ID and output a dataframe containing the relevant fields
 
     Based from: https://huggingface.co/docs/lighteval/en/saving-and-reading-results
@@ -181,8 +184,7 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[st
     metrics_df = pd.DataFrame(metrics)
     model_info = _parse_model_info(dataset_id)
     metrics_df = metrics_df.assign(**model_info)
-
-    breakpoint()
+    return df
 
 
 def _parse_eval_str(task_str: str) -> dict[str, str | int]:
