@@ -167,11 +167,6 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[st
         ),
     )
 
-    def _parse_eval_str(task_str: str) -> dict[str, str | int]:
-        task_lang, n_shots = task_str.split("|")
-        task, lang = task_lang.split(":")
-        return {"task": task, "lang": lang, "n_shots": int(n_shots)}
-
     metrics = []
     for eval_run in tqdm(ds.keys(), desc="Processing eval runs"):
         df = ds[eval_run].to_pandas()
@@ -183,59 +178,52 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[st
                 task_dict.update({"raw_result": result})
                 metrics.append(task_dict)
 
-    def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
-        # Extract the part after 'details_msde-'
-        prefix = "details_msde-"
-        relevant_part = (
-            dataset_id.split(prefix, 1)[1] if prefix in dataset_id else dataset_id
-        )
-
-        # Split by '-msde-S1-' to separate model info from language
-        parts = relevant_part.split("-msde-S1-")
-        model_info_raw = parts[0] if len(parts) >= 1 else relevant_part
-        lang_and_teacher = parts[1] if len(parts) >= 2 else ""
-
-        # Extract language and teacher model
-        # Format: es_Llama-3_1-8B-Instruct
-        if lang_and_teacher:
-            lang_teacher_parts = lang_and_teacher.split("_", 1)
-            language = lang_teacher_parts[0]
-            teacher_model_raw = lang_teacher_parts[1] if len(lang_teacher_parts) > 1 else ""
-            # Replace underscores with periods for version numbers (e.g., 3_1 -> 3.1)
-            teacher_model = teacher_model_raw.replace("_", ".")
-        else:
-            language = ""
-            teacher_model = ""
-
-        # Check for lora/qlora in the model info
-        is_lora_model = "lora" in model_info_raw.lower()
-        is_qlora_model = is_lora_model and (
-            "4bit" in model_info_raw.lower() or "8bit" in model_info_raw.lower()
-        )
-
-        # Remove lora/qlora suffix to get clean base model name
-        base_model_raw = model_info_raw
-        if "-lora" in base_model_raw.lower():
-            idx = base_model_raw.lower().find("-lora")
-            base_model_raw = base_model_raw[:idx]
-
-        # Replace only the first underscore with slash (org/model)
-        if "_" in base_model_raw:
-            base_model = base_model_raw.replace("_", "/", 1)
-        else:
-            base_model = base_model_raw
-
-        return {
-            "base_model": base_model,
-            "teacher_model": teacher_model,
-            "lora": is_lora_model,
-            "qlora": is_qlora_model,
-            "lang": language,
-        }
-
-    x = _parse_model_info(dataset_id)
+    metrics_df = pd.DataFrame(metrics)
+    model_info = _parse_model_info(dataset_id)
 
     breakpoint()
+
+
+def _parse_eval_str(task_str: str) -> dict[str, str | int]:
+    task_lang, n_shots = task_str.split("|")
+    task, lang = task_lang.split(":")
+    return {"task": task, "lang": lang, "n_shots": int(n_shots)}
+
+
+def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
+    # dataset_id: 'ljvmiranda921/details_msde-allenai_Olmo-3-1025-7B-lora-4bit-msde-S1-es_Llama-3_1-8B-Instruct' -> 'allenai_Olmo-3-1025-7B-lora-4bit-msde-S1-es_Llama-3_1-8B-Instruct'
+    prefix = "details_msde-"
+    relevant_part = dataset_id.split(prefix, 1)[1] if prefix in dataset_id else dataset_id  # fmt: skip
+    # from: 'allenai_Olmo-3-1025-7B-lora-4bit-msde-S1-es_Llama-3_1-8B-Instruct'
+    # parts: ['allenai_Olmo-3-1025-7B-lora-4bit', 'es_Llama-3_1-8B-Instruct']
+    # model_info_raw: 'allenai_Olmo-3-1025-7B-lora-4bit'
+    # lang_and_teacher: 'es_Llama-3_1-8B-Instruct'
+    model_info_raw, lang_and_teacher = relevant_part.split("-msde-S1-")
+    # Extract language and teacher model
+    lang_teacher_parts = lang_and_teacher.split("_", 1)
+    language = lang_teacher_parts[0]
+    teacher_model_raw = lang_teacher_parts[1] if len(lang_teacher_parts) > 1 else ""
+    teacher_model = teacher_model_raw.replace("_", ".")
+    # Check for lora/qlora in the model info
+    is_lora_model = "lora" in model_info_raw.lower()
+    is_qlora_model = is_lora_model and "4bit" in model_info_raw.lower() or "8bit" in model_info_raw.lower()  # fmt: skip
+    # Remove lora/qlora suffix to get clean base model name
+    base_model_raw = model_info_raw
+    if "-lora" in base_model_raw.lower():
+        idx = base_model_raw.lower().find("-lora")
+        base_model_raw = base_model_raw[:idx]
+    # Replace only the first underscore with slash (org/model)
+    base_model = (
+        base_model_raw.replace("_", "/", 1) if "_" in base_model_raw else base_model_raw
+    )
+
+    return {
+        "base_model": base_model,
+        "teacher_model": teacher_model,
+        "lora": is_lora_model,
+        "qlora": is_qlora_model,
+        "lang": language,
+    }
 
 
 if __name__ == "__main__":
