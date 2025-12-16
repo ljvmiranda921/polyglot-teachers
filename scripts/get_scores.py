@@ -178,15 +178,22 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> pd.Data
     )
 
     metrics = []
-    for eval_run in tqdm(ds.keys(), desc="Processing eval runs"):
+    _tasks_checked = []
+    eval_runs = sorted(ds.keys())  # from oldest to newest
+    for eval_run in tqdm(eval_runs, desc="Processing eval runs"):
         df = ds[eval_run].to_pandas()
         for task, result in json.loads(df.results.iloc[0]).items():
             if task != "all":
-                task_dict = _parse_eval_str(task)
-                task_dict.update({"result": result.get(METRICS_TASK_MAP.get(task_dict.get("task")))})  # fmt: skip
-                task_dict.update({"result_stderr": result.get(METRICS_TASK_MAP.get(task_dict.get("task")) + "_stderr")})  # fmt: skip
-                task_dict.update({"raw_result": result})
-                metrics.append(task_dict)
+                if task in _tasks_checked:
+                    # Skip, so we don't have duplicate results
+                    pass
+                else:
+                    _tasks_checked.append(task)
+                    task_dict = _parse_eval_str(task)
+                    task_dict.update({"result": result.get(METRICS_TASK_MAP.get(task_dict.get("task")))})  # fmt: skip
+                    task_dict.update({"result_stderr": result.get(METRICS_TASK_MAP.get(task_dict.get("task")) + "_stderr")})  # fmt: skip
+                    task_dict.update({"raw_result": result})
+                    metrics.append(task_dict)
 
     metrics_df = pd.DataFrame(metrics)
     metrics_df = metrics_df.assign(**model_info)
