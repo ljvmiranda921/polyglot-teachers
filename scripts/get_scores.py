@@ -186,7 +186,7 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> pd.Data
 
     metrics_df = pd.DataFrame(metrics)
     metrics_df = metrics_df.assign(**model_info)
-    return df
+    return metrics_df
 
 
 def _parse_eval_str(task_str: str) -> dict[str, str | int]:
