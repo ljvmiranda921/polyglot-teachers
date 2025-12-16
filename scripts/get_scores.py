@@ -44,6 +44,8 @@ def get_args():
     parser.add_argument("-e", "--extrinsic", type=str, default="details_", help="Search string for getting HuggingFace datasets with student model performance.")
     parser.add_argument("--intrinsic_kwargs", type=str, default='{"directory_path": "csd3", "local_path": "data"}', help="Extra arguments to pass when processing the intrinsic metrics.")
     parser.add_argument("--extrinsic_kwargs", type=str, default="{}", help="Extra arguments to pass when processing the extrinsic metrics.")
+    parser.add_argument("--ref_model_results", type=str, default="ljvmiranda921/details_allenai__Olmo-3-7B-Instruct-SFT_private", help="Huggingface Dataset containing the reference model results.")
+    parser.add_argument("--base_model_results", type=str, default="ljvmiranda921/details_allenai__Olmo-3-1025-7B_private", help="Huggingface Dataset containing the base model results.")
     # fmt: on
     return parser.parse_args()
 
@@ -234,11 +236,15 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
     }
 
 
-def get_base_model_results(dataset_id: str):
+def get_base_model_results(
+    dataset_id: str = "ljvmiranda921/details_allenai__Olmo-3-1025-7B_private",
+) -> pd.DataFrame:
     pass
 
 
-def get_ref_model_results(dataset_id: str):
+def get_ref_model_results(
+    dataset_id: str = "ljvmiranda921/details_allenai__Olmo-3-7B-Instruct-SFT_private",
+) -> pd.DataFrame:
     pass
 
 
