@@ -119,7 +119,7 @@ def get_intrinsic_metrics(
         )
 
         if cache_results:
-            df.to_json(CACHE_INT, orient="records", line=True)
+            df.to_json(CACHE_INT, orient="records", lines=True)
             logging.info(f"Saved intrinsic metrics to {CACHE_INT}")
 
     else:
@@ -135,17 +135,21 @@ def get_extrinsic_metrics(
     use_cache: bool = False,
     hf_org: str = "ljvmiranda921",
     force_redownload: bool = False,
+    cache_results: bool = False,
 ):
     if not use_cache:
         hf_dataset_ids = [dataset.id for dataset in list_datasets(search=repo_search_str, author=hf_org)]  # fmt: skip
         logging.info(f"Found {len(hf_dataset_ids)} datasets using search string: '{repo_search_str}'")  # fmt: skip
 
-        _dfs = []
+        _dfs: list[pd.DataFrame] = []
         for hf_dataset_id in hf_dataset_ids:
             _dfs.append(
                 _process_results(hf_dataset_id, force_redownload=force_redownload)
             )
-        breakpoint()
+        df = pd.concat(_dfs).reset_index(drop=True)
+        if cache_results:
+            df.to_json(CACHE_EXT, orient="records", lines=True)
+            logging.info(f"Saved extrinsic metrics to {CACHE_EXT}")
 
     else:
         df = pd.read_json(CACHE_EXT, lines=True)
@@ -192,7 +196,7 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> pd.Data
 def _parse_eval_str(task_str: str) -> dict[str, str | int]:
     task_lang, n_shots = task_str.split("|")
     task, lang = task_lang.split(":")
-    return {"task": task, "lang": lang, "n_shots": int(n_shots)}
+    return {"task": task, "eval_lang": lang, "n_shots": int(n_shots)}
 
 
 def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
@@ -227,7 +231,7 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
         "teacher_model": teacher_model,
         "lora": is_lora_model,
         "qlora": is_qlora_model,
-        "lang": language,
+        "target_lang": language,
     }
 
 
