@@ -200,7 +200,9 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[st
         if lang_and_teacher:
             lang_teacher_parts = lang_and_teacher.split("_", 1)
             language = lang_teacher_parts[0]
-            teacher_model = lang_teacher_parts[1] if len(lang_teacher_parts) > 1 else ""
+            teacher_model_raw = lang_teacher_parts[1] if len(lang_teacher_parts) > 1 else ""
+            # Replace underscores with periods for version numbers (e.g., 3_1 -> 3.1)
+            teacher_model = teacher_model_raw.replace("_", ".")
         else:
             language = ""
             teacher_model = ""
@@ -217,8 +219,11 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[st
             idx = base_model_raw.lower().find("-lora")
             base_model_raw = base_model_raw[:idx]
 
-        # Replace only the first underscore with slash for base model name (org/model)
-        base_model = base_model_raw.replace("_", "/", 1)
+        # Replace only the first underscore with slash (org/model)
+        if "_" in base_model_raw:
+            base_model = base_model_raw.replace("_", "/", 1)
+        else:
+            base_model = base_model_raw
 
         return {
             "base_model": base_model,
