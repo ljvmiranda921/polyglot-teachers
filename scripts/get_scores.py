@@ -18,8 +18,11 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
+# Setup cache
 CACHE_DIR = Path("data/mtep-cache")
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
+CACHE_INT = CACHE_DIR / "intrinsic_metrics.jsonl"
+CACHE_EXT = CACHE_DIR / "extrinsic_metrics.jsonl"
 
 
 def get_args():
@@ -36,9 +39,16 @@ def get_args():
 def main():
     args = get_args()
 
-    if args.intrinsic_kwargs:
-        int_kwargs = json.loads(args.intrinsic_kwargs)
-    intrinsic_metrics: pd.DataFrame = get_intrinsic_metrics(repo_id=args.intrinsic, **int_kwargs)  # fmt: skip
+    if args.use_cache:
+        logging.info(f"Using cache for intrinsic ({CACHE_INT}) and extrinsic metrics ({CACHE_EXT})")  # fmt: skip
+
+    int_metrics = (
+        pd.read_json(CACHE_INT, lines=True)
+        if args.use_cache
+        else get_intrinsic_metrics(repo_id=args.intrinsic, **json.loads(args.intrinsic_kwargs))  # fmt: skip
+    )
+
+    breakpoint()
 
 
 def get_intrinsic_metrics(
@@ -89,9 +99,10 @@ def get_intrinsic_metrics(
     )
 
     if cache_results:
-        cache_path = CACHE_DIR / "intrinsic_metrics.jsonl"
-        df.to_json(CACHE_DIR / "intrinsic_metrics.jsonl", orient="records", line=True)
-        logging.info(f"Saved intrinsic metrics to {cache_path}")
+        df.to_json(CACHE_INT, orient="records", line=True)
+        logging.info(f"Saved intrinsic metrics to {CACHE_INT}")
+
+    return df
 
 
 if __name__ == "__main__":
