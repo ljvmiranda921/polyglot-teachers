@@ -195,8 +195,15 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[st
         model_info_raw = parts[0] if len(parts) >= 1 else relevant_part
         lang_and_teacher = parts[1] if len(parts) >= 2 else ""
 
-        # Extract language (everything before the next underscore)
-        language = lang_and_teacher.split("_")[0] if lang_and_teacher else ""
+        # Extract language and teacher model
+        # Format: es_Llama-3_1-8B-Instruct
+        if lang_and_teacher:
+            lang_teacher_parts = lang_and_teacher.split("_", 1)
+            language = lang_teacher_parts[0]
+            teacher_model = lang_teacher_parts[1] if len(lang_teacher_parts) > 1 else ""
+        else:
+            language = ""
+            teacher_model = ""
 
         # Check for lora/qlora in the model info
         is_lora_model = "lora" in model_info_raw.lower()
@@ -204,16 +211,14 @@ def _process_results(dataset_id: str, force_redownload: bool = False) -> dict[st
             "4bit" in model_info_raw.lower() or "8bit" in model_info_raw.lower()
         )
 
-        # Remove lora/qlora suffix to get clean model name
-        # Split on -lora or -qlora to separate the base model name
-        model_name_raw = model_info_raw
-        if "-lora" in model_name_raw.lower():
-            # Find the index and cut everything after -lora
-            idx = model_name_raw.lower().find("-lora")
-            model_name_raw = model_name_raw[:idx]
+        # Remove lora/qlora suffix to get clean base model name
+        base_model_raw = model_info_raw
+        if "-lora" in base_model_raw.lower():
+            idx = base_model_raw.lower().find("-lora")
+            base_model_raw = base_model_raw[:idx]
 
-        # Replace underscores with slashes for model name
-        model_name = model_name_raw.replace("_", "/")
+        # Replace only the first underscore with slash for base model name (org/model)
+        base_model = base_model_raw.replace("_", "/", 1)
 
         return {
             "base_model": base_model,
