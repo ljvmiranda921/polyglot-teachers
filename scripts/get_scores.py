@@ -61,9 +61,23 @@ def main():
         **json.loads(args.extrinsic_kwargs),
     )
 
-    base_model = get_base_model_results(args.base_model_results)
-    ref_model = get_ref_model_results(args.ref_model_results)
-    breakpoint()
+    # Get base model and reference model results to compute PG-Score
+    df_base = _process_results(
+        args.base_model_results,
+        model_info={
+            "model_name": "allenai/OLMo-3-1025-7B",
+            "lora": False,
+            "qlora": False,
+        },
+    )
+    df_ref = _process_results(
+        args.ref_model_results,
+        model_info={
+            "model_name": "allenai/OLMo-3-7B-Instruct-SFT",
+            "lora": False,
+            "qlora": False,
+        },
+    )
 
 
 def get_intrinsic_metrics(
@@ -242,35 +256,6 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
         "qlora": is_qlora_model,
         "target_lang": language,
     }
-
-
-def get_base_model_results(
-    dataset_id: str = "ljvmiranda921/details_allenai__Olmo-3-1025-7B_private",
-) -> pd.DataFrame:
-    df = _process_results(
-        dataset_id,
-        model_info={
-            "model_name": "allenai/OLMo-3-1025-7B",
-            "lora": False,
-            "qlora": False,
-        },
-    )
-    breakpoint()
-
-
-def get_ref_model_results(
-    dataset_id: str = "ljvmiranda921/details_allenai__Olmo-3-7B-Instruct-SFT_private",
-) -> pd.DataFrame:
-    df = _process_results(
-        dataset_id,
-        model_info={
-            "model_name": "allenai/OLMo-3-7B-Instruct-SFT",
-            "lora": False,
-            "qlora": False,
-        },
-    )
-    breakpoint()
-    pass
 
 
 if __name__ == "__main__":
