@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
-from huggingface_hub import hf_hub_download, snapshot_download
+from huggingface_hub import list_datasets, snapshot_download
 from datasets import load_dataset
 
 
@@ -31,7 +31,7 @@ def get_args():
     parser.add_argument("-i", "--intrinsic", type=str, default="ljvmiranda921/mtep-intrinsic-metrics", help="Huggingface Dataset containing the intrinsic metrics.")
     parser.add_argument("-e", "--extrinsic", type=str, default="details_", help="Search string for getting HuggingFace datasets with student model performance.")
     parser.add_argument("--intrinsic_kwargs", type=str, default='{"directory_path": "csd3", "local_path": "data"}', help="Extra arguments to pass when processing the intrinsic metrics.")
-    parser.add_argument("--extrinsic_kwargs", type=str, default='{"directory_path": "csd3", "local_path": "data"}', help="Extra arguments to pass when processing the extrinsic metrics.")
+    parser.add_argument("--extrinsic_kwargs", type=str, default="{}", help="Extra arguments to pass when processing the extrinsic metrics.")
     # fmt: on
     return parser.parse_args()
 
@@ -112,6 +112,19 @@ def get_intrinsic_metrics(
     else:
         logging.info(f"Using cache from {CACHE_INT}. Ignoring other kwargs...")
         df = pd.read_json(CACHE_INT, lines=True)
+
+    return df
+
+
+def get_extrinsic_metrics(
+    repo_search_str: str, *, use_cache: bool = False, hf_org: str = "ljvmiranda921"
+):
+    if not use_cache:
+        hf_dataset_ids = [dataset.id for dataset in list_datasets(search=repo_search_str, author=hf_org)]  # fmt: skip
+        logging.info(f"Found {len(hf_dataset_ids)} datasets using search string: '{repo_search_str}'")  # fmt: skip
+        breakpoint()
+    else:
+        df = pd.read_json(CACHE_EXT, lines=True)
 
     return df
 
