@@ -1,3 +1,5 @@
+"""Finetune a Tunix model on TPUs using LoRA and optionally quantization."""
+
 import argparse
 import datetime
 import json

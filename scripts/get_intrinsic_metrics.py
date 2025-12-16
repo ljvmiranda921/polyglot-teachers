@@ -1,3 +1,5 @@
+"""Compute intrinsic metrics for a given dataset."""
+
 import argparse
 import json
 import logging

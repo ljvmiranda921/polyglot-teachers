@@ -1,3 +1,5 @@
+"""Defines multilingual evaluation tasks for LightEval, including Global-MMLU-Lite, MGSM, and M-RewardBench."""
+
 import logging
 import random
 import sys
@@ -8,10 +10,10 @@ import numpy as np
 from langcodes import standardize_tag
 
 from lighteval.metrics.dynamic_metrics import LogLikelihoodAccMetric, MultilingualExtractiveMatchMetric  # fmt: skip
-from lighteval.metrics.metrics_corpus import CorpusLevelComputation, MRewardBenchWeightedAccuracy
+from lighteval.metrics.metrics_corpus import MRewardBenchWeightedAccuracy
 from lighteval.metrics.metrics_sample import SampleLevelComputation
 from lighteval.metrics.normalizations import LogProbCharNorm, LogProbPMINorm, LogProbTokenNorm  # fmt: skip
-from lighteval.metrics.sample_preparator import GenerativeCorpusMetricInput, LoglikelihoodPreparator, LogprobCorpusMetricInput  # fmt: skip
+from lighteval.metrics.sample_preparator import LoglikelihoodPreparator, LogprobCorpusMetricInput  # fmt: skip
 from lighteval.metrics.utils.extractive_match_utils import ExprExtractionConfig
 from lighteval.metrics.utils.metric_utils import CorpusLevelMetric, SampleLevelMetric
 from lighteval.models.model_output import ModelResponse
@@ -19,7 +21,7 @@ from lighteval.tasks.lighteval_task import LightevalTaskConfig
 from lighteval.tasks.multilingual.utils.task_utils import get_metrics_for_formulation
 from lighteval.tasks.requests import Doc, SamplingMethod
 from lighteval.tasks.templates.multichoice import get_mcq_prompt_function
-from lighteval.tasks.templates.utils.formulation import CFFormulation, MCFFormulation
+from lighteval.tasks.templates.utils.formulation import MCFFormulation
 from lighteval.utils.language import Language
 
 logging.basicConfig(
@@ -156,11 +158,14 @@ MGSM = [
 
 # ==== M-RewardBench ====
 
+
 # Custom preparator that includes source metadata
 class MRewardBenchPreparator(LoglikelihoodPreparator):
     """Custom preparator for M-RewardBench that extracts and includes source metadata."""
 
-    def prepare(self, doc: Doc, model_response: ModelResponse, **kwargs) -> LogprobCorpusMetricInput:
+    def prepare(
+        self, doc: Doc, model_response: ModelResponse, **kwargs
+    ) -> LogprobCorpusMetricInput:
         """Prepare loglikelihood data with source metadata.
 
         Args:
