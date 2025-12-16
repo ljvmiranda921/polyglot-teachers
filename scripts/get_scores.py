@@ -1,18 +1,17 @@
 """Get the PG-Score for a given dataset."""
 
-import os
 import argparse
-import logging
-import sys
 import json
+import logging
+import os
+import sys
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
+from datasets import DownloadMode, load_dataset
 from huggingface_hub import list_datasets, snapshot_download
-from datasets import load_dataset, DownloadMode
 from tqdm import tqdm
-
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
