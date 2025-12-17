@@ -78,6 +78,11 @@ def main():
         },
     )
 
+    # Maybe? For df_ext, maybe filter only on where target lang is in eval_lang?
+    df_ext.groupby(["teacher_model", "target_lang"]).agg({"result": "mean"})
+    df_base.groupby(["eval_lang"]).agg({"result": "mean"}).reset_index()
+    df_ref.groupby(["eval_lang"]).agg({"result": "mean"}).reset_index()
+
 
 def get_intrinsic_metrics(
     repo_id: str,
