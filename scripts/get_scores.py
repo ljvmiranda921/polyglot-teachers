@@ -103,9 +103,22 @@ def main():
     ).drop(columns=["eval_lang"])
 
     # Compute PG-Score
-    df_merged["pg_score"] = df_merged.apply(compute_pg_score, axis=1).drop(
-        columns=["base_perf", "ref_perf"]  # we don't need these anymore.
+    df_merged["pg_score"] = df_merged.apply(compute_pg_score, axis=1)
+    df_merged = df_merged.drop(columns=["base_perf", "ref_perf"])
+
+    # Report results
+    print("\n====== PG-Scores (by language) ======")
+    print(df_merged.to_markdown(index=False))
+
+    print("\n====== PG-Scores (average) ======")
+    print(
+        df_merged.groupby("teacher_model")
+        .agg({"pg_score": "mean"})
+        .reset_index()
+        .to_markdown(index=False)
     )
+    df_merged.to_json(CACHE_DIR / "pg_scores.jsonl", orient="records", lines=True)
+    logging.info(f"Saved PG-Scores to {CACHE_DIR / 'pg_scores.jsonl'}")
 
 
 def get_intrinsic_metrics(
