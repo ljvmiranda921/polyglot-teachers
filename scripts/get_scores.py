@@ -78,10 +78,28 @@ def main():
         },
     )
 
-    # Maybe? For df_ext, maybe filter only on where target lang is in eval_lang?
-    df_ext.groupby(["teacher_model", "target_lang"]).agg({"result": "mean"})
-    df_base.groupby(["eval_lang"]).agg({"result": "mean"}).reset_index()
-    df_ref.groupby(["eval_lang"]).agg({"result": "mean"}).reset_index()
+    def _conditional_agg(group):
+        matching = group[group["target_lang"] == group["eval_lang"]]
+        data = matching if len(matching) > 0 else group
+        return data[["result", "result_stderr"]].mean()
+
+    df_ext_avg = (
+        df_ext.groupby(["teacher_model", "target_lang"])
+        .apply(_conditional_agg)
+        .reset_index()
+    )
+    df_base_avg = (
+        df_base.groupby(["eval_lang"])
+        .agg({"result": "mean", "result_stderr": "mean"})
+        .reset_index()
+    )
+    df_ref_avg = (
+        df_ref.groupby(["eval_lang"])
+        .agg({"result": "mean", "result_stderr": "mean"})
+        .reset_index()
+    )
+
+    breakpoint()
 
 
 def get_intrinsic_metrics(
