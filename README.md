@@ -15,7 +15,7 @@ Make sure that you have `uv` in your system (see [download instructions](https:/
 To install all dependencies, run the following commands: 
 
 ```sh
-git submodule update --init --recursive
+git submodule update --init --recursive --depth 1
 uv sync --dev
 # When training on TPUs and developing models via tunix
 # uv sync --extra tpu
