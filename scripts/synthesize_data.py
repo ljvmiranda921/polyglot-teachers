@@ -1,3 +1,5 @@
+"""Generate synthetic data given a dataset, strategy (generate, translate, refine), and target language."""
+
 import argparse
 import json
 import logging

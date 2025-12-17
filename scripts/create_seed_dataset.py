@@ -1,3 +1,5 @@
+"""Create a seed dataset from a series of multilingual datasets."""
+
 import argparse
 import hashlib
 import logging
