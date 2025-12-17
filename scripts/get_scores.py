@@ -291,7 +291,18 @@ def compute_extrinsic_pgr(
 
     def _cagg(group):
         matching = group[group["target_lang"] == group["eval_lang"]]
-        data = matching if len(matching) > 0 else group
+        match len(matching):
+            case 1:
+                non_matching = group[group["target_lang"] != group["eval_lang"]]
+                if len(non_matching) >= 2:
+                    random_non_matching = non_matching.sample(n=2, random_state=42)
+                    data = pd.concat([matching, random_non_matching])
+                else:
+                    data = group
+            case 0:
+                data = group
+            case _:
+                data = matching
         return data[["result"]].mean()
 
     df_ext_avg = df_ext.groupby(["teacher_model", "target_lang"]).apply(_cagg).reset_index()  # fmt: skip
