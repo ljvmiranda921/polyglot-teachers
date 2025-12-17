@@ -82,28 +82,27 @@ def main():
     )
 
     # Merge intrinsic and extrinsic metrics
+    # Extract model name without org from intrinsic data
+    df_int_for_merge = df_int_computed.copy()
+    df_int_for_merge["model_short"] = df_int_for_merge["model"].str.split("/").str[-1]
+
     df_merged = df_ext_computed.merge(
-        df_int_computed[["model", "language", "z_score"]],
+        df_int_for_merge[["model_short", "language", "z_score"]],
         left_on=["teacher_model", "target_lang"],
-        right_on=["model", "language"],
+        right_on=["model_short", "language"],
         how="left",
-    ).drop(columns=["model", "language"])
+    ).drop(columns=["model_short", "language"])
+    # Compute PG-Score as average of PGR and z-score
+    df_merged["pg_score"] = (df_merged["pgr"] + df_merged["z_score"]) / 2
 
-    breakpoint()
-
-    # Report results
-    # print("\n====== PGR (by language) ======")
-    # print(df_ext_merged.to_markdown(index=False))
-
-    # print("\n====== PGR (average) ======")
-    # print(
-    #     df_ext_merged.groupby("teacher_model")
-    #     .agg({"pgr": "mean"})
-    #     .reset_index()
-    #     .to_markdown(index=False)
-    # )
-    # df_ext_merged.to_json(CACHE_DIR / "pg_scores.jsonl", orient="records", lines=True)
-    breakpoint()
+    print("\n====== PGR (grouped-by teacher model across languages) ======")
+    print(
+        df_merged.groupby("teacher_model")
+        .agg({"pg_score": "mean"})
+        .reset_index()
+        .to_markdown(index=False)
+    )
+    df_merged.to_json(CACHE_DIR / "pg_scores.jsonl", orient="records", lines=True)
     logging.info(f"Saved PG-Scores to {CACHE_DIR / 'pg_scores.jsonl'}")
 
 
