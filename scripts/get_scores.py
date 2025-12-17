@@ -52,15 +52,14 @@ def get_args():
 
 def main():
     args = get_args()
-    df_int = get_intrinsic_metrics(
-        repo_id=args.intrinsic,
-        **json.loads(args.intrinsic_kwargs),
-    )
-    df_ext = get_extrinsic_metrics(
-        repo_search_str=args.extrinsic,
-        **json.loads(args.extrinsic_kwargs),
-    )
-    # Get base model and reference model results to compute PG-Score
+
+    # Get intrinsic metrics
+    df_int = get_intrinsic_metrics(repo_id=args.intrinsic, **json.loads(args.intrinsic_kwargs))  # fmt: skip
+    numeric_cols = df_int.select_dtypes(include="number").columns.tolist()
+    df_int["intrinsic"] = df_int[numeric_cols].apply(lambda row: (row - row.mean()) / row.std() if row.std() != 0 else 0, axis=1)  # fmt: skip
+
+    # Get extrinsic metrics
+    df_ext = get_extrinsic_metrics(repo_search_str=args.extrinsic, **json.loads(args.extrinsic_kwargs))  # fmt: skip
     df_base = _process_results(
         args.base_model_results,
         model_info={
@@ -86,40 +85,36 @@ def main():
     df_ext_avg = df_ext.groupby(["teacher_model", "target_lang"]).apply(_cagg).reset_index()  # fmt: skip
     df_base_avg = df_base.groupby(["eval_lang"]).agg({"result": "mean"}).reset_index()
     df_ref_avg = df_ref.groupby(["eval_lang"]).agg({"result": "mean"}).reset_index()
-
     # Merge base and ref performance based on target_lang == eval_lang
-    df_merged = df_ext_avg.merge(
+    df_ext_merged = df_ext_avg.merge(
         df_base_avg.rename(columns={"result": "base_perf"}),
         left_on="target_lang",
         right_on="eval_lang",
         how="left",
     ).drop(columns=["eval_lang"])
-
-    df_merged = df_merged.merge(
+    df_ext_merged = df_ext_merged.merge(
         df_ref_avg.rename(columns={"result": "ref_perf"}),
         left_on="target_lang",
         right_on="eval_lang",
         how="left",
     ).drop(columns=["eval_lang"])
+    df_ext_merged["pgr"] = df_ext_merged.apply(compute_pgr, axis=1)
+    df_ext_merged = df_ext_merged.drop(columns=["base_perf", "ref_perf"])
 
-    # Compute intrinsic metrics z-score
-
-    # Compute extrinsic metric - PGR
-    df_merged["pgr"] = df_merged.apply(compute_pgr, axis=1)
-    df_merged = df_merged.drop(columns=["base_perf", "ref_perf"])
+    breakpoint()
 
     # Report results
     print("\n====== PGR (by language) ======")
-    print(df_merged.to_markdown(index=False))
+    print(df_ext_merged.to_markdown(index=False))
 
     print("\n====== PGR (average) ======")
     print(
-        df_merged.groupby("teacher_model")
+        df_ext_merged.groupby("teacher_model")
         .agg({"pgr": "mean"})
         .reset_index()
         .to_markdown(index=False)
     )
-    df_merged.to_json(CACHE_DIR / "pg_scores.jsonl", orient="records", lines=True)
+    df_ext_merged.to_json(CACHE_DIR / "pg_scores.jsonl", orient="records", lines=True)
     breakpoint()
     logging.info(f"Saved PG-Scores to {CACHE_DIR / 'pg_scores.jsonl'}")
 
