@@ -81,6 +81,14 @@ def main():
         ),
     )
 
+    # Merge intrinsic and extrinsic metrics
+    df_merged = df_ext_computed.merge(
+        df_int_computed[["model", "language", "z_score"]],
+        left_on=["teacher_model", "target_lang"],
+        right_on=["model", "language"],
+        how="left",
+    ).drop(columns=["model", "language"])
+
     breakpoint()
 
     # Report results
@@ -320,7 +328,7 @@ def compute_intrinsic_zscore(df: pd.DataFrame) -> pd.DataFrame:
     scaler = StandardScaler()
     normalized = scaler.fit_transform(data)
     df = df.copy()
-    df["intrinsic"] = normalized.mean(axis=1)
+    df["z_score"] = normalized.mean(axis=1)
     return df
 
 
