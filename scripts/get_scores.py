@@ -102,9 +102,10 @@ def main():
         how="left",
     ).drop(columns=["eval_lang"])
 
-    df_merged["pg_score"] = df_merged.apply(compute_pg_score, axis=1)
-
-    breakpoint()
+    # Compute PG-Score
+    df_merged["pg_score"] = df_merged.apply(compute_pg_score, axis=1).drop(
+        columns=["base_perf", "ref_perf"]  # we don't need these anymore.
+    )
 
 
 def get_intrinsic_metrics(
