@@ -78,29 +78,7 @@ def main():
         },
     )
 
-    def _cagg(group):
-        matching = group[group["target_lang"] == group["eval_lang"]]
-        data = matching if len(matching) > 0 else group
-        return data[["result"]].mean()
-
-    df_ext_avg = df_ext.groupby(["teacher_model", "target_lang"]).apply(_cagg).reset_index()  # fmt: skip
-    df_base_avg = df_base.groupby(["eval_lang"]).agg({"result": "mean"}).reset_index()
-    df_ref_avg = df_ref.groupby(["eval_lang"]).agg({"result": "mean"}).reset_index()
-    # Merge base and ref performance based on target_lang == eval_lang
-    df_ext_merged = df_ext_avg.merge(
-        df_base_avg.rename(columns={"result": "base_perf"}),
-        left_on="target_lang",
-        right_on="eval_lang",
-        how="left",
-    ).drop(columns=["eval_lang"])
-    df_ext_merged = df_ext_merged.merge(
-        df_ref_avg.rename(columns={"result": "ref_perf"}),
-        left_on="target_lang",
-        right_on="eval_lang",
-        how="left",
-    ).drop(columns=["eval_lang"])
-    df_ext_merged["pgr"] = df_ext_merged.apply(compute_pgr, axis=1)
-    df_ext_merged = df_ext_merged.drop(columns=["base_perf", "ref_perf"])
+    df_ext_merged = compute_extrinsic_pgr(df_ext, df_base, df_ref)
 
     breakpoint()
 
@@ -296,6 +274,33 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
         "qlora": is_qlora_model,
         "target_lang": language,
     }
+
+
+def compute_extrinsic_pgr(df_ext: pd.DataFrame, df_base: pd.DataFrame, df_ref: pd.DataFrame) -> pd.DataFrame:
+    """Compute PGR scores for extrinsic metrics."""
+    def _cagg(group):
+        matching = group[group["target_lang"] == group["eval_lang"]]
+        data = matching if len(matching) > 0 else group
+        return data[["result"]].mean()
+
+    df_ext_avg = df_ext.groupby(["teacher_model", "target_lang"]).apply(_cagg).reset_index()  # fmt: skip
+    df_base_avg = df_base.groupby(["eval_lang"]).agg({"result": "mean"}).reset_index()
+    df_ref_avg = df_ref.groupby(["eval_lang"]).agg({"result": "mean"}).reset_index()
+
+    df_merged = df_ext_avg.merge(
+        df_base_avg.rename(columns={"result": "base_perf"}),
+        left_on="target_lang",
+        right_on="eval_lang",
+        how="left",
+    ).drop(columns=["eval_lang"])
+    df_merged = df_merged.merge(
+        df_ref_avg.rename(columns={"result": "ref_perf"}),
+        left_on="target_lang",
+        right_on="eval_lang",
+        how="left",
+    ).drop(columns=["eval_lang"])
+    df_merged["pgr"] = df_merged.apply(compute_pgr, axis=1)
+    return df_merged.drop(columns=["base_perf", "ref_perf"])
 
 
 def compute_intrinsic_score(row):
