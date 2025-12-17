@@ -78,26 +78,31 @@ def main():
         },
     )
 
-    def _conditional_agg(group):
+    def _cagg(group):
         matching = group[group["target_lang"] == group["eval_lang"]]
         data = matching if len(matching) > 0 else group
-        return data[["result", "result_stderr"]].mean()
+        return data[["result"]].mean()
 
-    df_ext_avg = (
-        df_ext.groupby(["teacher_model", "target_lang"])
-        .apply(_conditional_agg)
-        .reset_index()
-    )
-    df_base_avg = (
-        df_base.groupby(["eval_lang"])
-        .agg({"result": "mean", "result_stderr": "mean"})
-        .reset_index()
-    )
-    df_ref_avg = (
-        df_ref.groupby(["eval_lang"])
-        .agg({"result": "mean", "result_stderr": "mean"})
-        .reset_index()
-    )
+    df_ext_avg = df_ext.groupby(["teacher_model", "target_lang"]).apply(_cagg).reset_index()  # fmt: skip
+    df_base_avg = df_base.groupby(["eval_lang"]).agg({"result": "mean"}).reset_index()
+    df_ref_avg = df_ref.groupby(["eval_lang"]).agg({"result": "mean"}).reset_index()
+
+    # Merge base and ref performance based on target_lang == eval_lang
+    df_merged = df_ext_avg.merge(
+        df_base_avg.rename(columns={"result": "base_perf"}),
+        left_on="target_lang",
+        right_on="eval_lang",
+        how="left",
+    ).drop(columns=["eval_lang"])
+
+    df_merged = df_merged.merge(
+        df_ref_avg.rename(columns={"result": "ref_perf"}),
+        left_on="target_lang",
+        right_on="eval_lang",
+        how="left",
+    ).drop(columns=["eval_lang"])
+
+    df_merged["pg_score"] = df_merged.apply(compute_pg_score, axis=1)
 
     breakpoint()
 
@@ -278,6 +283,16 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
         "qlora": is_qlora_model,
         "target_lang": language,
     }
+
+
+def compute_pg_score(
+    row,
+    result_col: str = "result",
+    base_col: str = "base_perf",
+    ref_col: str = "ref_perf",
+):
+    """Compute the PG-Score for a given row."""
+    return (row[result_col] - row[base_col]) / (row[ref_col] - row[base_col])
 
 
 if __name__ == "__main__":
