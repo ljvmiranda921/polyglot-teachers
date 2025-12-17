@@ -57,11 +57,11 @@ def main():
 
     # Get intrinsic metrics
     df_int = get_intrinsic_metrics(repo_id=args.intrinsic, **json.loads(args.intrinsic_kwargs))  # fmt: skip
-    df_int["intrinsic"] = df_int.apply(compute_intrinsic_score, axis=1)
+    df_int_computed = compute_intrinsic_zscore(df_int)
 
     # Get extrinsic metrics
     df_ext = get_extrinsic_metrics(repo_search_str=args.extrinsic, **json.loads(args.extrinsic_kwargs))  # fmt: skip
-    df_ext_merged = compute_extrinsic_pgr(
+    df_ext_computed = compute_extrinsic_pgr(
         df_ext,
         df_base=_process_results(
             args.base_model_results,
@@ -84,17 +84,17 @@ def main():
     breakpoint()
 
     # Report results
-    print("\n====== PGR (by language) ======")
-    print(df_ext_merged.to_markdown(index=False))
+    # print("\n====== PGR (by language) ======")
+    # print(df_ext_merged.to_markdown(index=False))
 
-    print("\n====== PGR (average) ======")
-    print(
-        df_ext_merged.groupby("teacher_model")
-        .agg({"pgr": "mean"})
-        .reset_index()
-        .to_markdown(index=False)
-    )
-    df_ext_merged.to_json(CACHE_DIR / "pg_scores.jsonl", orient="records", lines=True)
+    # print("\n====== PGR (average) ======")
+    # print(
+    #     df_ext_merged.groupby("teacher_model")
+    #     .agg({"pgr": "mean"})
+    #     .reset_index()
+    #     .to_markdown(index=False)
+    # )
+    # df_ext_merged.to_json(CACHE_DIR / "pg_scores.jsonl", orient="records", lines=True)
     breakpoint()
     logging.info(f"Saved PG-Scores to {CACHE_DIR / 'pg_scores.jsonl'}")
 
@@ -307,19 +307,21 @@ def compute_extrinsic_pgr(
     return df_merged.drop(columns=["base_perf", "ref_perf"])
 
 
-def compute_intrinsic_score(row):
-    """Compute intrinsic quality score using z-score normalization."""
-    data = np.array(
+def compute_intrinsic_zscore(df: pd.DataFrame) -> pd.DataFrame:
+    """Compute intrinsic quality scores using z-score normalization."""
+    data = np.column_stack(
         [
-            row["prompts_distinct_ri"],
-            row["responses_distinct_ri"],
-            row["rubric_score"],
-            -np.log1p(row["perplexity"]),
+            df["prompts_distinct_ri"],
+            df["responses_distinct_ri"],
+            df["rubric_score"],
+            -np.log1p(df["perplexity"]),
         ]
-    ).reshape(1, -1)
+    )
     scaler = StandardScaler()
     normalized = scaler.fit_transform(data)
-    return normalized.mean()
+    df = df.copy()
+    df["intrinsic"] = normalized.mean(axis=1)
+    return df
 
 
 def compute_pgr(
