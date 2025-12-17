@@ -61,24 +61,25 @@ def main():
 
     # Get extrinsic metrics
     df_ext = get_extrinsic_metrics(repo_search_str=args.extrinsic, **json.loads(args.extrinsic_kwargs))  # fmt: skip
-    df_base = _process_results(
-        args.base_model_results,
-        model_info={
-            "model_name": "allenai/OLMo-3-1025-7B",
-            "lora": False,
-            "qlora": False,
-        },
+    df_ext_merged = compute_extrinsic_pgr(
+        df_ext,
+        df_base=_process_results(
+            args.base_model_results,
+            model_info={
+                "model_name": "allenai/OLMo-3-1025-7B",
+                "lora": False,
+                "qlora": False,
+            },
+        ),
+        df_ref=_process_results(
+            args.ref_model_results,
+            model_info={
+                "model_name": "allenai/OLMo-3-7B-Instruct-SFT",
+                "lora": False,
+                "qlora": False,
+            },
+        ),
     )
-    df_ref = _process_results(
-        args.ref_model_results,
-        model_info={
-            "model_name": "allenai/OLMo-3-7B-Instruct-SFT",
-            "lora": False,
-            "qlora": False,
-        },
-    )
-
-    df_ext_merged = compute_extrinsic_pgr(df_ext, df_base, df_ref)
 
     breakpoint()
 
@@ -276,8 +277,11 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
     }
 
 
-def compute_extrinsic_pgr(df_ext: pd.DataFrame, df_base: pd.DataFrame, df_ref: pd.DataFrame) -> pd.DataFrame:
+def compute_extrinsic_pgr(
+    df_ext: pd.DataFrame, df_base: pd.DataFrame, df_ref: pd.DataFrame
+) -> pd.DataFrame:
     """Compute PGR scores for extrinsic metrics."""
+
     def _cagg(group):
         matching = group[group["target_lang"] == group["eval_lang"]]
         data = matching if len(matching) > 0 else group
@@ -305,12 +309,14 @@ def compute_extrinsic_pgr(df_ext: pd.DataFrame, df_base: pd.DataFrame, df_ref: p
 
 def compute_intrinsic_score(row):
     """Compute intrinsic quality score using z-score normalization."""
-    data = np.array([
-        row["prompts_distinct_ri"],
-        row["responses_distinct_ri"],
-        row["rubric_score"],
-        -np.log1p(row["perplexity"]),
-    ]).reshape(1, -1)
+    data = np.array(
+        [
+            row["prompts_distinct_ri"],
+            row["responses_distinct_ri"],
+            row["rubric_score"],
+            -np.log1p(row["perplexity"]),
+        ]
+    ).reshape(1, -1)
     scaler = StandardScaler()
     normalized = scaler.fit_transform(data)
     return normalized.mean()
