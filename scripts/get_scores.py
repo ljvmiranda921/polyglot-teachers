@@ -102,22 +102,25 @@ def main():
         how="left",
     ).drop(columns=["eval_lang"])
 
-    # Compute PG-Score
-    df_merged["pg_score"] = df_merged.apply(compute_pg_score, axis=1)
+    # Compute intrinsic metrics z-score
+
+    # Compute extrinsic metric - PGR
+    df_merged["pgr"] = df_merged.apply(compute_pgr, axis=1)
     df_merged = df_merged.drop(columns=["base_perf", "ref_perf"])
 
     # Report results
-    print("\n====== PG-Scores (by language) ======")
+    print("\n====== PGR (by language) ======")
     print(df_merged.to_markdown(index=False))
 
-    print("\n====== PG-Scores (average) ======")
+    print("\n====== PGR (average) ======")
     print(
         df_merged.groupby("teacher_model")
-        .agg({"pg_score": "mean"})
+        .agg({"pgr": "mean"})
         .reset_index()
         .to_markdown(index=False)
     )
     df_merged.to_json(CACHE_DIR / "pg_scores.jsonl", orient="records", lines=True)
+    breakpoint()
     logging.info(f"Saved PG-Scores to {CACHE_DIR / 'pg_scores.jsonl'}")
 
 
@@ -299,13 +302,15 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
     }
 
 
-def compute_pg_score(
+def compute_pgr(
     row,
     result_col: str = "result",
     base_col: str = "base_perf",
     ref_col: str = "ref_perf",
 ):
-    """Compute the PG-Score for a given row."""
+    """Compute the PGR (Performance Gain Recovered) for a given row.
+    Ref: https://arxiv.org/abs/2412.03679
+    """
     return (row[result_col] - row[base_col]) / (row[ref_col] - row[base_col])
 
 
