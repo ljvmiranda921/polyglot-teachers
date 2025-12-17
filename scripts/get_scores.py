@@ -8,9 +8,11 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
+import numpy as np
 import pandas as pd
 from datasets import DownloadMode, load_dataset
 from huggingface_hub import list_datasets, snapshot_download
+from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
 
 logging.basicConfig(
@@ -55,8 +57,7 @@ def main():
 
     # Get intrinsic metrics
     df_int = get_intrinsic_metrics(repo_id=args.intrinsic, **json.loads(args.intrinsic_kwargs))  # fmt: skip
-    numeric_cols = df_int.select_dtypes(include="number").columns.tolist()
-    df_int["intrinsic"] = df_int[numeric_cols].apply(lambda row: (row - row.mean()) / row.std() if row.std() != 0 else 0, axis=1)  # fmt: skip
+    df_int["intrinsic"] = df_int.apply(compute_intrinsic_score, axis=1)
 
     # Get extrinsic metrics
     df_ext = get_extrinsic_metrics(repo_search_str=args.extrinsic, **json.loads(args.extrinsic_kwargs))  # fmt: skip
@@ -295,6 +296,19 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
         "qlora": is_qlora_model,
         "target_lang": language,
     }
+
+
+def compute_intrinsic_score(row):
+    """Compute intrinsic quality score using z-score normalization."""
+    data = np.array([
+        row["prompts_distinct_ri"],
+        row["responses_distinct_ri"],
+        row["rubric_score"],
+        -np.log1p(row["perplexity"]),
+    ]).reshape(1, -1)
+    scaler = StandardScaler()
+    normalized = scaler.fit_transform(data)
+    return normalized.mean()
 
 
 def compute_pgr(
