@@ -305,7 +305,7 @@ def save_finetuned_model(
                 f"Successfully uploaded and deleted local directory: {local_save_dir}"
             )
 
-    elif save_precision == "lora":
+    elif save_precision in ["lora", "full"]:
         model.push_to_hub(
             output_hf_name,
             revision=run_name,
