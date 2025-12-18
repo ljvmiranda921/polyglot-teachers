@@ -44,7 +44,7 @@ def get_args():
     parser.add_argument("--max_seq_length", type=int, default=2048, help="Maximum sequence length for the model.")
     parser.add_argument("--use_lora", action="store_true", help="If set, will use LoRA for finetuning.")
     parser.add_argument("--load_in_4bit", action="store_true", help="If set, will load the model in 4-bit precision to save memory.")
-    parser.add_argument("--save_mode", choices=["merged_16bit", "merged_4bit", "lora"], default="merged_16bit", help="Precision for saving the finetuned model.")
+    parser.add_argument("--save_mode", choices=["merged_16bit", "merged_4bit", "lora", "full"], default="merged_16bit", help="Precision for saving the finetuned model.")
     parser.add_argument("--apply_subsampling", action="store_true", default=False, help="Whether to apply subsampling to the dataset before finetuning. This is to ensure that the number of samples per strategy is roughly the same.")
     parser.add_argument("--max_train_samples", type=int, default=None, help="If set, will limit the number of training samples to this number when sampling.")
     parser.add_argument("--input_dataset_filter", type=str, default=None, help="JSON string representing a filter to apply to the input dataset before finetuning. The keys should be the field names and the values should be the values to filter by. This is an AND operation.")
