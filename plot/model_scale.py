@@ -16,9 +16,9 @@ def get_args():
     parser = argparse.ArgumentParser(description="Plot model scale")
     parser.add_argument("--input_path", type=Path, required=True, help="Results JSONL file to plot. Must contain the fields `teacher_model`, `target_lang`, and `pg_score`.")
     parser.add_argument("--output_path", type=Path, default=OUTPUT_DIR / "model_scale.pdf", help="Path to save the outputs.")
-    parser.add_argument("--figsize", type=lambda s: tuple(map(int, s.split(","))), default=(6, 8), help="Figure size as WIDTH,HEIGHT in inches. Default: 6,8")
+    parser.add_argument("--figsize", type=lambda s: tuple(map(int, s.split(","))), default=(8, 6), help="Figure size as WIDTH,HEIGHT in inches. Default: 6,8")
     parser.add_argument("--average", action="store_true", help="Plot average pg_score per model instead of individual language points.")
-    parser.add_argument("--size_by", type=str, choices=["joshi_etal_resource_level", "pct_commoncrawl", "native_speakers_in_m"], help="Vary marker size based on language metadata (only for non-average mode).")
+    parser.add_argument("--size_by", type=str, choices=["joshi_etal_resource_level", "pct_commoncrawl", "native_speakers_in_m"], default="pct_commoncrawl", help="Vary marker size based on language metadata (only for non-average mode).")
     # fmt: on
     return parser.parse_args()
 
