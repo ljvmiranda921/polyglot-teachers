@@ -35,35 +35,6 @@ MODEL_INFORMATION: list[ModelInfo] = [
         parameter_size=32.0,
         context_length=128_000,
         num_languages_supported=23,
-        benchmark_scores={
-            "global_mmlu_lite:de": {"acc": 0.6425, "acc_stderr": 0.02399319817984352},
-            "global_mmlu_lite:es": {"acc": 0.5625, "acc_stderr": 0.02483498169496957},
-            "global_mmlu_lite:ja": {"acc": 0.635, "acc_stderr": 0.0241016539745881},
-            "mgsm_custom:de": {
-                "extractive_match": 0.192,
-                "extractive_match_stderr": 0.02496069198917201,
-            },
-            "mgsm_custom:es": {
-                "extractive_match": 0.204,
-                "extractive_match_stderr": 0.025537121574548165,
-            },
-            "mgsm_custom:ja": {
-                "extractive_match": 0.184,
-                "extractive_match_stderr": 0.02455581299422256,
-            },
-            "mrewardbench_mcf:de": {
-                "weighted_acc": 0.5022278184618428,
-                "weighted_acc_stderr": 0.00035300870389390245,
-            },
-            "mrewardbench_mcf:es": {
-                "weighted_acc": 0.5229215112069668,
-                "weighted_acc_stderr": 0.000364187939021855,
-            },
-            "mrewardbench_mcf:ja": {
-                "weighted_acc": 0.5119041310960775,
-                "weighted_acc_stderr": 0.00036416225530845267,
-            },
-        },
     ),
     ModelInfo(
         name="cohere-command-a",
@@ -77,35 +48,6 @@ MODEL_INFORMATION: list[ModelInfo] = [
         parameter_size=27.0,
         context_length=128_000,
         num_languages_supported=140,
-        benchmark_scores={
-            "global_mmlu_lite:de": {"acc": 0.525, "acc_stderr": 0.02499999999999999},
-            "global_mmlu_lite:es": {"acc": 0.5825, "acc_stderr": 0.024688218756390913},
-            "global_mmlu_lite:ja": {"acc": 0.5725, "acc_stderr": 0.024766769210836766},
-            "mgsm_custom:de": {
-                "extractive_match": 0.356,
-                "extractive_match_stderr": 0.030343680657153215,
-            },
-            "mgsm_custom:es": {
-                "extractive_match": 0.376,
-                "extractive_match_stderr": 0.030696336267394594,
-            },
-            "mgsm_custom:ja": {
-                "extractive_match": 0.308,
-                "extractive_match_stderr": 0.029256928606501864,
-            },
-            "mrewardbench_mcf:de": {
-                "weighted_acc": 0.5750263506342785,
-                "weighted_acc_stderr": 0.0003255175172176768,
-            },
-            "mrewardbench_mcf:es": {
-                "weighted_acc": 0.6124111076294042,
-                "weighted_acc_stderr": 0.00032574927498296333,
-            },
-            "mrewardbench_mcf:ja": {
-                "weighted_acc": 0.5233506964885964,
-                "weighted_acc_stderr": 0.0003635369682722193,
-            },
-        },
     ),
     ModelInfo(
         name="google/gemma-3-12b-it",
@@ -113,35 +55,6 @@ MODEL_INFORMATION: list[ModelInfo] = [
         parameter_size=12.0,
         context_length=128_000,
         num_languages_supported=140,
-        benchmark_scores={
-            "global_mmlu_lite:de": {"acc": 0.58, "acc_stderr": 0.02470883072485368},
-            "global_mmlu_lite:es": {"acc": 0.5675, "acc_stderr": 0.024802162065186352},
-            "global_mmlu_lite:ja": {"acc": 0.4075, "acc_stderr": 0.024599231297971983},
-            "mgsm_custom:de": {
-                "extractive_match": 0.256,
-                "extractive_match_stderr": 0.02765710871820491,
-            },
-            "mgsm_custom:es": {
-                "extractive_match": 0.24,
-                "extractive_match_stderr": 0.027065293652239007,
-            },
-            "mgsm_custom:ja": {
-                "extractive_match": 0.208,
-                "extractive_match_stderr": 0.025721398901416392,
-            },
-            "mrewardbench_mcf:de": {
-                "weighted_acc": 0.5696295291739387,
-                "weighted_acc_stderr": 0.0003408040546038874,
-            },
-            "mrewardbench_mcf:es": {
-                "weighted_acc": 0.5557202929043195,
-                "weighted_acc_stderr": 0.000370059843642755,
-            },
-            "mrewardbench_mcf:ja": {
-                "weighted_acc": 0.5135933202852667,
-                "weighted_acc_stderr": 0.00036674921157268855,
-            },
-        },
     ),
     ModelInfo(
         name="google/gemma-3-4b-it",
@@ -149,35 +62,6 @@ MODEL_INFORMATION: list[ModelInfo] = [
         parameter_size=4.0,
         context_length=128_000,
         num_languages_supported=140,
-        benchmark_scores={
-            "global_mmlu_lite:de": {"acc": 0.4775, "acc_stderr": 0.025005951672504308},
-            "global_mmlu_lite:es": {"acc": 0.3725, "acc_stderr": 0.024203800008203095},
-            "global_mmlu_lite:ja": {"acc": 0.3925, "acc_stderr": 0.024445927747963326},
-            "mgsm_custom:de": {
-                "extractive_match": 0.088,
-                "extractive_match_stderr": 0.017953084777052892,
-            },
-            "mgsm_custom:es": {
-                "extractive_match": 0.1,
-                "extractive_match_stderr": 0.019011727515734385,
-            },
-            "mgsm_custom:ja": {
-                "extractive_match": 0.06,
-                "extractive_match_stderr": 0.015050117079158726,
-            },
-            "mrewardbench_mcf:de": {
-                "weighted_acc": 0.4955803245334807,
-                "weighted_acc_stderr": 0.00034780195962513826,
-            },
-            "mrewardbench_mcf:es": {
-                "weighted_acc": 0.5209067536043488,
-                "weighted_acc_stderr": 0.0003676074411597853,
-            },
-            "mrewardbench_mcf:ja": {
-                "weighted_acc": 0.515282509474456,
-                "weighted_acc_stderr": 0.0003677631286160483,
-            },
-        },
     ),
     ModelInfo(
         name="gpt-4o-mini-2024-07-18",
