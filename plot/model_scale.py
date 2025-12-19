@@ -92,7 +92,7 @@ def main():
         alpha=0.6,
         s=marker_sizes,
         zorder=2,
-        color=COLORS.get("warm_blue"),
+        color=COLORS.get("heritage"),
         edgecolor="k",
         linewidth=1,
     )
