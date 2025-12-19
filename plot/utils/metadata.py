@@ -36,7 +36,7 @@ class LanguageInfo(BaseModel):
     joshi_etal_resource_level: Optional[int] = None  # 1-5 scale
     ethnologue_num_speakers: Optional[int] = None
     pct_commoncrawl: Optional[float] = None  # Percentage of CommonCrawl data
-    native_speakers_in_m: Optional[int] = None
+    native_speakers_in_m: Optional[float] = None
 
 
 LANGUAGE_INFORMATION: list[LanguageInfo] = [
