@@ -46,36 +46,37 @@ def main():
     # Plot
     fig, ax = plt.subplots(1, 1, figsize=args.figsize)
 
-    # Define color palette for different models
-    color_palette = [
-        COLORS.get("warm_blue"),
-        COLORS.get("crest"),
-        COLORS.get("cherry"),
-        COLORS.get("purple"),
-        COLORS.get("indigo"),
-        COLORS.get("green"),
-        COLORS.get("dark_blue"),
-        COLORS.get("dark_crest"),
-        COLORS.get("dark_cherry"),
-        COLORS.get("heritage"),
-    ]
+    # Aggregate statistics across models for each resource level
+    agg_stats = df_plot.groupby(args.resource_by).agg(
+        mean_pg_score=("pg_score", "mean"),
+        q25_pg_score=("pg_score", lambda x: x.quantile(0.25)),
+        q75_pg_score=("pg_score", lambda x: x.quantile(0.75)),
+    ).reset_index()
 
-    # Plot each model as a separate line
-    for idx, model in enumerate(sorted(df_plot["teacher_model"].unique())):
-        model_data = df_plot[df_plot["teacher_model"] == model].sort_values(args.resource_by)
-        beautiful_name = model_data["beautiful_name"].iloc[0]
-        color = color_palette[idx % len(color_palette)]
+    # Sort by resource level for proper line plotting
+    agg_stats = agg_stats.sort_values(args.resource_by)
 
-        ax.plot(
-            model_data[args.resource_by],
-            model_data["pg_score"],
-            marker="o",
-            markersize=8,
-            linewidth=2,
-            label=beautiful_name,
-            color=color,
-            alpha=0.8,
-        )
+    # Plot gray shaded area (IQR: 25th-75th percentile)
+    ax.fill_between(
+        agg_stats[args.resource_by],
+        agg_stats["q25_pg_score"],
+        agg_stats["q75_pg_score"],
+        color=COLORS.get("slate_2"),
+        alpha=0.3,
+        label="Model range (IQR)",
+    )
+
+    # Plot red average line
+    ax.plot(
+        agg_stats[args.resource_by],
+        agg_stats["mean_pg_score"],
+        marker="o",
+        markersize=10,
+        linewidth=3,
+        color=COLORS.get("dark_crest"),
+        label="Average across models",
+        zorder=10,
+    )
 
     # Set labels
     x_label = {
