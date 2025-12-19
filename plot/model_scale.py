@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from plot.utils.plot_theme import PLOT_PARAMS, COLORS, OUTPUT_DIR
+from plot.utils.plot_theme import PLOT_PARAMS, COLORS, OUTPUT_DIR, FONT_SIZES
 from plot.utils.metadata import MODEL_INFORMATION, LANGUAGE_INFORMATION
 
 plt.rcParams.update(PLOT_PARAMS)
@@ -82,26 +82,10 @@ def main():
             beautiful_name = model_data["beautiful_name"].iloc[0]
             y_min = model_data["pg_score"].min()
             y_max = model_data["pg_score"].max()
-            ax.vlines(
-                model_size,
-                y_min,
-                y_max,
-                colors="gray",
-                alpha=0.3,
-                linewidth=1,
-                zorder=1,
-            )
+            ax.vlines(model_size, y_min, y_max, colors=COLORS.get("slate"), alpha=0.3, linewidth=1, zorder=1)  # fmt: skip
 
             # Annotate with beautiful name on top of the group
-            ax.text(
-                model_size,
-                y_max,
-                f" {beautiful_name}",
-                fontsize=8,
-                ha="left",
-                va="bottom",
-                alpha=0.7,
-            )
+            ax.text(model_size, y_max+0.2, beautiful_name, fontsize=FONT_SIZES.get("small"), ha="left", va="bottom", alpha=0.7)  # fmt: skip
 
     ax.scatter(
         df_plot["model_size"], df_plot["pg_score"], alpha=0.6, s=marker_sizes, zorder=2
