@@ -20,7 +20,12 @@ def get_args():
 
 
 def main():
-    pass
+    args = get_args()
+
+    df = pd.read_jon(args.input_path, lines=True)
+    breakpoint()
+
+    fig, ax = plt.subplots(1, 1, figsize=(6, 8))
 
 
 if __name__ == "__main__":
