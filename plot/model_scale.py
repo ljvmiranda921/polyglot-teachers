@@ -100,6 +100,22 @@ def main():
 
     ax.grid(True, which="both", linestyle="--", alpha=0.3)
 
+    # Add legend for resource levels (only if size_by is used and not averaging)
+    if args.size_by and not args.average:
+        from matplotlib.lines import Line2D
+
+        if args.size_by in ["pct_commoncrawl", "native_speakers_in_m"]:
+            # Create custom legend elements for the three bins
+            legend_elements = [
+                # fmt: off
+                Line2D([0], [0], marker='o', color='w', markerfacecolor='gray', markersize=np.sqrt(40/3), alpha=0.6, label='Low'),
+                Line2D([0], [0], marker='o', color='w', markerfacecolor='gray', markersize=np.sqrt(250/3), alpha=0.6, label='Medium'),
+                Line2D([0], [0], marker='o', color='w', markerfacecolor='gray', markersize=np.sqrt(500/3), alpha=0.6, label='High'),
+                # fmt: on
+            ]
+            legend_title = "Resource Level"
+            ax.legend(handles=legend_elements, loc='lower left', title=legend_title, framealpha=0.9)  # fmt: skip
+
     plt.tight_layout()
     plt.savefig(args.output_path, bbox_inches="tight")
     print(f"Plot saved to {args.output_path}")
