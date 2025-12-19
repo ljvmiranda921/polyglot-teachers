@@ -74,7 +74,7 @@ def main():
     # Plot
     fig, ax = plt.subplots(1, 1, figsize=args.figsize)
 
-    # Aesthetics - add vertical lines connecting points from the same model
+    # Add vertical lines connecting points from the same model
     if not args.average:
         for model in df_plot["teacher_model"].unique():
             model_data = df_plot[df_plot["teacher_model"] == model]
@@ -82,7 +82,7 @@ def main():
             beautiful_name = model_data["beautiful_name"].iloc[0]
             y_min = model_data["pg_score"].min()
             y_max = model_data["pg_score"].max()
-            ax.vlines(model_size, y_min, y_max, colors=COLORS.get("slate"), alpha=0.3, linewidth=1, zorder=1)  # fmt: skip
+            ax.vlines(model_size, y_min, y_max, colors=COLORS.get("slate"), alpha=1, linewidth=1, zorder=1)  # fmt: skip
 
             # Annotate with beautiful name on top of the group
             ax.text(model_size, y_max+0.2, beautiful_name, fontsize=FONT_SIZES.get("small"), ha="center", va="bottom", alpha=0.7)  # fmt: skip
@@ -94,6 +94,10 @@ def main():
     ax.set_xscale("log")
     ax.set_xlabel("Model Size (parameters, log scale)")
     ax.set_ylabel("PG-Score")
+
+    # Some aesthetics
+    ax.set_ylim(top=2.3)  # Leave space for annotations
+    ax.grid(True, which="both", linestyle="--", alpha=0.3)
 
     plt.tight_layout()
     plt.savefig(args.output_path, bbox_inches="tight")
