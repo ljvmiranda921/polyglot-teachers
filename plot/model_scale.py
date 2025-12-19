@@ -85,7 +85,7 @@ def main():
             ax.vlines(model_size, y_min, y_max, colors=COLORS.get("slate"), alpha=0.3, linewidth=1, zorder=1)  # fmt: skip
 
             # Annotate with beautiful name on top of the group
-            ax.text(model_size, y_max+0.2, beautiful_name, fontsize=FONT_SIZES.get("small"), ha="left", va="bottom", alpha=0.7)  # fmt: skip
+            ax.text(model_size, y_max+0.2, beautiful_name, fontsize=FONT_SIZES.get("small"), ha="center", va="bottom", alpha=0.7)  # fmt: skip
 
     ax.scatter(
         df_plot["model_size"], df_plot["pg_score"], alpha=0.6, s=marker_sizes, zorder=2
