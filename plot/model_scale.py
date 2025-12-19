@@ -94,11 +94,11 @@ def main():
         zorder=2,
         color=COLORS.get("warm_blue"),
         edgecolor="k",
-        linewidth=0.5,
+        linewidth=1,
     )
 
     ax.set_xscale("log")
-    ax.set_xlabel("Model Size (parameters, log scale)")
+    ax.set_xlabel("Parameter Size in B, log-scale")
     ax.set_ylabel("PG-Score")
 
     # Some aesthetics
@@ -124,6 +124,12 @@ def main():
             ]
             legend_title = "Resource Level"
             ax.legend(handles=legend_elements, loc="lower left", title=legend_title, framealpha=0.9)  # fmt: skip
+
+    # Save figure
+    args.output_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.tight_layout()
+    plt.savefig(args.output_path)
+    print(f"Saved figure to {args.output_path}")
 
 
 if __name__ == "__main__":
