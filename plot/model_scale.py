@@ -83,6 +83,10 @@ def main():
             y_max = model_data["pg_score"].max()
             ax.vlines(model_size, y_min, y_max, colors='gray', alpha=0.3, linewidth=1, zorder=1)
 
+            # Annotate with model name on top of the group
+            ax.text(model_size, y_max, f'  {model}',
+                   fontsize=8, ha='left', va='bottom', rotation=45, alpha=0.7)
+
     ax.scatter(df_plot["model_size"], df_plot["pg_score"], alpha=0.6, s=marker_sizes, zorder=2)
 
     ax.set_xscale("log")
