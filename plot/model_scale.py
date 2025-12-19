@@ -16,7 +16,7 @@ def get_args():
     parser = argparse.ArgumentParser(description="Plot model scale")
     parser.add_argument("--input_path", type=Path, required=True, help="Results JSONL file to plot. Must contain the fields `teacher_model`, `target_lang`, and `pg_score`.")
     parser.add_argument("--output_path", type=Path, default=OUTPUT_DIR / "model_scale.pdf", help="Path to save the outputs.")
-    parser.add_argument("--figsize", type=lambda s: tuple(map(int, s.split(","))), default=(8, 6), help="Figure size as WIDTH,HEIGHT in inches. Default: 6,8")
+    parser.add_argument("--figsize", type=lambda s: tuple(map(int, s.split(","))), default=(12, 7), help="Figure size as WIDTH,HEIGHT in inches. Default: 6,8")
     parser.add_argument("--average", action="store_true", help="Plot average pg_score per model instead of individual language points.")
     parser.add_argument("--size_by", type=str, choices=["joshi_etal_resource_level", "pct_commoncrawl", "native_speakers_in_m"], default="pct_commoncrawl", help="Vary marker size based on language metadata (only for non-average mode).")
     # fmt: on
@@ -81,13 +81,31 @@ def main():
             model_size = model_data["model_size"].iloc[0]
             y_min = model_data["pg_score"].min()
             y_max = model_data["pg_score"].max()
-            ax.vlines(model_size, y_min, y_max, colors='gray', alpha=0.3, linewidth=1, zorder=1)
+            ax.vlines(
+                model_size,
+                y_min,
+                y_max,
+                colors="gray",
+                alpha=0.3,
+                linewidth=1,
+                zorder=1,
+            )
 
             # Annotate with model name on top of the group
-            ax.text(model_size, y_max, f'  {model}',
-                   fontsize=8, ha='left', va='bottom', rotation=45, alpha=0.7)
+            ax.text(
+                model_size,
+                y_max,
+                f"  {model}",
+                fontsize=8,
+                ha="left",
+                va="bottom",
+                rotation=45,
+                alpha=0.7,
+            )
 
-    ax.scatter(df_plot["model_size"], df_plot["pg_score"], alpha=0.6, s=marker_sizes, zorder=2)
+    ax.scatter(
+        df_plot["model_size"], df_plot["pg_score"], alpha=0.6, s=marker_sizes, zorder=2
+    )
 
     ax.set_xscale("log")
     ax.set_xlabel("Model Size (parameters, log scale)")

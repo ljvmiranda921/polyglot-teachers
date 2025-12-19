@@ -5,6 +5,7 @@ from typing import Optional, Literal, Any
 class ModelInfo(BaseModel):
     name: str
     model_family: str
+    beautiful_name: Optional[str] = None  # Short display name for plots
     url: Optional[str] = None
 
     # Model characteristics
@@ -89,6 +90,7 @@ MODEL_INFORMATION: list[ModelInfo] = [
     ModelInfo(
         name="CohereLabs/aya-expanse-32b",
         model_family="Aya",
+        beautiful_name="Aya Expanse 32B",
         parameter_size=32.0,
         context_length=128_000,
         num_languages_supported=23,
@@ -96,12 +98,14 @@ MODEL_INFORMATION: list[ModelInfo] = [
     ModelInfo(
         name="cohere-command-a",
         model_family="Command",
+        beautiful_name="Command A",
         parameter_size=111.0,
         context_length=256_000,
     ),
     ModelInfo(
         name="google/gemma-3-27b-it",
         model_family="Gemma",
+        beautiful_name="Gemma 3 27B",
         parameter_size=27.0,
         context_length=128_000,
         num_languages_supported=140,
@@ -109,6 +113,7 @@ MODEL_INFORMATION: list[ModelInfo] = [
     ModelInfo(
         name="google/gemma-3-12b-it",
         model_family="Gemma",
+        beautiful_name="Gemma 3 12B",
         parameter_size=12.0,
         context_length=128_000,
         num_languages_supported=140,
@@ -116,6 +121,7 @@ MODEL_INFORMATION: list[ModelInfo] = [
     ModelInfo(
         name="google/gemma-3-4b-it",
         model_family="Gemma",
+        beautiful_name="Gemma 3 4B",
         parameter_size=4.0,
         context_length=128_000,
         num_languages_supported=140,
@@ -123,18 +129,21 @@ MODEL_INFORMATION: list[ModelInfo] = [
     ModelInfo(
         name="gpt-4o-mini-2024-07-18",
         model_family="GPT-4o",
+        beautiful_name="GPT-4o mini",
         parameter_size="Unknown",
         context_length=128_000,
     ),
     ModelInfo(
         name="ibm-granite/granite-4.0-1b",
         model_family="Granite",
+        beautiful_name="Granite 1B",
         parameter_size=1.0,
         context_length=128_000,
     ),
     ModelInfo(
         name="ibm-granite/granite-4.0-micro",
         model_family="Granite",
+        beautiful_name="Granite 3B",
         parameter_size=3.0,
         context_length=128_000,
         num_languages_supported=12,
@@ -142,18 +151,21 @@ MODEL_INFORMATION: list[ModelInfo] = [
     ModelInfo(
         name="meta-llama/Llama-3.1-70B-Instruct",
         model_family="Llama",
+        beautiful_name="Llama 3.1 70B",
         parameter_size=70.0,
         context_length=8_000,
     ),
     ModelInfo(
         name="meta-llama/Llama-3.1-8B-Instruct",
         model_family="Llama",
+        beautiful_name="Llama 3.1 8B",
         parameter_size=8.0,
         context_length=8_000,
     ),
     ModelInfo(
         name="mistralai/Mistral-Small-24B-Instruct-2501",
         model_family="Mistral",
+        beautiful_name="Mistral 24B",
         parameter_size=24.0,
         context_length=128_000,
     ),
