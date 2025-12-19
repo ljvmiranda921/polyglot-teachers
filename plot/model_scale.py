@@ -48,9 +48,7 @@ def main():
 
     # Aggregate if averaging
     if args.average:
-        df_plot = df_plot.groupby(["teacher_model", "model_size"], as_index=False)[
-            "pg_score"
-        ].mean()
+        df_plot = df_plot.groupby(["teacher_model", "model_size"], as_index=False)["pg_score"].mean()  # fmt: skip
 
     # Determine marker sizes
     if args.size_by and not args.average:
