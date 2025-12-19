@@ -106,19 +106,16 @@ def main():
 
         if args.size_by in ["pct_commoncrawl", "native_speakers_in_m"]:
             # Create custom legend elements for the three bins
+            markerfacecolor = COLORS.get("warm_blue")
             legend_elements = [
                 # fmt: off
-                Line2D([0], [0], marker='o', color='w', markerfacecolor='gray', markersize=np.sqrt(40/3), alpha=0.6, label='Low'),
-                Line2D([0], [0], marker='o', color='w', markerfacecolor='gray', markersize=np.sqrt(250/3), alpha=0.6, label='Medium'),
-                Line2D([0], [0], marker='o', color='w', markerfacecolor='gray', markersize=np.sqrt(500/3), alpha=0.6, label='High'),
+                Line2D([0], [0], marker="o", color="w", markerfacecolor=markerfacecolor, markersize=np.sqrt(40/3), alpha=0.6, label="Low"),
+                Line2D([0], [0], marker="o", color="w", markerfacecolor=markerfacecolor, markersize=np.sqrt(250/3), alpha=0.6, label="Medium"),
+                Line2D([0], [0], marker="o", color="w", markerfacecolor=markerfacecolor, markersize=np.sqrt(500/3), alpha=0.6, label="High"),
                 # fmt: on
             ]
             legend_title = "Resource Level"
-            ax.legend(handles=legend_elements, loc='lower left', title=legend_title, framealpha=0.9)  # fmt: skip
-
-    plt.tight_layout()
-    plt.savefig(args.output_path, bbox_inches="tight")
-    print(f"Plot saved to {args.output_path}")
+            ax.legend(handles=legend_elements, loc="lower left", title=legend_title, framealpha=0.9)  # fmt: skip
 
 
 if __name__ == "__main__":
