@@ -57,7 +57,7 @@ def main():
         # Scale marker sizes based on the selected attribute
         # Map resource level (3-5) to marker sizes (50-200) for more pronounced differences
         size_values = df_plot[args.size_by].values
-        marker_sizes = 50 + (size_values - size_values.min()) * 150 / (
+        marker_sizes = 50 + (size_values - size_values.min()) * 400 / (
             size_values.max() - size_values.min()
         )
     else:
