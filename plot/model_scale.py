@@ -34,7 +34,7 @@ def main():
     df_langs = pd.DataFrame([lang.model_dump() for lang in LANGUAGE_INFORMATION])
 
     df_plot = df.merge(
-        df_models[["teacher_model", "parameter_size"]],
+        df_models[["teacher_model", "parameter_size", "beautiful_name"]],
         on="teacher_model",
         how="left",
     ).merge(
@@ -79,6 +79,7 @@ def main():
         for model in df_plot["teacher_model"].unique():
             model_data = df_plot[df_plot["teacher_model"] == model]
             model_size = model_data["model_size"].iloc[0]
+            beautiful_name = model_data["beautiful_name"].iloc[0]
             y_min = model_data["pg_score"].min()
             y_max = model_data["pg_score"].max()
             ax.vlines(
@@ -91,15 +92,14 @@ def main():
                 zorder=1,
             )
 
-            # Annotate with model name on top of the group
+            # Annotate with beautiful name on top of the group
             ax.text(
                 model_size,
                 y_max,
-                f"  {model}",
+                f" {beautiful_name}",
                 fontsize=8,
                 ha="left",
                 va="bottom",
-                rotation=45,
                 alpha=0.7,
             )
 

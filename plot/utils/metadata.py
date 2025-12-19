@@ -136,14 +136,14 @@ MODEL_INFORMATION: list[ModelInfo] = [
     ModelInfo(
         name="ibm-granite/granite-4.0-1b",
         model_family="Granite",
-        beautiful_name="Granite 1B",
+        beautiful_name="Granite 4.0 1B",
         parameter_size=1.0,
         context_length=128_000,
     ),
     ModelInfo(
         name="ibm-granite/granite-4.0-micro",
         model_family="Granite",
-        beautiful_name="Granite 3B",
+        beautiful_name="Granite 4.0 Micro",
         parameter_size=3.0,
         context_length=128_000,
         num_languages_supported=12,
@@ -165,7 +165,7 @@ MODEL_INFORMATION: list[ModelInfo] = [
     ModelInfo(
         name="mistralai/Mistral-Small-24B-Instruct-2501",
         model_family="Mistral",
-        beautiful_name="Mistral 24B",
+        beautiful_name="Mistral Small 24B",
         parameter_size=24.0,
         context_length=128_000,
     ),
