@@ -79,6 +79,8 @@ def main():
     ax.set_xlabel("Model Size (parameters, log scale)")
     ax.set_ylabel("PG-Score")
 
+    # Aesthetics
+
     plt.tight_layout()
     plt.savefig(args.output_path, bbox_inches="tight")
     print(f"Plot saved to {args.output_path}")
