@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 from plot.utils.plot_theme import PLOT_PARAMS, COLORS, OUTPUT_DIR
+from plot.utils.model_info import MODEL_INFORMATION
 
 plt.rcParams.update(PLOT_PARAMS)
 
@@ -22,7 +23,7 @@ def get_args():
 def main():
     args = get_args()
 
-    df = pd.read_jon(args.input_path, lines=True)
+    df = pd.read_json(args.input_path, lines=True)
     breakpoint()
 
     fig, ax = plt.subplots(1, 1, figsize=(6, 8))
