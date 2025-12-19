@@ -17,6 +17,7 @@ def get_args():
     parser.add_argument("--input_path", type=Path, required=True, help="Results JSONL file to plot. Must contain the fields `teacher_model`, `target_lang`, and `pg_score`.")
     parser.add_argument("--output_path", type=Path, default=OUTPUT_DIR / "model_scale.pdf", help="Path to save the outputs.")
     parser.add_argument("--figsize", type=lambda s: tuple(map(int, s.split(","))), default=(6, 8), help="Figure size as WIDTH,HEIGHT in inches. Default: 6,8")
+    parser.add_argument("--average", action="store_true", help="Plot average pg_score per model instead of individual language points.")
     # fmt: on
     return parser.parse_args()
 
@@ -36,14 +37,19 @@ def main():
     df_plot = df_plot[df_plot["parameter_size"] != "Unknown"].copy()
     df_plot["model_size"] = df_plot["parameter_size"].astype(float)
 
+    # Aggregate if averaging
+    if args.average:
+        df_plot = df_plot.groupby(["teacher_model", "model_size"], as_index=False)[
+            "pg_score"
+        ].mean()
+
     # Plot
     fig, ax = plt.subplots(1, 1, figsize=args.figsize)
     ax.scatter(df_plot["model_size"], df_plot["pg_score"], alpha=0.6, s=50)
 
     ax.set_xscale("log")
     ax.set_xlabel("Model Size (parameters, log scale)")
-    ax.set_ylabel("PG Score")
-    ax.grid(True, alpha=0.3)
+    ax.set_ylabel("PG-Score")
 
     plt.tight_layout()
     plt.savefig(args.output_path, bbox_inches="tight")
