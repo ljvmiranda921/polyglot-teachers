@@ -97,6 +97,9 @@ def main():
 
     # Some aesthetics
     ax.set_ylim(top=2.3)  # Leave space for annotations
+    x_min, x_max = df_plot["model_size"].min(), df_plot["model_size"].max()
+    ax.set_xlim(x_min * 0.7, x_max * 1.4)  # Add padding on both sides
+
     ax.grid(True, which="both", linestyle="--", alpha=0.3)
 
     plt.tight_layout()
