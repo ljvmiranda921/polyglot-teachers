@@ -59,9 +59,9 @@ def main():
         # For float values, bin into 3 categories for more pronounced differences
         if args.size_by in ["pct_commoncrawl", "native_speakers_in_m"]:
             # Bin into tertiles (low, medium, high)
-            tertiles = pd.qcut(size_values, q=3, labels=False, duplicates='drop')
+            tertiles = pd.qcut(size_values, q=3, labels=False, duplicates="drop")
             # Map to distinct sizes: small (80), medium (200), large (400)
-            size_map = {0: 80, 1: 200, 2: 400}
+            size_map = {0: 40, 1: 250, 2: 500}
             marker_sizes = np.array([size_map[t] for t in tertiles])
         else:
             # For discrete values like resource level, scale linearly
