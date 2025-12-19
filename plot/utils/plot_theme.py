@@ -1,3 +1,5 @@
+from pathlib import Path
+
 FONT_SIZES = {"small": 14, "medium": 18, "large": 24}
 
 PLOT_PARAMS = {
@@ -25,3 +27,6 @@ COLORS = {
     "warm_crest": "#FFC392",
     "slate": "#B5BDC8",
 }
+
+OUTPUT_DIR = Path("plot_outputs")
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
