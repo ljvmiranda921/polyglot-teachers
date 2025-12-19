@@ -73,13 +73,21 @@ def main():
 
     # Plot
     fig, ax = plt.subplots(1, 1, figsize=args.figsize)
-    ax.scatter(df_plot["model_size"], df_plot["pg_score"], alpha=0.6, s=marker_sizes)
+
+    # Aesthetics - add vertical lines connecting points from the same model
+    if not args.average:
+        for model in df_plot["teacher_model"].unique():
+            model_data = df_plot[df_plot["teacher_model"] == model]
+            model_size = model_data["model_size"].iloc[0]
+            y_min = model_data["pg_score"].min()
+            y_max = model_data["pg_score"].max()
+            ax.vlines(model_size, y_min, y_max, colors='gray', alpha=0.3, linewidth=1, zorder=1)
+
+    ax.scatter(df_plot["model_size"], df_plot["pg_score"], alpha=0.6, s=marker_sizes, zorder=2)
 
     ax.set_xscale("log")
     ax.set_xlabel("Model Size (parameters, log scale)")
     ax.set_ylabel("PG-Score")
-
-    # Aesthetics
 
     plt.tight_layout()
     plt.savefig(args.output_path, bbox_inches="tight")
