@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 from plot.utils.plot_theme import PLOT_PARAMS, COLORS, OUTPUT_DIR
-from plot.utils.model_info import MODEL_INFORMATION
+from plot.utils.metadata import MODEL_INFORMATION
 
 plt.rcParams.update(PLOT_PARAMS)
 
