@@ -82,7 +82,7 @@ def main():
             beautiful_name = model_data["beautiful_name"].iloc[0]
             y_min = model_data["pg_score"].min()
             y_max = model_data["pg_score"].max()
-            ax.vlines(model_size, y_min, y_max, colors=COLORS.get("slate"), alpha=1, linewidth=1, zorder=1)  # fmt: skip
+            ax.vlines(model_size, y_min, y_max, colors=COLORS.get("slate"), alpha=0.6, linewidth=1, zorder=1)  # fmt: skip
 
             # Annotate with beautiful name on top of the group
             ax.text(model_size, y_max+0.2, beautiful_name, fontsize=FONT_SIZES.get("small"), ha="center", va="bottom", alpha=0.7)  # fmt: skip
