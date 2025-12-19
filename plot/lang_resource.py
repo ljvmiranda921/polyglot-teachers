@@ -43,15 +43,22 @@ def main():
     df_plot = df_plot[df_plot["parameter_size"] != "Unknown"].copy()
     df_plot["model_size"] = df_plot["parameter_size"].astype(float)
 
+    # Filter out Czech and Indonesian
+    df_plot = df_plot[~df_plot["target_lang"].isin(["cs", "ja"])].copy()
+
     # Plot
     fig, ax = plt.subplots(1, 1, figsize=args.figsize)
 
     # Aggregate statistics across models for each resource level
-    agg_stats = df_plot.groupby(args.resource_by).agg(
-        mean_pg_score=("pg_score", "mean"),
-        q25_pg_score=("pg_score", lambda x: x.quantile(0.25)),
-        q75_pg_score=("pg_score", lambda x: x.quantile(0.75)),
-    ).reset_index()
+    agg_stats = (
+        df_plot.groupby(args.resource_by)
+        .agg(
+            mean_pg_score=("pg_score", "mean"),
+            q25_pg_score=("pg_score", lambda x: x.quantile(0.25)),
+            q75_pg_score=("pg_score", lambda x: x.quantile(0.75)),
+        )
+        .reset_index()
+    )
 
     # Sort by resource level for proper line plotting
     agg_stats = agg_stats.sort_values(args.resource_by)
