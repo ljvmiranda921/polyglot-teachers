@@ -30,9 +30,7 @@ def main():
 
     df_models = pd.DataFrame([m.model_dump() for m in MODEL_INFORMATION])
     df_models["teacher_model"] = df_models["name"].str.split("/").str[-1]
-
     df_langs = pd.DataFrame([lang.model_dump() for lang in LANGUAGE_INFORMATION])
-
     df_plot = df.merge(
         df_models[["teacher_model", "parameter_size", "beautiful_name"]],
         on="teacher_model",
@@ -45,6 +43,9 @@ def main():
     )
     df_plot = df_plot[df_plot["parameter_size"] != "Unknown"].copy()
     df_plot["model_size"] = df_plot["parameter_size"].astype(float)
+
+    # Marker color
+    marker_color = COLORS.get("warm_blue")
 
     # Aggregate if averaging
     if args.average:
@@ -92,7 +93,7 @@ def main():
         alpha=0.6,
         s=marker_sizes,
         zorder=2,
-        color=COLORS.get("heritage"),
+        color=marker_color,
         edgecolor="k",
         linewidth=1,
     )
@@ -114,12 +115,11 @@ def main():
 
         if args.size_by in ["pct_commoncrawl", "native_speakers_in_m"]:
             # Create custom legend elements for the three bins
-            markerfacecolor = COLORS.get("warm_blue")
             legend_elements = [
                 # fmt: off
-                Line2D([0], [0], marker="o", color="w", markerfacecolor=markerfacecolor, markersize=np.sqrt(40/3), alpha=0.6, label="Low"),
-                Line2D([0], [0], marker="o", color="w", markerfacecolor=markerfacecolor, markersize=np.sqrt(250/3), alpha=0.6, label="Medium"),
-                Line2D([0], [0], marker="o", color="w", markerfacecolor=markerfacecolor, markersize=np.sqrt(500/3), alpha=0.6, label="High"),
+                Line2D([0], [0], marker="o", color="w", markerfacecolor=marker_color, markersize=np.sqrt(40/3), alpha=0.6, label="Low"),
+                Line2D([0], [0], marker="o", color="w", markerfacecolor=marker_color, markersize=np.sqrt(250/3), alpha=0.6, label="Medium"),
+                Line2D([0], [0], marker="o", color="w", markerfacecolor=marker_color, markersize=np.sqrt(500/3), alpha=0.6, label="High"),
                 # fmt: on
             ]
             legend_title = "Resource Level"
