@@ -85,8 +85,16 @@ def main():
             # Annotate with beautiful name on top of the group
             ax.text(model_size, y_max+0.2, beautiful_name, fontsize=FONT_SIZES.get("small"), ha="center", va="bottom", alpha=0.7)  # fmt: skip
 
+    # Actual scatter plot
     ax.scatter(
-        df_plot["model_size"], df_plot["pg_score"], alpha=0.6, s=marker_sizes, zorder=2
+        df_plot["model_size"],
+        df_plot["pg_score"],
+        alpha=0.6,
+        s=marker_sizes,
+        zorder=2,
+        color=COLORS.get("warm_blue"),
+        edgecolor="k",
+        linewidth=0.5,
     )
 
     ax.set_xscale("log")
