@@ -28,6 +28,63 @@ class ModelInfo(BaseModel):
     license: Optional[str] = None  # e.g., "apache-2.0", "proprietary"
 
 
+class LanguageInfo(BaseModel):
+    name: str
+    iso_639_1: str
+
+    # Resourcesness
+    joshi_etal_resource_level: Optional[int] = None  # 1-5 scale
+    ethnologue_num_speakers: Optional[int] = None
+    pct_commoncrawl: Optional[float] = None  # Percentage of CommonCrawl data
+    native_speakers_in_m: Optional[int] = None
+
+
+LANGUAGE_INFORMATION: list[LanguageInfo] = [
+    LanguageInfo(
+        name="Arabic",
+        iso_639_1="ar",
+        joshi_etal_resource_level=5,
+        pct_commoncrawl=0.65,
+        native_speakers_in_m=380,
+    ),
+    LanguageInfo(
+        name="Czech",
+        iso_639_1="cs",
+        joshi_etal_resource_level=4,
+        pct_commoncrawl=0.99,
+        native_speakers_in_m=10.7,
+    ),
+    LanguageInfo(
+        name="German",
+        iso_639_1="de",
+        joshi_etal_resource_level=5,
+        pct_commoncrawl=6.01,
+        native_speakers_in_m=95,
+    ),
+    LanguageInfo(
+        name="Spanish",
+        iso_639_1="es",
+        joshi_etal_resource_level=5,
+        pct_commoncrawl=4.37,
+        native_speakers_in_m=500,
+    ),
+    LanguageInfo(
+        name="Indonesian",
+        iso_639_1="id",
+        joshi_etal_resource_level=3,
+        pct_commoncrawl=0.95,
+        native_speakers_in_m=43,
+    ),
+    LanguageInfo(
+        name="Japanese",
+        iso_639_1="ja",
+        joshi_etal_resource_level=5,
+        pct_commoncrawl=5.20,
+        native_speakers_in_m=120,
+    ),
+]
+
+
 MODEL_INFORMATION: list[ModelInfo] = [
     ModelInfo(
         name="CohereLabs/aya-expanse-32b",
