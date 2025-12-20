@@ -50,9 +50,9 @@ python -m scripts.finetune_unsloth \
     --num_epochs 2 \
     --learning_rate 5e-5 \
     --max_seq_length 16384 \
-    --use_lora \
-    --load_in_4bit \
     --apply_subsampling \
     --max_train_samples 10500 \
-    --save_mode merged_16bit \
+    --save_mode full \
     --input_dataset_filter "${INPUT_DATASET_FILTER}"
+#    --use_lora \
+#    --load_in_4bit \
