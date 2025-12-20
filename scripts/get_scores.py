@@ -44,6 +44,7 @@ def get_args():
     parser = argparse.ArgumentParser(description="Get the PG-Score for a given dataset.")
     parser.add_argument("-i", "--intrinsic", type=str, default="ljvmiranda921/mtep-intrinsic-metrics", help="Huggingface Dataset containing the intrinsic metrics.")
     parser.add_argument("-e", "--extrinsic", type=str, default="msde-allenai_Olmo-3-1025-7B", help="Search string for getting HuggingFace datasets with student model performance.")
+    parser.add_argument("--output_file", type=str, default="pg_scores.jsonl", help="Output file to save the PG-Scores.")
     parser.add_argument("--intrinsic_kwargs", type=str, default='{"directory_path": "csd3", "local_path": "data"}', help="Extra arguments to pass when processing the intrinsic metrics.")
     parser.add_argument("--extrinsic_kwargs", type=str, default="{}", help="Extra arguments to pass when processing the extrinsic metrics.")
     parser.add_argument("--ref_model_results", type=str, default="ljvmiranda921/details_allenai__Olmo-3-7B-Instruct-SFT_private", help="Huggingface Dataset containing the reference model results.")
@@ -102,8 +103,8 @@ def main():
         .reset_index()
         .to_markdown(index=False)
     )
-    df_merged.to_json(CACHE_DIR / "pg_scores.jsonl", orient="records", lines=True)
-    logging.info(f"Saved PG-Scores to {CACHE_DIR / 'pg_scores.jsonl'}")
+    df_merged.to_json(CACHE_DIR / args.output_file, orient="records", lines=True)
+    logging.info(f"Saved PG-Scores to {CACHE_DIR / args.output_file}")
 
 
 def get_intrinsic_metrics(
