@@ -1,4 +1,6 @@
 import argparse
+import logging
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -6,6 +8,14 @@ import pandas as pd
 import statsmodels.formula.api as smf
 
 from plot.utils.metadata import MODEL_INFORMATION
+
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[logging.StreamHandler(sys.stdout)],
+    level=logging.INFO,
+)
+logger = logging.getLogger(__name__)
 
 
 def get_args():
@@ -18,12 +28,11 @@ def get_args():
     return parser.parse_args()
 
 
-def main():
-    args = get_args()
+def prepare_data(pg_scores_path: Path, teacher_perf_path: Path) -> pd.DataFrame:
+    """Prepare and merge data from PG scores and teacher performance files."""
+    df_pg = pd.read_json(pg_scores_path, lines=True)
 
-    df_pg = pd.read_json(args.pg_scores_path, lines=True)
-
-    df_teacher = pd.read_json(args.teacher_perf_path, lines=True)
+    df_teacher = pd.read_json(teacher_perf_path, lines=True)
     df_teacher["teacher_model"] = df_teacher["model_name"].str.split("/").str[-1]
 
     df_models = pd.DataFrame([m.model_dump() for m in MODEL_INFORMATION])
@@ -46,56 +55,88 @@ def main():
     df_plot["benchmark_performance"] = df_plot["avg_all"]
     df_plot = df_plot.dropna(subset=["benchmark_performance"])
 
-    print("\n" + "=" * 80)
-    print("ANALYSIS: Does Stronger Mean Better?")
-    print("=" * 80)
-    print(f"\nPG scores file: {args.pg_scores_path}")
-    print(f"Teacher performance file: {args.teacher_perf_path}")
-    print(f"\nTotal models analyzed: {df_plot['teacher_model'].nunique()}")
-    print(f"Total languages: {df_plot['target_lang'].nunique()}")
-    print(f"Total observations: {len(df_plot)}")
+    return df_plot
+
+
+def model_1_scale_only(df_plot: pd.DataFrame):
+    """Fit mixed-effects model with log(model_size) as predictor."""
+    logger.info("=" * 80)
+    logger.info("1. MODEL SCALE → PG-SCORE")
+    logger.info("=" * 80)
+    model = smf.mixedlm(
+        "pg_score ~ log_model_size",
+        df_plot,
+        groups=df_plot["teacher_model"],
+        re_formula="1",
+    )
+    result = model.fit(method="lbfgs")
+    return result
+
+
+def model_2_benchmark_perf_only(df_plot: pd.DataFrame):
+    """Fit mixed-effects model with benchmark_performance as predictor."""
+    logger.info("=" * 80)
+    logger.info("2. BENCHMARK PERFORMANCE (avg_all) → PG-SCORE")
+    logger.info("=" * 80)
+    model = smf.mixedlm(
+        "pg_score ~ benchmark_performance",
+        df_plot,
+        groups=df_plot["teacher_model"],
+        re_formula="1",
+    )
+    result = model.fit(method="lbfgs")
+    return result
+
+
+def model_3_combined(df_plot: pd.DataFrame):
+    """Fit mixed-effects model with both log(model_size) and benchmark_performance."""
+    logger.info("=" * 80)
+    logger.info("3. COMBINED MODEL")
+    logger.info("=" * 80)
+    model = smf.mixedlm(
+        "pg_score ~ log_model_size + benchmark_performance",
+        df_plot,
+        groups=df_plot["teacher_model"],
+        re_formula="1",
+    )
+    result = model.fit(method="lbfgs")
+    return result
+
+
+def report_results(result, predictor: str):
+    """Report the results of a mixed-effects model."""
+    logger.info(f"β = {result.params[predictor]:.4f}, SE = {result.bse[predictor]:.4f}, p = {result.pvalues[predictor]:.4f}")
+
+
+def main():
+    args = get_args()
+
+    # Prepare data
+    df_plot = prepare_data(args.pg_scores_path, args.teacher_perf_path)
+
+    logger.info("=" * 80)
+    logger.info("ANALYSIS: Does Stronger Mean Better?")
+    logger.info("=" * 80)
+    logger.info(f"PG scores file: {args.pg_scores_path}")
+    logger.info(f"Teacher performance file: {args.teacher_perf_path}")
+    logger.info(f"Total models analyzed: {df_plot['teacher_model'].nunique()}")
+    logger.info(f"Total languages: {df_plot['target_lang'].nunique()}")
+    logger.info(f"Total observations: {len(df_plot)}")
 
     # =========================================================================
     # Mixed-Effects Models
     # =========================================================================
 
     # Model 1: Scale only
-    print("\n" + "=" * 80)
-    print("1. MODEL SCALE → PG-SCORE")
-    print("=" * 80)
-    model_size = smf.mixedlm(
-        "pg_score ~ log_model_size",
-        df_plot,
-        groups=df_plot["teacher_model"],
-        re_formula="1",
-    )
-    result_size = model_size.fit(method="lbfgs")
-    print(f"\nβ = {result_size.params['log_model_size']:.4f}, SE = {result_size.bse['log_model_size']:.4f}, p = {result_size.pvalues['log_model_size']:.4f}")  # fmt: skip
+    result_size = model_1_scale_only(df_plot)
+    report_results(result_size, "log_model_size")
 
     # Model 2: Benchmark performance only
-    print("\n" + "=" * 80)
-    print("2. BENCHMARK PERFORMANCE (avg_all) → PG-SCORE")
-    print("=" * 80)
-    model_perf = smf.mixedlm(
-        "pg_score ~ benchmark_performance",
-        df_plot,
-        groups=df_plot["teacher_model"],
-        re_formula="1",
-    )
-    result_perf = model_perf.fit(method="lbfgs")
-    print(f"\nβ = {result_perf.params['benchmark_performance']:.4f}, SE = {result_perf.bse['benchmark_performance']:.4f}, p = {result_perf.pvalues['benchmark_performance']:.4f}")  # fmt: skip
+    result_perf = model_2_benchmark_perf_only(df_plot)
+    report_results(result_perf, "benchmark_performance")
 
     # Model 3: Combined
-    print("\n" + "=" * 80)
-    print("3. COMBINED MODEL")
-    print("=" * 80)
-    model_combined = smf.mixedlm(
-        "pg_score ~ log_model_size + benchmark_performance",
-        df_plot,
-        groups=df_plot["teacher_model"],
-        re_formula="1",
-    )
-    result_combined = model_combined.fit(method="lbfgs")
+    result_combined = model_3_combined(df_plot)
 
     # Create results table as DataFrame
     results_table = pd.DataFrame(
@@ -121,9 +162,9 @@ def main():
     # =========================================================================
     # Summary Statistics
     # =========================================================================
-    print("\n" + "=" * 80)
-    print("4. MODEL SUMMARY")
-    print("=" * 80)
+    logger.info("=" * 80)
+    logger.info("4. MODEL SUMMARY")
+    logger.info("=" * 80)
 
     df_summary = df_plot.groupby(
         ["teacher_model", "beautiful_name", "model_size", "benchmark_performance"],
@@ -138,18 +179,16 @@ def main():
         "Avg PG-Score",
     ]
 
-    print(
-        f"\n{df_summary[['Model', 'Size (B)', 'Benchmark (avg_all)', 'Avg PG-Score']].to_string(index=False)}"
-    )
+    print(f"\n{df_summary[['Model', 'Size (B)', 'Benchmark (avg_all)', 'Avg PG-Score']].to_string(index=False)}")
 
     # Correlation between size and benchmark performance
     size_perf_corr = df_summary["Size (B)"].corr(df_summary["Benchmark (avg_all)"])
-    print(
-        f"\nCorrelation between model size and benchmark performance: r = {size_perf_corr:.3f}"
-    )
+    logger.info(f"Correlation between model size and benchmark performance: r = {size_perf_corr:.3f}")
+    logger.info("=" * 80)
 
-    print("=" * 80 + "\n")
-
+    # =========================================================================
+    # Save results if requested
+    # =========================================================================
     if args.output_path:
         results_data = []
 
@@ -207,7 +246,7 @@ def main():
         df_results = pd.DataFrame(results_data)
         args.output_path.parent.mkdir(parents=True, exist_ok=True)
         df_results.to_csv(args.output_path, index=False)
-        print(f"Saved results to {args.output_path}")
+        logger.info(f"Saved results to {args.output_path}")
 
 
 if __name__ == "__main__":
