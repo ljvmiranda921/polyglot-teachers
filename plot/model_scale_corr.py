@@ -1,8 +1,15 @@
 import argparse
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 from scipy import stats
+
+try:
+    import statsmodels.formula.api as smf
+    HAS_STATSMODELS = True
+except ImportError:
+    HAS_STATSMODELS = False
 
 from plot.utils.metadata import MODEL_INFORMATION
 
@@ -43,6 +50,33 @@ def main():
     df_avg = df_plot.groupby(["teacher_model", "model_size", "beautiful_name"], as_index=False)["pg_score"].mean()  # fmt: skip
     pearson_r_avg, pearson_p_avg = stats.pearsonr(df_avg["model_size"], df_avg["pg_score"])  # fmt: skip
     spearman_r_avg, spearman_p_avg = stats.spearmanr(df_avg["model_size"], df_avg["pg_score"])  # fmt: skip
+
+    # Compute mixed-effects model (if statsmodels available)
+    mixed_model_result = None
+    if HAS_STATSMODELS:
+        # Use log(model_size) for better linearity
+        df_plot["log_model_size"] = np.log(df_plot["model_size"])
+
+        # Mixed model with random intercepts for both model and language
+        # Formula: pg_score ~ log_model_size + (1|teacher_model) + (1|target_lang)
+        try:
+            model = smf.mixedlm(
+                "pg_score ~ log_model_size",
+                df_plot,
+                groups=df_plot["teacher_model"],
+                re_formula="1"
+            )
+            mixed_result = model.fit(method="lbfgs")
+            mixed_model_result = {
+                "coef": mixed_result.params["log_model_size"],
+                "se": mixed_result.bse["log_model_size"],
+                "pvalue": mixed_result.pvalues["log_model_size"],
+                "tvalue": mixed_result.tvalues["log_model_size"],
+                "converged": mixed_result.converged,
+            }
+        except Exception as e:
+            print(f"\nWarning: Mixed model fitting failed: {e}")
+            mixed_model_result = None
 
     # Create results dataframe
     results = pd.DataFrame([
@@ -85,6 +119,23 @@ def main():
     print(f"   N = {len(df_avg)}")
     print(f"   Pearson's r  = {pearson_r_avg:7.4f} (p = {pearson_p_avg:.4e})")
     print(f"   Spearman's rho = {spearman_r_avg:7.4f} (p = {spearman_p_avg:.4e})")
+
+    # Print mixed model results if available
+    if mixed_model_result and mixed_model_result["converged"]:
+        print("\n" + "-"*80)
+        print("3. MIXED-EFFECTS MODEL (random intercepts by model)")
+        print("-"*80)
+        print(f"   Formula: pg_score ~ log(model_size) + (1|teacher_model)")
+        print(f"   Coefficient = {mixed_model_result['coef']:7.4f} (SE = {mixed_model_result['se']:.4f})")
+        print(f"   t-value     = {mixed_model_result['tvalue']:7.4f} (p = {mixed_model_result['pvalue']:.4e})")
+        print(f"   ")
+        print(f"   Interpretation: A 1-unit increase in log(model size)")
+        print(f"   is associated with a {mixed_model_result['coef']:.4f} change in PG-score")
+    elif not HAS_STATSMODELS:
+        print("\n" + "-"*80)
+        print("3. MIXED-EFFECTS MODEL")
+        print("-"*80)
+        print("   Not available (install statsmodels: pip install statsmodels)")
 
     print("\n" + "-"*80)
     print("Model Details:")
