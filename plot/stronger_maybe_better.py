@@ -47,18 +47,32 @@ def main():
     # Model 3: Combined
     logging.info("Model 3: Combined")
     result_combined = model_3_combined(df)
+    breakpoint()
+    report_results(result_combined, "combined")
 
     # Create results table as DataFrame
     results_table = pd.DataFrame(
         [
             {
-                "Predictor": "log(model_size)",
+                "Model": "Scale only",
+                "β": f"{result_size.params['log_model_size']:.3f}",
+                "SE": f"{result_size.bse['log_model_size']:.3f}",
+                "p": f"{result_size.pvalues['log_model_size']:.3f}",
+            },
+            {
+                "Model": "Benchmark only",
+                "β": f"{result_perf.params['benchmark_performance']:.3f}",
+                "SE": f"{result_perf.bse['benchmark_performance']:.3f}",
+                "p": f"{result_perf.pvalues['benchmark_performance']:.3f}",
+            },
+            {
+                "Model": "Combined (size)",
                 "β": f"{result_combined.params['log_model_size']:.3f}",
                 "SE": f"{result_combined.bse['log_model_size']:.3f}",
                 "p": f"{result_combined.pvalues['log_model_size']:.3f}",
             },
             {
-                "Predictor": "benchmark_performance",
+                "Model": "Combined (benchmark)",
                 "β": f"{result_combined.params['benchmark_performance']:.3f}",
                 "SE": f"{result_combined.bse['benchmark_performance']:.3f}",
                 "p": f"{result_combined.pvalues['benchmark_performance']:.3f}",
