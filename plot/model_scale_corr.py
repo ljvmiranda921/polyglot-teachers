@@ -77,14 +77,14 @@ def main():
     print("-"*80)
     print(f"   N = {len(df_plot)}")
     print(f"   Pearson's r  = {pearson_r:7.4f} (p = {pearson_p:.4e})")
-    print(f"   Spearman's Á = {spearman_r:7.4f} (p = {spearman_p:.4e})")
+    print(f"   Spearman's rho = {spearman_r:7.4f} (p = {spearman_p:.4e})")
 
     print("\n" + "-"*80)
     print("2. MODEL AVERAGES (averaged across languages)")
     print("-"*80)
     print(f"   N = {len(df_avg)}")
     print(f"   Pearson's r  = {pearson_r_avg:7.4f} (p = {pearson_p_avg:.4e})")
-    print(f"   Spearman's Á = {spearman_r_avg:7.4f} (p = {spearman_p_avg:.4e})")
+    print(f"   Spearman's rho = {spearman_r_avg:7.4f} (p = {spearman_p_avg:.4e})")
 
     print("\n" + "-"*80)
     print("Model Details:")
