@@ -3,7 +3,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from scipy import stats
 import statsmodels.formula.api as smf
 
 from plot.utils.metadata import MODEL_INFORMATION
@@ -161,59 +160,56 @@ def main():
     if args.output_path:
         results_data = []
 
-        if result_size:
-            results_data.append(
-                {
-                    "model": "scale_only",
-                    "predictor": "log_model_size",
-                    "beta": result_size.params["log_model_size"],
-                    "se": result_size.bse["log_model_size"],
-                    "t": result_size.tvalues["log_model_size"],
-                    "p": result_size.pvalues["log_model_size"],
-                    "aic": result_size.aic,
-                    "bic": result_size.bic,
-                }
-            )
+        results_data.append(
+            {
+                "model": "scale_only",
+                "predictor": "log_model_size",
+                "beta": result_size.params["log_model_size"],
+                "se": result_size.bse["log_model_size"],
+                "t": result_size.tvalues["log_model_size"],
+                "p": result_size.pvalues["log_model_size"],
+                "aic": result_size.aic,
+                "bic": result_size.bic,
+            }
+        )
 
-        if result_perf:
-            results_data.append(
-                {
-                    "model": "performance_only",
-                    "predictor": "benchmark_performance",
-                    "beta": result_perf.params["benchmark_performance"],
-                    "se": result_perf.bse["benchmark_performance"],
-                    "t": result_perf.tvalues["benchmark_performance"],
-                    "p": result_perf.pvalues["benchmark_performance"],
-                    "aic": result_perf.aic,
-                    "bic": result_perf.bic,
-                }
-            )
+        results_data.append(
+            {
+                "model": "performance_only",
+                "predictor": "benchmark_performance",
+                "beta": result_perf.params["benchmark_performance"],
+                "se": result_perf.bse["benchmark_performance"],
+                "t": result_perf.tvalues["benchmark_performance"],
+                "p": result_perf.pvalues["benchmark_performance"],
+                "aic": result_perf.aic,
+                "bic": result_perf.bic,
+            }
+        )
 
-        if result_combined:
-            results_data.append(
-                {
-                    "model": "combined",
-                    "predictor": "log_model_size",
-                    "beta": result_combined.params["log_model_size"],
-                    "se": result_combined.bse["log_model_size"],
-                    "t": result_combined.tvalues["log_model_size"],
-                    "p": result_combined.pvalues["log_model_size"],
-                    "aic": result_combined.aic,
-                    "bic": result_combined.bic,
-                }
-            )
-            results_data.append(
-                {
-                    "model": "combined",
-                    "predictor": "benchmark_performance",
-                    "beta": result_combined.params["benchmark_performance"],
-                    "se": result_combined.bse["benchmark_performance"],
-                    "t": result_combined.tvalues["benchmark_performance"],
-                    "p": result_combined.pvalues["benchmark_performance"],
-                    "aic": result_combined.aic,
-                    "bic": result_combined.bic,
-                }
-            )
+        results_data.append(
+            {
+                "model": "combined",
+                "predictor": "log_model_size",
+                "beta": result_combined.params["log_model_size"],
+                "se": result_combined.bse["log_model_size"],
+                "t": result_combined.tvalues["log_model_size"],
+                "p": result_combined.pvalues["log_model_size"],
+                "aic": result_combined.aic,
+                "bic": result_combined.bic,
+            }
+        )
+        results_data.append(
+            {
+                "model": "combined",
+                "predictor": "benchmark_performance",
+                "beta": result_combined.params["benchmark_performance"],
+                "se": result_combined.bse["benchmark_performance"],
+                "t": result_combined.tvalues["benchmark_performance"],
+                "p": result_combined.pvalues["benchmark_performance"],
+                "aic": result_combined.aic,
+                "bic": result_combined.bic,
+            }
+        )
 
         df_results = pd.DataFrame(results_data)
         args.output_path.parent.mkdir(parents=True, exist_ok=True)
