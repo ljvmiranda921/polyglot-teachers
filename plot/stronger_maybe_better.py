@@ -70,9 +70,7 @@ def main():
         re_formula="1",
     )
     result_size = model_size.fit(method="lbfgs")
-    print(
-        f"\nβ = {result_size.params['log_model_size']:.4f}, SE = {result_size.bse['log_model_size']:.4f}, p = {result_size.pvalues['log_model_size']:.4f}"
-    )
+    print(f"\nβ = {result_size.params['log_model_size']:.4f}, SE = {result_size.bse['log_model_size']:.4f}, p = {result_size.pvalues['log_model_size']:.4f}")  # fmt: skip
 
     # Model 2: Benchmark performance only
     print("\n" + "=" * 80)
@@ -85,9 +83,7 @@ def main():
         re_formula="1",
     )
     result_perf = model_perf.fit(method="lbfgs")
-    print(
-        f"\nβ = {result_perf.params['benchmark_performance']:.4f}, SE = {result_perf.bse['benchmark_performance']:.4f}, p = {result_perf.pvalues['benchmark_performance']:.4f}"
-    )
+    print(f"\nβ = {result_perf.params['benchmark_performance']:.4f}, SE = {result_perf.bse['benchmark_performance']:.4f}, p = {result_perf.pvalues['benchmark_performance']:.4f}")  # fmt: skip
 
     # Model 3: Combined
     print("\n" + "=" * 80)
@@ -154,9 +150,6 @@ def main():
 
     print("=" * 80 + "\n")
 
-    # =========================================================================
-    # Save results if requested
-    # =========================================================================
     if args.output_path:
         results_data = []
 
