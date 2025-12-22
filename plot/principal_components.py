@@ -159,14 +159,9 @@ def main():
     # Plot loading factors heatmap
     heatmap_path = OUTPUT_DIR / "pca_loading_factors.pdf"
     plot_loading_factors_heatmap(pca, feature_cols, n_components, heatmap_path)
-
     # Plot predicted vs actual for best model
-    pred_vs_actual_path = (
-        OUTPUT_DIR / f"pca_predicted_vs_actual_{best_model_name.lower()}.pdf"
-    )
-    plot_predicted_vs_actual(
-        y, y_pred, r2, best_model_name, pred_vs_actual_path, df["target_lang"]
-    )
+    pred_vs_actual_path = OUTPUT_DIR / f"pca_predicted_vs_actual_{best_model_name.lower()}.pdf"  # fmt: skip
+    plot_predicted_vs_actual(y, y_pred, r2, best_model_name, pred_vs_actual_path, df["target_lang"])  # fmt: skip
 
     if args.output_path:
         results = {
