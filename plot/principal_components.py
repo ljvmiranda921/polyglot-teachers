@@ -178,7 +178,7 @@ def plot_loading_factors_heatmap(pca, feature_names, n_components, output_path):
         [COLORS["dark_cherry"], COLORS["white"], COLORS["dark_blue"]],
     )
 
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(10, 6))
 
     sns.heatmap(
         loadings_df,
