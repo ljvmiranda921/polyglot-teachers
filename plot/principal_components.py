@@ -37,7 +37,6 @@ def main():
     logging.info(
         f"Loaded {len(df)} samples with both intrinsic metrics and benchmark scores"
     )
-    breakpoint()
 
     feature_cols = [
         "prompts_distinct_ri",
@@ -68,7 +67,7 @@ def main():
     y_pred = model.predict(X_pca)
     r2 = r2_score(y, y_pred)
 
-    logging.info(f"R² score: {r2:.4f}")
+    logging.info(f"R^2 score: {r2:.4f}")
     logging.info(f"Model coefficients: {model.coef_}")
     logging.info(f"Model intercept: {model.intercept_:.4f}")
 
