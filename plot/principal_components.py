@@ -8,8 +8,8 @@ import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import r2_score
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.metrics import r2_score, mean_squared_error
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -62,14 +62,31 @@ def main():
         f"Cumulative explained variance: {np.cumsum(pca.explained_variance_ratio_)}"
     )
 
-    model = LinearRegression()
-    model.fit(X_pca, y)
-    y_pred = model.predict(X_pca)
-    r2 = r2_score(y, y_pred)
+    models = {
+        "Linear": LinearRegression(),
+        "Ridge": Ridge(alpha=1.0),
+        "Lasso": Lasso(alpha=0.1),
+    }
 
-    logging.info(f"R^2 score: {r2:.4f}")
-    logging.info(f"Model coefficients: {model.coef_}")
-    logging.info(f"Model intercept: {model.intercept_:.4f}")
+    results = {}
+    for name, model in models.items():
+        model.fit(X_pca, y)
+        y_pred = model.predict(X_pca)
+        r2 = r2_score(y, y_pred)
+        rmse = np.sqrt(mean_squared_error(y, y_pred))
+        results[name] = {
+            "model": model,
+            "r2": r2,
+            "rmse": rmse,
+            "y_pred": y_pred,
+        }
+        logging.info(f"{name} - R²: {r2:.4f}, RMSE: {rmse:.4f}")
+
+    best_model_name = max(results, key=lambda k: results[k]["r2"])
+    model = results[best_model_name]["model"]
+    r2 = results[best_model_name]["r2"]
+    y_pred = results[best_model_name]["y_pred"]
+    logging.info(f"Best model: {best_model_name}")
 
     print("\n=== PCA Components ===")
     components_df = pd.DataFrame(
@@ -79,12 +96,21 @@ def main():
     )
     print(components_df.to_string())
 
-    print(f"\n=== Regression Results ===")
-    print(f"R^2 score: {r2:.4f}")
-    print(f"Intercept: {model.intercept_:.4f}")
-    print("\nCoefficients:")
-    for i, coef in enumerate(model.coef_):
-        print(f"  PC{i+1}: {coef:.4f}")
+    print(f"\n=== Model Comparison ===")
+    comparison_df = pd.DataFrame([
+        {"Model": name, "R^2": res["r2"], "RMSE": res["rmse"]}
+        for name, res in results.items()
+    ]).sort_values("R^2", ascending=False)
+    print(comparison_df.to_string(index=False))
+
+    for model_name, res in results.items():
+        print(f"\n=== {model_name} Regression ===")
+        print(f"R^2 score: {res['r2']:.4f}")
+        print(f"RMSE: {res['rmse']:.4f}")
+        print(f"Intercept: {res['model'].intercept_:.4f}")
+        print("\nCoefficients:")
+        for i, coef in enumerate(res['model'].coef_):
+            print(f"  PC{i+1}: {coef:.4f}")
 
     print(f"\n=== Explained Variance ===")
     variance_df = pd.DataFrame(
