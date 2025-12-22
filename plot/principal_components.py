@@ -140,7 +140,12 @@ def load_intrinsic_metrics(intrinsic_dir: Path) -> pd.DataFrame:
             continue
 
         dataset_lang = parts[0].split("-")[-1]
-        teacher_model = "_".join(parts[1:-2])
+        teacher_model_full = "_".join(parts[1:-2])
+
+        if "__" in teacher_model_full:
+            teacher_model = teacher_model_full.split("__", 1)[1]
+        else:
+            teacher_model = teacher_model_full
 
         with open(json_file) as f:
             data = json.load(f)
@@ -148,32 +153,23 @@ def load_intrinsic_metrics(intrinsic_dir: Path) -> pd.DataFrame:
         record = {
             "teacher_model": teacher_model,
             "target_lang": dataset_lang,
-        }
-
-        if "distinct_ri" in data:
-            record["prompts_distinct_ri"] = data["distinct_ri"].get(
+            "prompts_distinct_ri": data.get("distinct_ri", {}).get(
                 "prompts_distinct_ri"
-            )
-            record["responses_distinct_ri"] = data["distinct_ri"].get(
+            ),
+            "responses_distinct_ri": data.get("distinct_ri", {}).get(
                 "responses_distinct_ri"
-            )
-
-        if "perplexity" in data:
-            record["average_perplexity"] = data["perplexity"].get("average_perplexity")
-
-        if "reward_model" in data:
-            record["average_rubric_score"] = data["reward_model"].get(
+            ),
+            "average_perplexity": data.get("perplexity", {}).get("average_perplexity"),
+            "average_rubric_score": data.get("reward_model", {}).get(
                 "average_rubric_score"
-            )
-
-        if "length" in data:
-            record["prompts_average_length"] = data["length"].get(
+            ),
+            "prompts_average_length": data.get("length", {}).get(
                 "prompts_average_length"
-            )
-            record["responses_average_length"] = data["length"].get(
+            ),
+            "responses_average_length": data.get("length", {}).get(
                 "responses_average_length"
-            )
-
+            ),
+        }
         records.append(record)
 
     df = pd.DataFrame(records)
