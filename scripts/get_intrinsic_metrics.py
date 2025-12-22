@@ -29,6 +29,7 @@ def get_intrinsic_metrics():
         "distinct_ri": _compute_distinct_ri,
         "perplexity": _compute_perplexity,
         "reward_model": _compute_rubric_score,
+        "length": _compute_output_length,
     }
 
 
@@ -45,6 +46,7 @@ def get_args():
     parser.add_argument("--input_dataset_filter", type=str, default=None, help="JSON string representing a filter to apply to the input dataset before finetuning. The keys should be the field names and the values should be the values to filter by. This is an AND operation.")
     parser.add_argument("--apply_subsampling", action="store_true", default=False, help="Whether to apply subsampling to the dataset before computing metrics. This is to ensure that the number of samples per strategy is roughly the same.")
     parser.add_argument("--overwrite", action="store_true", default=False, help="Whether to overwrite the output file if it already exists.")
+    parser.add_argument("--sleep_time", type=int, default=120, help="Time to sleep (in seconds) between metric computations to allow GPU memory to be released.")
     # fmt: on
     return parser.parse_args()
 
@@ -117,8 +119,8 @@ def main():
         )
         time_elapsed = time.time() - start_time
         logging.info(f"Done processing: {metric} (time elapsed={_get_human_time(time_elapsed)})")  # fmt: skip
-        # Sleep for 2 minutes to let vLLM release GPU memory
-        time.sleep(120)
+        # Sleep for specified time to let vLLM release GPU memory
+        time.sleep(args.sleep_time)
 
 
 def _get_human_time(seconds: float) -> str:
@@ -598,6 +600,50 @@ def _compute_rubric_score(
         "language": language,
         "model": model_name,
         "provider": provider,
+    }
+
+    return metrics
+
+
+def _compute_output_length(
+    dataset: "Dataset",
+    dry_run: bool = False,
+    *,
+    tokenizer: str = "allenai/Olmo-3-1025-7B",
+    use_tiktoken: bool = False,
+) -> dict[str, float]:
+    """Compute the average output length in tokens."""
+    from transformers import AutoTokenizer
+
+    if "prompt" not in dataset.column_names or "response" not in dataset.column_names:
+        raise ValueError("Dataset must contain 'prompt' and 'response' fields!")
+
+    prompts = dataset["prompt"]
+    responses = dataset["response"]
+
+    if use_tiktoken:
+        import tiktoken
+
+        enc = tiktoken.get_encoding(tokenizer)
+
+        def _count_tokens(text: str) -> int:
+            return len(enc.encode(text))
+
+    else:
+        hf_tokenizer = AutoTokenizer.from_pretrained(tokenizer)
+
+        def _count_tokens(text: str) -> int:
+            return len(hf_tokenizer.encode(text, add_special_tokens=False))
+
+    metrics = {}
+    for k, texts in {"prompts": prompts, "responses": responses}.items():
+        lengths = [_count_tokens(text) for text in texts]
+        average_length = sum(lengths) / len(lengths)
+        metrics[f"{k}_average_length"] = average_length
+
+    metrics["metadata"] = {
+        "tokenizer": tokenizer,
+        "use_tiktoken": use_tiktoken,
     }
 
     return metrics
