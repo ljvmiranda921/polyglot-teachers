@@ -29,6 +29,7 @@ def get_intrinsic_metrics():
         "distinct_ri": _compute_distinct_ri,
         "perplexity": _compute_perplexity,
         "reward_model": _compute_rubric_score,
+        "length": _compute_output_length,
     }
 
 
@@ -598,6 +599,49 @@ def _compute_rubric_score(
         "language": language,
         "model": model_name,
         "provider": provider,
+    }
+
+    return metrics
+
+
+def _compute_output_length(
+    dataset: "Dataset",
+    *,
+    tokenizer: str = "allenai/Olmo-3-1025-7B",
+    use_tiktoken: bool = False,
+) -> dict[str, float]:
+    """Compute the average output length in tokens."""
+    from transformers import AutoTokenizer
+
+    if "prompt" not in dataset.column_names or "response" not in dataset.column_names:
+        raise ValueError("Dataset must contain 'prompt' and 'response' fields!")
+
+    prompts = dataset["prompt"]
+    responses = dataset["response"]
+
+    if use_tiktoken:
+        import tiktoken
+
+        enc = tiktoken.get_encoding(tokenizer)
+
+        def _count_tokens(text: str) -> int:
+            return len(enc.encode(text))
+
+    else:
+        hf_tokenizer = AutoTokenizer.from_pretrained(tokenizer)
+
+        def _count_tokens(text: str) -> int:
+            return len(hf_tokenizer.encode(text, add_special_tokens=False))
+
+    metrics = {}
+    for k, texts in {"prompts": prompts, "responses": responses}.items():
+        lengths = [_count_tokens(text) for text in texts]
+        average_length = sum(lengths) / len(lengths)
+        metrics[f"{k}_average_length"] = average_length
+
+    metrics["metadata"] = {
+        "tokenizer": tokenizer,
+        "use_tiktoken": use_tiktoken,
     }
 
     return metrics
