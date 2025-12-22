@@ -34,6 +34,22 @@ FEATURE_NAMES = {
     "responses_average_length": "Avg. Response\nLength",
 }
 
+LANGUAGE_NAMES = {
+    "ar": "Arabic",
+    "de": "German",
+    "es": "Spanish",
+    "fr": "French",
+    "hi": "Hindi",
+    "it": "Italian",
+    "ja": "Japanese",
+    "ko": "Korean",
+    "pt": "Portuguese",
+    "ru": "Russian",
+    "th": "Thai",
+    "tr": "Turkish",
+    "zh": "Chinese",
+}
+
 
 def get_args():
     # fmt: off
@@ -148,7 +164,9 @@ def main():
     pred_vs_actual_path = (
         OUTPUT_DIR / f"pca_predicted_vs_actual_{best_model_name.lower()}.pdf"
     )
-    plot_predicted_vs_actual(y, y_pred, r2, best_model_name, pred_vs_actual_path, df["target_lang"])
+    plot_predicted_vs_actual(
+        y, y_pred, r2, best_model_name, pred_vs_actual_path, df["target_lang"]
+    )
 
     if args.output_path:
         results = {
@@ -168,38 +186,35 @@ def main():
         logging.info(f"Saved results to {args.output_path}")
 
 
-def plot_predicted_vs_actual(y_true, y_pred, r2, model_name, output_path, languages=None):
+def plot_predicted_vs_actual(
+    y_true, y_pred, r2, model_name, output_path, languages=None
+):
     fig, ax = plt.subplots(figsize=(8, 8))
 
     # Color by language if provided
-    if languages is not None:
-        unique_langs = sorted(languages.unique())
-        colors = [COLORS["warm_blue"], COLORS["warm_green"], COLORS["warm_cherry"],
-                  COLORS["warm_purple"], COLORS["warm_indigo"], COLORS["warm_crest"]]
-        lang_colors = {lang: colors[i % len(colors)] for i, lang in enumerate(unique_langs)}
+    unique_langs = sorted(languages.unique())
+    colors = [
+        COLORS["warm_blue"],
+        COLORS["warm_green"],
+        COLORS["warm_cherry"],
+        COLORS["warm_purple"],
+        COLORS["warm_indigo"],
+        COLORS["warm_crest"],
+    ]
+    lang_colors = {lang: colors[i % len(colors)] for i, lang in enumerate(unique_langs)}
 
-        for lang in unique_langs:
-            mask = languages == lang
-            ax.scatter(
-                y_true[mask],
-                y_pred[mask],
-                alpha=0.6,
-                s=100,
-                color=lang_colors[lang],
-                edgecolors=COLORS["dark_blue"],
-                linewidth=1.5,
-                label=lang,
-            )
-    else:
-        # Single color if no language info
+    for lang in unique_langs:
+        mask = languages == lang
+        lang_label = LANGUAGE_NAMES.get(lang, lang)
         ax.scatter(
-            y_true,
-            y_pred,
+            y_true[mask],
+            y_pred[mask],
             alpha=0.6,
             s=100,
-            color=COLORS["warm_blue"],
+            color=lang_colors[lang],
             edgecolors=COLORS["dark_blue"],
             linewidth=1.5,
+            label=lang_label,
         )
 
     # Perfect prediction line (y=x)
@@ -211,33 +226,44 @@ def plot_predicted_vs_actual(y_true, y_pred, r2, model_name, output_path, langua
         "--",
         color=COLORS["slate_3"],
         linewidth=2,
-        label="Perfect Prediction",
     )
 
-    # Labels and title
     ax.set_xlabel("Actual Benchmark Score")
     ax.set_ylabel("Predicted Benchmark Score")
-
-    # Grid
     ax.grid(True, alpha=0.3, linestyle=":", linewidth=0.5)
+    ax.legend(
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.12),
+        frameon=True,
+        fancybox=True,
+        shadow=False,
+        ncol=4,
+    )
 
-    # Legend - only show if we have language colors
-    if languages is not None:
-        ax.legend(loc="upper left", frameon=True, fancybox=True, shadow=False, ncol=2)
-
-    # Add R² annotation box
-    textstr = f'$R^2 = {r2:.3f}$'
-    props = dict(boxstyle='round', facecolor=COLORS["white"], edgecolor=COLORS["slate_3"], alpha=0.9, linewidth=1.5)
-    ax.text(0.95, 0.05, textstr, transform=ax.transAxes, fontsize=18,
-            verticalalignment='bottom', horizontalalignment='right', bbox=props)
+    # Report R^2
+    textstr = f"$R^2 = {r2:.3f}$"
+    props = dict(
+        boxstyle="round",
+        facecolor=COLORS["white"],
+        edgecolor=COLORS["slate_3"],
+        alpha=0.9,
+        linewidth=1.5,
+    )
+    ax.text(
+        0.95,
+        0.05,
+        textstr,
+        transform=ax.transAxes,
+        fontsize=18,
+        verticalalignment="bottom",
+        horizontalalignment="right",
+        bbox=props,
+    )
 
     ax.set_aspect("equal", adjustable="box")
-
     plt.tight_layout()
-
     output_path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_path, format="pdf", bbox_inches="tight")
-
     logging.info(f"Saved predicted vs actual plot to {output_path}")
 
 
@@ -274,15 +300,10 @@ def plot_loading_factors_heatmap(pca, feature_names, n_components, output_path):
         ax=ax,
     )
 
-    # Adjust y-axis labels alignment
     ax.set_yticklabels(ax.get_yticklabels(), rotation=0, ha="right", va="center")
-
     plt.tight_layout()
-
     output_path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_path, format="pdf", bbox_inches="tight")
-    plt.close()
-
     logging.info(f"Saved loading factors heatmap to {output_path}")
 
 
