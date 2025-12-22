@@ -606,6 +606,7 @@ def _compute_rubric_score(
 
 def _compute_output_length(
     dataset: "Dataset",
+    dry_run: bool = False,
     *,
     tokenizer: str = "allenai/Olmo-3-1025-7B",
     use_tiktoken: bool = False,
