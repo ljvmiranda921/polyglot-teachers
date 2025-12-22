@@ -58,3 +58,11 @@ python -m scripts.get_intrinsic_metrics --input_dataset ljvmiranda921/msde-S1-${
     --metric_params "$METRIC_PARAMS" \
     --input_dataset_filter "$INPUT_FILTER" \
     --apply_subsampling
+
+# Run length metric
+python -m scripts.get_intrinsic_metrics --input_dataset ljvmiranda921/msde-S1-${LANGUAGE} \
+    --metrics length \
+    --output_path "$OUTPUT_PATH" \
+    --metric_params "$METRIC_PARAMS" \
+    --input_dataset_filter "$INPUT_FILTER" \
+    --apply_subsampling
