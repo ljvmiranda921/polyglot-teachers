@@ -148,7 +148,7 @@ def main():
     pred_vs_actual_path = (
         OUTPUT_DIR / f"pca_predicted_vs_actual_{best_model_name.lower()}.pdf"
     )
-    plot_predicted_vs_actual(y, y_pred, r2, best_model_name, pred_vs_actual_path)
+    plot_predicted_vs_actual(y, y_pred, r2, best_model_name, pred_vs_actual_path, df["target_lang"])
 
     if args.output_path:
         results = {
@@ -168,19 +168,39 @@ def main():
         logging.info(f"Saved results to {args.output_path}")
 
 
-def plot_predicted_vs_actual(y_true, y_pred, r2, model_name, output_path):
+def plot_predicted_vs_actual(y_true, y_pred, r2, model_name, output_path, languages=None):
     fig, ax = plt.subplots(figsize=(8, 8))
 
-    # Scatter plot
-    ax.scatter(
-        y_true,
-        y_pred,
-        alpha=0.6,
-        s=100,
-        color=COLORS["warm_blue"],
-        edgecolors=COLORS["dark_blue"],
-        linewidth=1.5,
-    )
+    # Color by language if provided
+    if languages is not None:
+        unique_langs = sorted(languages.unique())
+        colors = [COLORS["warm_blue"], COLORS["warm_green"], COLORS["warm_cherry"],
+                  COLORS["warm_purple"], COLORS["warm_indigo"], COLORS["warm_crest"]]
+        lang_colors = {lang: colors[i % len(colors)] for i, lang in enumerate(unique_langs)}
+
+        for lang in unique_langs:
+            mask = languages == lang
+            ax.scatter(
+                y_true[mask],
+                y_pred[mask],
+                alpha=0.6,
+                s=100,
+                color=lang_colors[lang],
+                edgecolors=COLORS["dark_blue"],
+                linewidth=1.5,
+                label=lang,
+            )
+    else:
+        # Single color if no language info
+        ax.scatter(
+            y_true,
+            y_pred,
+            alpha=0.6,
+            s=100,
+            color=COLORS["warm_blue"],
+            edgecolors=COLORS["dark_blue"],
+            linewidth=1.5,
+        )
 
     # Perfect prediction line (y=x)
     min_val = min(y_true.min(), y_pred.min())
@@ -200,7 +220,10 @@ def plot_predicted_vs_actual(y_true, y_pred, r2, model_name, output_path):
 
     # Grid
     ax.grid(True, alpha=0.3, linestyle=":", linewidth=0.5)
-    ax.legend(loc="upper left")
+
+    # Legend - only show if we have language colors
+    if languages is not None:
+        ax.legend(loc="upper left", frameon=True, fancybox=True, shadow=False, ncol=2)
 
     # Add R² annotation box
     textstr = f'$R^2 = {r2:.3f}$'
