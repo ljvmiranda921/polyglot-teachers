@@ -47,8 +47,11 @@ def main():
     # Model 3: Combined
     logging.info("Model 3: Combined")
     result_combined = model_3_combined(df)
-    breakpoint()
-    report_results(result_combined, "combined")
+    # report_results(result_combined, "combined")
+
+    # Model 4: Language-specific analysis
+    logging.info("Model 4: Language-specific")
+    results_lang_specific = model_4_language_specific(df)
 
     # Create results table as DataFrame
     results_table = pd.DataFrame(
@@ -82,6 +85,31 @@ def main():
 
     # Print markdown table
     print("\n" + results_table.to_markdown(index=False))
+
+    # Print language-specific results table
+    lang_results_table = pd.DataFrame(
+        [
+            {
+                "Language": "German (de)",
+                "β": f"{results_lang_specific['de'].params['lang_benchmark_performance']:.3f}",
+                "SE": f"{results_lang_specific['de'].bse['lang_benchmark_performance']:.3f}",
+                "p": f"{results_lang_specific['de'].pvalues['lang_benchmark_performance']:.3f}",
+            },
+            {
+                "Language": "Spanish (es)",
+                "β": f"{results_lang_specific['es'].params['lang_benchmark_performance']:.3f}",
+                "SE": f"{results_lang_specific['es'].bse['lang_benchmark_performance']:.3f}",
+                "p": f"{results_lang_specific['es'].pvalues['lang_benchmark_performance']:.3f}",
+            },
+            {
+                "Language": "Japanese (ja)",
+                "β": f"{results_lang_specific['ja'].params['lang_benchmark_performance']:.3f}",
+                "SE": f"{results_lang_specific['ja'].bse['lang_benchmark_performance']:.3f}",
+                "p": f"{results_lang_specific['ja'].pvalues['lang_benchmark_performance']:.3f}",
+            },
+        ]
+    )
+    print("\n" + lang_results_table.to_markdown(index=False))
 
     # Summary statistics
     df_summary = df.groupby(
@@ -147,6 +175,25 @@ def main():
                 "bic": result_combined.bic,
             }
         )
+        for lang in ["de", "es", "ja"]:
+            results_data.append(
+                {
+                    "model": f"lang_specific_{lang}",
+                    "predictor": "lang_benchmark_performance",
+                    "beta": results_lang_specific[lang].params[
+                        "lang_benchmark_performance"
+                    ],
+                    "se": results_lang_specific[lang].bse["lang_benchmark_performance"],
+                    "t": results_lang_specific[lang].tvalues[
+                        "lang_benchmark_performance"
+                    ],
+                    "p": results_lang_specific[lang].pvalues[
+                        "lang_benchmark_performance"
+                    ],
+                    "aic": results_lang_specific[lang].aic,
+                    "bic": results_lang_specific[lang].bic,
+                }
+            )
         df_results = pd.DataFrame(results_data)
         args.output_path.parent.mkdir(parents=True, exist_ok=True)
         df_results.to_csv(args.output_path, index=False)
@@ -168,7 +215,7 @@ def prepare_data(pg_scores_path: Path, teacher_perf_path: Path) -> pd.DataFrame:
         on="teacher_model",
         how="left",
     ).merge(
-        df_teacher[["teacher_model", "avg_all"]],
+        df_teacher[["teacher_model", "avg_all", "avg_de", "avg_es", "avg_ja"]],
         on="teacher_model",
         how="left",
     )
@@ -214,6 +261,29 @@ def model_3_combined(df_plot: pd.DataFrame):
         re_formula="1",
     )
     return model.fit(method="lbfgs")
+
+
+def model_4_language_specific(df_plot: pd.DataFrame):
+    """Fit mixed-effects models for each language separately using language-specific benchmark performance."""
+    results = {}
+    for lang in ["de", "es", "ja"]:
+        df_lang = df_plot[df_plot["target_lang"] == lang].copy()
+        df_lang["lang_benchmark_performance"] = df_lang[f"avg_{lang}"]
+
+        model = smf.mixedlm(
+            "pg_score ~ lang_benchmark_performance",
+            df_lang,
+            groups=df_lang["teacher_model"],
+            re_formula="1",
+        )
+        result = model.fit(method="lbfgs")
+        results[lang] = result
+
+        logging.info(
+            f"{lang.upper()}: β = {result.params['lang_benchmark_performance']:.4f}, SE = {result.bse['lang_benchmark_performance']:.4f}, p = {result.pvalues['lang_benchmark_performance']:.4f}"
+        )
+
+    return results
 
 
 def report_results(result, predictor: str):
