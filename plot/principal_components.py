@@ -25,6 +25,15 @@ logging.basicConfig(
 
 plt.rcParams.update(PLOT_PARAMS)
 
+FEATURE_NAMES = {
+    "prompts_distinct_ri": "Distinct Prompts",
+    "responses_distinct_ri": "Distinct Responses",
+    "average_perplexity": "Perplexity",
+    "average_rubric_score": "Rubric Score (M-Prometheus)",
+    "prompts_average_length": "Avg. Prompt Length",
+    "responses_average_length": "Avg. Response Length",
+}
+
 
 def get_args():
     # fmt: off
