@@ -46,6 +46,7 @@ def get_args():
     parser.add_argument("--input_dataset_filter", type=str, default=None, help="JSON string representing a filter to apply to the input dataset before finetuning. The keys should be the field names and the values should be the values to filter by. This is an AND operation.")
     parser.add_argument("--apply_subsampling", action="store_true", default=False, help="Whether to apply subsampling to the dataset before computing metrics. This is to ensure that the number of samples per strategy is roughly the same.")
     parser.add_argument("--overwrite", action="store_true", default=False, help="Whether to overwrite the output file if it already exists.")
+    parser.add_argument("--sleep_time", type=int, default=120, help="Time to sleep (in seconds) between metric computations to allow GPU memory to be released.")
     # fmt: on
     return parser.parse_args()
 
@@ -118,8 +119,8 @@ def main():
         )
         time_elapsed = time.time() - start_time
         logging.info(f"Done processing: {metric} (time elapsed={_get_human_time(time_elapsed)})")  # fmt: skip
-        # Sleep for 2 minutes to let vLLM release GPU memory
-        time.sleep(120)
+        # Sleep for specified time to let vLLM release GPU memory
+        time.sleep(args.sleep_time)
 
 
 def _get_human_time(seconds: float) -> str:
