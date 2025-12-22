@@ -48,7 +48,7 @@ def get_args():
     # fmt: off
     parser = argparse.ArgumentParser(description="PCA analysis on intrinsic metrics to predict benchmark performance")
     parser.add_argument("--intrinsic_dir", type=Path, required=True, help="Directory containing intrinsic metrics JSON files (e.g., data/csd3/)")
-    parser.add_argument("--benchmark_path", type=Path, required=True, help="JSONL file with benchmark scores. Must contain `teacher_model`, `target_lang`, and `pg_score`.")
+    parser.add_argument("--benchmark_path", type=Path, required=True, help="JSONL file with benchmark scores. Must contain `teacher_model`, `target_lang`, and `result`.")
     parser.add_argument("--n_components", type=int, default=None, help="Number of principal components to use. If not specified, uses all components.")
     parser.add_argument("--output_path", type=Path, default=None, help="Path to save results (CSV). If not provided, results are printed to stdout.")
     # fmt: on
@@ -72,7 +72,7 @@ def main():
         "responses_average_length",
     ]
     X = df[feature_cols].values
-    y = df["pg_score"].values
+    y = df["result"].values
 
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
@@ -298,7 +298,7 @@ def prepare_dataframe(intrinsic_dir: Path, benchmark_path: Path) -> pd.DataFrame
     df_benchmark = pd.read_json(benchmark_path, lines=True)
 
     df = df_intrinsic.merge(
-        df_benchmark[["teacher_model", "target_lang", "pg_score"]],
+        df_benchmark[["teacher_model", "target_lang", "result"]],
         on=["teacher_model", "target_lang"],
         how="inner",
     )
