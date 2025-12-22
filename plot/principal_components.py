@@ -144,6 +144,12 @@ def main():
     heatmap_path = OUTPUT_DIR / "pca_loading_factors.pdf"
     plot_loading_factors_heatmap(pca, feature_cols, n_components, heatmap_path)
 
+    # Plot predicted vs actual for best model
+    pred_vs_actual_path = (
+        OUTPUT_DIR / f"pca_predicted_vs_actual_{best_model_name.lower()}.pdf"
+    )
+    plot_predicted_vs_actual(y, y_pred, r2, best_model_name, pred_vs_actual_path)
+
     if args.output_path:
         results = {
             "n_components": n_components,
@@ -160,6 +166,49 @@ def main():
         with open(args.output_path, "w") as f:
             json.dump(results, f, indent=2)
         logging.info(f"Saved results to {args.output_path}")
+
+
+def plot_predicted_vs_actual(y_true, y_pred, r2, model_name, output_path):
+    fig, ax = plt.subplots(figsize=(8, 8))
+
+    # Scatter plot
+    ax.scatter(
+        y_true,
+        y_pred,
+        alpha=0.6,
+        s=100,
+        color=COLORS["warm_blue"],
+        edgecolors=COLORS["dark_blue"],
+        linewidth=1.5,
+    )
+
+    # Perfect prediction line (y=x)
+    min_val = min(y_true.min(), y_pred.min())
+    max_val = max(y_true.max(), y_pred.max())
+    ax.plot(
+        [min_val, max_val],
+        [min_val, max_val],
+        "--",
+        color=COLORS["slate_3"],
+        linewidth=2,
+        label="Perfect Prediction",
+    )
+
+    # Labels and title
+    ax.set_xlabel("Actual Benchmark Score")
+    ax.set_ylabel("Predicted Benchmark Score")
+
+    # Grid
+    ax.grid(True, alpha=0.3, linestyle=":", linewidth=0.5)
+    ax.legend(loc="upper left")
+    ax.set_aspect("equal", adjustable="box")
+
+    plt.tight_layout()
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(output_path, format="pdf", bbox_inches="tight")
+
+    logging.info(f"Saved predicted vs actual plot to {output_path}")
 
 
 def plot_loading_factors_heatmap(pca, feature_names, n_components, output_path):
