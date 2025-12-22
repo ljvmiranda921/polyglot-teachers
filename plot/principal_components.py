@@ -201,6 +201,13 @@ def plot_predicted_vs_actual(y_true, y_pred, r2, model_name, output_path):
     # Grid
     ax.grid(True, alpha=0.3, linestyle=":", linewidth=0.5)
     ax.legend(loc="upper left")
+
+    # Add R² annotation box
+    textstr = f'$R^2 = {r2:.3f}$'
+    props = dict(boxstyle='round', facecolor=COLORS["white"], edgecolor=COLORS["slate_3"], alpha=0.9, linewidth=1.5)
+    ax.text(0.95, 0.05, textstr, transform=ax.transAxes, fontsize=18,
+            verticalalignment='bottom', horizontalalignment='right', bbox=props)
+
     ax.set_aspect("equal", adjustable="box")
 
     plt.tight_layout()
