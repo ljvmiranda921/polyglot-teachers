@@ -175,7 +175,7 @@ def plot_loading_factors_heatmap(pca, feature_names, n_components, output_path):
     # Create custom colormap using Cambridge colors
     cmap = LinearSegmentedColormap.from_list(
         "cambridge_diverging",
-        [COLORS["dark_cherry"], COLORS["white"], COLORS["dark_blue"]],
+        [COLORS["cherry"], COLORS["white"], COLORS["green"]],
     )
 
     fig, ax = plt.subplots(figsize=(8, 8))
