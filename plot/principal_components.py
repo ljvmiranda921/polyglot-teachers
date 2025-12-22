@@ -104,10 +104,12 @@ def main():
     print(components_df.to_string())
 
     print(f"\n=== Model Comparison ===")
-    comparison_df = pd.DataFrame([
-        {"Model": name, "R^2": res["r2"], "RMSE": res["rmse"]}
-        for name, res in results.items()
-    ]).sort_values("R^2", ascending=False)
+    comparison_df = pd.DataFrame(
+        [
+            {"Model": name, "R^2": res["r2"], "RMSE": res["rmse"]}
+            for name, res in results.items()
+        ]
+    ).sort_values("R^2", ascending=False)
     print(comparison_df.to_string(index=False))
 
     for model_name, res in results.items():
@@ -116,7 +118,7 @@ def main():
         print(f"RMSE: {res['rmse']:.4f}")
         print(f"Intercept: {res['model'].intercept_:.4f}")
         print("\nCoefficients:")
-        for i, coef in enumerate(res['model'].coef_):
+        for i, coef in enumerate(res["model"].coef_):
             print(f"  PC{i+1}: {coef:.4f}")
 
     print(f"\n=== Explained Variance ===")
@@ -128,6 +130,10 @@ def main():
         }
     )
     print(variance_df.to_string(index=False))
+
+    # Plot loading factors heatmap
+    heatmap_path = OUTPUT_DIR / "pca_loading_factors.pdf"
+    plot_loading_factors_heatmap(pca, feature_cols, n_components, heatmap_path)
 
     if args.output_path:
         results = {
@@ -145,6 +151,40 @@ def main():
         with open(args.output_path, "w") as f:
             json.dump(results, f, indent=2)
         logging.info(f"Saved results to {args.output_path}")
+
+
+def plot_loading_factors_heatmap(pca, feature_names, n_components, output_path):
+    loadings_df = pd.DataFrame(
+        pca.components_.T,
+        columns=[f"PC{i+1}" for i in range(n_components)],
+        index=feature_names,
+    )
+
+    # Create custom colormap using Cambridge colors
+    cmap = LinearSegmentedColormap.from_list(
+        "cambridge_diverging",
+        [COLORS["dark_cherry"], COLORS["white"], COLORS["dark_blue"]],
+    )
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    sns.heatmap(
+        loadings_df,
+        annot=True,
+        fmt=".3f",
+        cmap=cmap,
+        center=0,
+        cbar_kws={"label": "Loading Factor"},
+        ax=ax,
+    )
+
+    plt.tight_layout()
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(output_path, format="pdf", bbox_inches="tight")
+    plt.close()
+
+    logging.info(f"Saved loading factors heatmap to {output_path}")
 
 
 def prepare_dataframe(intrinsic_dir: Path, benchmark_path: Path) -> pd.DataFrame:
