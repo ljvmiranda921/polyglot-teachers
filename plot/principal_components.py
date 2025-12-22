@@ -178,15 +178,20 @@ def plot_loading_factors_heatmap(pca, feature_names, n_components, output_path):
         [COLORS["dark_cherry"], COLORS["white"], COLORS["dark_blue"]],
     )
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(8, 8))
 
-    sns.heatmap(
+    heatmap = sns.heatmap(
         loadings_df,
         annot=True,
         fmt=".3f",
         cmap=cmap,
         center=0,
-        cbar_kws={"label": "Loading Factor"},
+        cbar_kws={
+            "label": "Loading Factor",
+            "orientation": "horizontal",
+            "shrink": 0.8,
+            "pad": 0.1,
+        },
         ax=ax,
     )
 
