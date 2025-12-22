@@ -80,7 +80,7 @@ def main():
             "rmse": rmse,
             "y_pred": y_pred,
         }
-        logging.info(f"{name} - R²: {r2:.4f}, RMSE: {rmse:.4f}")
+        logging.info(f"{name} - R^2: {r2:.4f}, RMSE: {rmse:.4f}")
 
     best_model_name = max(results, key=lambda k: results[k]["r2"])
     model = results[best_model_name]["model"]
