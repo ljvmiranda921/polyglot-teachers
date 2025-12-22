@@ -163,10 +163,13 @@ def main():
 
 
 def plot_loading_factors_heatmap(pca, feature_names, n_components, output_path):
+    # Map feature names to beautiful labels
+    beautiful_names = [FEATURE_NAMES[name] for name in feature_names]
+
     loadings_df = pd.DataFrame(
         pca.components_.T,
         columns=[f"PC{i+1}" for i in range(n_components)],
-        index=feature_names,
+        index=beautiful_names,
     )
 
     # Create custom colormap using Cambridge colors
