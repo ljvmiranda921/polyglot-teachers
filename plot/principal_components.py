@@ -26,12 +26,12 @@ logging.basicConfig(
 plt.rcParams.update(PLOT_PARAMS)
 
 FEATURE_NAMES = {
-    "prompts_distinct_ri": "Distinct Prompts",
-    "responses_distinct_ri": "Distinct Responses",
+    "prompts_distinct_ri": "Distinct\nPrompts",
+    "responses_distinct_ri": "Distinct\nResponses",
     "average_perplexity": "Perplexity",
-    "average_rubric_score": "Rubric Score (M-Prometheus)",
-    "prompts_average_length": "Avg. Prompt Length",
-    "responses_average_length": "Avg. Response Length",
+    "average_rubric_score": "Rubric Score\n(M-Prometheus)",
+    "prompts_average_length": "Avg. Prompt\nLength",
+    "responses_average_length": "Avg. Response\nLength",
 }
 
 
@@ -189,6 +189,9 @@ def plot_loading_factors_heatmap(pca, feature_names, n_components, output_path):
         cbar_kws={"label": "Loading Factor"},
         ax=ax,
     )
+
+    # Adjust y-axis labels alignment
+    ax.set_yticklabels(ax.get_yticklabels(), rotation=0, ha="right", va="center")
 
     plt.tight_layout()
 
