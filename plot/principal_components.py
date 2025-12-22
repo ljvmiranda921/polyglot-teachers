@@ -151,24 +151,16 @@ def load_intrinsic_metrics(intrinsic_dir: Path) -> pd.DataFrame:
             data = json.load(f)
 
         record = {
+            # fmt: off
             "teacher_model": teacher_model,
             "target_lang": dataset_lang,
-            "prompts_distinct_ri": data.get("distinct_ri", {}).get(
-                "prompts_distinct_ri"
-            ),
-            "responses_distinct_ri": data.get("distinct_ri", {}).get(
-                "responses_distinct_ri"
-            ),
+            "prompts_distinct_ri": data.get("distinct_ri", {}).get("prompts_distinct_ri"),
+            "responses_distinct_ri": data.get("distinct_ri", {}).get("responses_distinct_ri"),
             "average_perplexity": data.get("perplexity", {}).get("average_perplexity"),
-            "average_rubric_score": data.get("reward_model", {}).get(
-                "average_rubric_score"
-            ),
-            "prompts_average_length": data.get("length", {}).get(
-                "prompts_average_length"
-            ),
-            "responses_average_length": data.get("length", {}).get(
-                "responses_average_length"
-            ),
+            "average_rubric_score": data.get("reward_model", {}).get("average_rubric_score"),
+            "prompts_average_length": data.get("length", {}).get("prompts_average_length"),
+            "responses_average_length": data.get("length", {}).get("responses_average_length"),
+            # fmt: on
         }
         records.append(record)
 
