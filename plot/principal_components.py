@@ -187,7 +187,7 @@ def plot_loading_factors_heatmap(pca, feature_names, n_components, output_path):
         cmap=cmap,
         center=0,
         cbar_kws={
-            "label": "Loading Factor",
+            "label": "Loading Strength",
             "orientation": "horizontal",
             "shrink": 0.8,
             "pad": 0.1,
