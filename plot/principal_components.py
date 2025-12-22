@@ -37,17 +37,10 @@ FEATURE_NAMES = {
 LANGUAGE_NAMES = {
     "ar": "Arabic",
     "de": "German",
+    "cs": "Czech",
     "es": "Spanish",
-    "fr": "French",
-    "hi": "Hindi",
-    "it": "Italian",
+    "id": "Indonesian",
     "ja": "Japanese",
-    "ko": "Korean",
-    "pt": "Portuguese",
-    "ru": "Russian",
-    "th": "Thai",
-    "tr": "Turkish",
-    "zh": "Chinese",
 }
 
 
@@ -229,10 +222,8 @@ def plot_predicted_vs_actual(
     ax.legend(
         loc="upper center",
         bbox_to_anchor=(0.5, -0.12),
-        frameon=True,
-        fancybox=True,
-        shadow=False,
-        ncol=4,
+        frameon=False,
+        ncol=3,
     )
 
     # Report R^2
