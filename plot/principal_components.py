@@ -51,6 +51,7 @@ def get_args():
     parser.add_argument("--benchmark_path", type=Path, required=True, help="JSONL file with benchmark scores. Must contain `teacher_model`, `target_lang`, and `result`.")
     parser.add_argument("--n_components", type=int, default=None, help="Number of principal components to use. If not specified, uses all components.")
     parser.add_argument("--output_path", type=Path, default=None, help="Path to save results (CSV). If not provided, results are printed to stdout.")
+    parser.add_argument("--results_key", type=str, default="result", help="Key in benchmark JSONL file to use as target variable.")
     # fmt: on
     return parser.parse_args()
 
@@ -58,7 +59,7 @@ def get_args():
 def main():
     args = get_args()
 
-    df = prepare_dataframe(args.intrinsic_dir, args.benchmark_path)
+    df = prepare_dataframe(args.intrinsic_dir, args.benchmark_path, args.results_key)
     logging.info(
         f"Loaded {len(df)} samples with both intrinsic metrics and benchmark scores"
     )
@@ -72,7 +73,7 @@ def main():
         "responses_average_length",
     ]
     X = df[feature_cols].values
-    y = df["result"].values
+    y = df[args.results_key].values
 
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
@@ -151,7 +152,6 @@ def main():
     heatmap_path = OUTPUT_DIR / "pca_loading_factors.pdf"
     plot_loading_factors_heatmap(pca, feature_cols, n_components, heatmap_path)
     # Plot predicted vs actual for best model
-    breakpoint()
     pred_vs_actual_path = OUTPUT_DIR / f"pca_predicted_vs_actual_{best_model_name.lower()}.pdf"  # fmt: skip
     plot_predicted_vs_actual(y, y_pred, r2, best_model_name, pred_vs_actual_path, df["target_lang"])  # fmt: skip
 
@@ -292,12 +292,14 @@ def plot_loading_factors_heatmap(pca, feature_names, n_components, output_path):
     logging.info(f"Saved loading factors heatmap to {output_path}")
 
 
-def prepare_dataframe(intrinsic_dir: Path, benchmark_path: Path) -> pd.DataFrame:
+def prepare_dataframe(
+    intrinsic_dir: Path, benchmark_path: Path, results_key: str
+) -> pd.DataFrame:
     df_intrinsic = load_intrinsic_metrics(intrinsic_dir)
     df_benchmark = pd.read_json(benchmark_path, lines=True)
 
     df = df_intrinsic.merge(
-        df_benchmark[["teacher_model", "target_lang", "result"]],
+        df_benchmark[["teacher_model", "target_lang", results_key]],
         on=["teacher_model", "target_lang"],
         how="inner",
     )
