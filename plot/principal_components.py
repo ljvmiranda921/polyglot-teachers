@@ -197,7 +197,7 @@ def plot_predicted_vs_actual(
         range_max - range_min
     ) + range_min
 
-    fig, ax = plt.subplots(figsize=(8, 8))
+    fig, ax = plt.subplots(figsize=(7, 7))
 
     # Color by language if provided
     unique_langs = sorted(languages.unique())
