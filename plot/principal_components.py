@@ -182,7 +182,7 @@ def plot_predicted_vs_actual(
     model_name,
     output_path,
     languages=None,
-    norm_range=(0.3, 0.5),
+    norm_range=(0.3, 0.5),  # for better visualization
 ):
     # Apply custom range normalization
     y_min = min(y_true.min(), y_pred.min())
@@ -206,8 +206,8 @@ def plot_predicted_vs_actual(
         COLORS["warm_green"],
         COLORS["warm_cherry"],
         COLORS["warm_purple"],
-        COLORS["warm_indigo"],
-        COLORS["warm_crest"],
+        COLORS["crest"],
+        COLORS["dark_indigo"],
     ]
     lang_colors = {lang: colors[i % len(colors)] for i, lang in enumerate(unique_langs)}
 
