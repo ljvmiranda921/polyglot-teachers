@@ -83,9 +83,7 @@ def main():
 
     logging.info(f"PCA with {n_components} components")
     logging.info(f"Explained variance ratio: {pca.explained_variance_ratio_}")
-    logging.info(
-        f"Cumulative explained variance: {np.cumsum(pca.explained_variance_ratio_)}"
-    )
+    logging.info(f"Cumulative explained variance: {np.cumsum(pca.explained_variance_ratio_)}")  # fmt: skip
 
     models = {
         "Linear": LinearRegression(),
@@ -153,6 +151,7 @@ def main():
     heatmap_path = OUTPUT_DIR / "pca_loading_factors.pdf"
     plot_loading_factors_heatmap(pca, feature_cols, n_components, heatmap_path)
     # Plot predicted vs actual for best model
+    breakpoint()
     pred_vs_actual_path = OUTPUT_DIR / f"pca_predicted_vs_actual_{best_model_name.lower()}.pdf"  # fmt: skip
     plot_predicted_vs_actual(y, y_pred, r2, best_model_name, pred_vs_actual_path, df["target_lang"])  # fmt: skip
 
