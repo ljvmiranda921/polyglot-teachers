@@ -153,7 +153,8 @@ def main():
     plot_loading_factors_heatmap(pca, feature_cols, n_components, heatmap_path)
     # Plot predicted vs actual for best model
     pred_vs_actual_path = OUTPUT_DIR / f"pca_predicted_vs_actual_{best_model_name.lower()}.pdf"  # fmt: skip
-    plot_predicted_vs_actual(y, y_pred, r2, best_model_name, pred_vs_actual_path, df["target_lang"])  # fmt: skip
+    rmse = np.sqrt(mean_squared_error(y, y_pred))
+    plot_predicted_vs_actual(y, y_pred, r2, rmse, best_model_name, pred_vs_actual_path, df["target_lang"])  # fmt: skip
 
     if args.output_path:
         results = {
@@ -174,8 +175,14 @@ def main():
 
 
 def plot_predicted_vs_actual(
-    y_true, y_pred, r2, model_name, output_path, languages=None
+    y_true, y_pred, r2, rmse, model_name, output_path, languages=None
 ):
+    # Normalize to [0, 1] for visualization
+    y_min = min(y_true.min(), y_pred.min())
+    y_max = max(y_true.max(), y_pred.max())
+    y_true_norm = (y_true - y_min) / (y_max - y_min)
+    y_pred_norm = (y_pred - y_min) / (y_max - y_min)
+
     fig, ax = plt.subplots(figsize=(8, 8))
 
     # Color by language if provided
@@ -194,8 +201,8 @@ def plot_predicted_vs_actual(
         mask = languages == lang
         lang_label = LANGUAGE_NAMES.get(lang, lang)
         ax.scatter(
-            y_true[mask],
-            y_pred[mask],
+            y_true_norm[mask],
+            y_pred_norm[mask],
             alpha=0.6,
             s=100,
             color=lang_colors[lang],
@@ -205,11 +212,9 @@ def plot_predicted_vs_actual(
         )
 
     # Perfect prediction line (y=x)
-    min_val = min(y_true.min(), y_pred.min())
-    max_val = max(y_true.max(), y_pred.max())
     ax.plot(
-        [min_val, max_val],
-        [min_val, max_val],
+        [0, 1],
+        [0, 1],
         "--",
         color=COLORS["slate_3"],
         linewidth=2,
@@ -225,8 +230,8 @@ def plot_predicted_vs_actual(
         ncol=3,
     )
 
-    # Report R^2
-    textstr = f"$R^2 = {r2:.3f}$"
+    # Report R^2 and RMSE
+    textstr = f"$R^2 = {r2:.3f}$\nRMSE = {rmse:.3f}"
     props = dict(
         boxstyle="round",
         facecolor=COLORS["white"],
