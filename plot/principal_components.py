@@ -206,9 +206,11 @@ def plot_predicted_vs_actual(
         )
 
     # Perfect prediction line (y=x)
+    min_val = min(y_true.min(), y_pred.min())
+    max_val = max(y_true.max(), y_pred.max())
     ax.plot(
-        [0, 1],
-        [0, 1],
+        [min_val, max_val],
+        [min_val, max_val],
         "--",
         color=COLORS["slate_3"],
         linewidth=2,
