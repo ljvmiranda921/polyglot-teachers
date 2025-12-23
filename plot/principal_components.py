@@ -270,14 +270,8 @@ def plot_predicted_vs_actual(
     y_min = min(y_true.min(), y_pred.min())
     y_max = max(y_true.max(), y_pred.max())
     range_min, range_max = norm_range
-
-    y_true_norm = (y_true - y_min) / (y_max - y_min) * (
-        range_max - range_min
-    ) + range_min
-    y_pred_norm = (y_pred - y_min) / (y_max - y_min) * (
-        range_max - range_min
-    ) + range_min
-
+    y_true_norm = (y_true - y_min) / (y_max - y_min) * (range_max - range_min) + range_min  # fmt: skip
+    y_pred_norm = (y_pred - y_min) / (y_max - y_min) * (range_max - range_min) + range_min  # fmt: skip
     fig, ax = plt.subplots(figsize=(7, 7))
 
     # Color by language if provided
