@@ -94,16 +94,18 @@ def main():
         "linear": LinearRegression(),
         "ridge": Ridge(alpha=1.0),
         "lasso": Lasso(alpha=0.1),
-        "quadratic": Pipeline([
-            ("poly", PolynomialFeatures(degree=2, include_bias=False)),
-            ("linear", LinearRegression())
-        ]),
+        "quadratic": Pipeline(
+            [
+                ("poly", PolynomialFeatures(degree=2, include_bias=False)),
+                ("linear", LinearRegression()),
+            ]
+        ),
         "xgboost": xgb.XGBRegressor(
             n_estimators=100,
             max_depth=3,
             learning_rate=0.1,
             random_state=42,
-            verbosity=0
+            verbosity=0,
         ),
     }
 
@@ -112,7 +114,9 @@ def main():
         selected_model_names = [m.lower() for m in args.models]
         invalid_models = [m for m in selected_model_names if m not in all_models]
         if invalid_models:
-            logging.error(f"Invalid model(s): {invalid_models}. Available: {list(all_models.keys())}")
+            logging.error(
+                f"Invalid model(s): {invalid_models}. Available: {list(all_models.keys())}"
+            )
             sys.exit(1)
         models = {m.capitalize(): all_models[m] for m in selected_model_names}
         logging.info(f"Using models: {list(models.keys())}")
@@ -163,31 +167,35 @@ def main():
         print(f"RMSE: {res['rmse']:.4f}")
 
         # Print model-specific parameters
-        model = res['model']
+        model = res["model"]
 
         if model_name == "Quadratic":
             # For polynomial pipeline, get the linear regression step
-            linear_model = model.named_steps['linear']
+            linear_model = model.named_steps["linear"]
             intercept = linear_model.intercept_
             if isinstance(intercept, np.ndarray):
                 intercept = intercept.item() if intercept.size == 1 else intercept[0]
             print(f"Intercept: {intercept:.4f}")
-            print(f"\nCoefficients (including polynomial terms): {len(linear_model.coef_)} terms")
+            print(
+                f"\nCoefficients (including polynomial terms): {len(linear_model.coef_)} terms"
+            )
         elif model_name == "XGBoost":
             print("\n(XGBoost feature importance shown in feature_importances_)")
-            if hasattr(model, 'feature_importances_'):
+            if hasattr(model, "feature_importances_"):
                 print("Feature importances:")
                 for i, importance in enumerate(model.feature_importances_):
                     print(f"  PC{i+1}: {importance:.4f}")
         else:
             # Standard linear models
-            if hasattr(model, 'intercept_'):
+            if hasattr(model, "intercept_"):
                 intercept = model.intercept_
                 if isinstance(intercept, np.ndarray):
-                    intercept = intercept.item() if intercept.size == 1 else intercept[0]
+                    intercept = (
+                        intercept.item() if intercept.size == 1 else intercept[0]
+                    )
                 print(f"Intercept: {intercept:.4f}")
 
-            if hasattr(model, 'coef_'):
+            if hasattr(model, "coef_"):
                 print("\nCoefficients:")
                 for i, coef in enumerate(model.coef_):
                     print(f"  PC{i+1}: {coef:.4f}")
@@ -223,23 +231,25 @@ def main():
 
         # Add model-specific parameters
         if best_model_name == "Quadratic":
-            linear_model = model.named_steps['linear']
+            linear_model = model.named_steps["linear"]
             output_data["coefficients"] = linear_model.coef_.tolist()
             intercept = linear_model.intercept_
             if isinstance(intercept, np.ndarray):
                 intercept = intercept.item() if intercept.size == 1 else intercept[0]
             output_data["intercept"] = intercept
         elif best_model_name == "XGBoost":
-            if hasattr(model, 'feature_importances_'):
+            if hasattr(model, "feature_importances_"):
                 output_data["feature_importances"] = model.feature_importances_.tolist()
         else:
             # Standard linear models
-            if hasattr(model, 'coef_'):
+            if hasattr(model, "coef_"):
                 output_data["coefficients"] = model.coef_.tolist()
-            if hasattr(model, 'intercept_'):
+            if hasattr(model, "intercept_"):
                 intercept = model.intercept_
                 if isinstance(intercept, np.ndarray):
-                    intercept = intercept.item() if intercept.size == 1 else intercept[0]
+                    intercept = (
+                        intercept.item() if intercept.size == 1 else intercept[0]
+                    )
                 output_data["intercept"] = intercept
 
         args.output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -317,7 +327,7 @@ def plot_predicted_vs_actual(
         bbox_to_anchor=(0.5, -0.12),
         frameon=False,
         ncol=3,
-        columnspacing=1.0,
+        columnspacing=0.5,
     )
 
     # Report R^2 and RMSE
