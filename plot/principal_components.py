@@ -10,9 +10,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.pipeline import Pipeline
+import xgboost as xgb
 
 from utils.plot_theme import COLORS, OUTPUT_DIR, PLOT_PARAMS
 
@@ -90,6 +92,17 @@ def main():
         "Linear": LinearRegression(),
         "Ridge": Ridge(alpha=1.0),
         "Lasso": Lasso(alpha=0.1),
+        "Quadratic": Pipeline([
+            ("poly", PolynomialFeatures(degree=2, include_bias=False)),
+            ("linear", LinearRegression())
+        ]),
+        "XGBoost": xgb.XGBRegressor(
+            n_estimators=100,
+            max_depth=3,
+            learning_rate=0.1,
+            random_state=42,
+            verbosity=0
+        ),
     }
 
     results = {}
@@ -133,10 +146,27 @@ def main():
         print(f"\n=== {model_name} Regression ===")
         print(f"R^2 score: {res['r2']:.4f}")
         print(f"RMSE: {res['rmse']:.4f}")
-        print(f"Intercept: {res['model'].intercept_:.4f}")
-        print("\nCoefficients:")
-        for i, coef in enumerate(res["model"].coef_):
-            print(f"  PC{i+1}: {coef:.4f}")
+
+        # Print model-specific parameters
+        model = res['model']
+        if hasattr(model, 'intercept_'):
+            print(f"Intercept: {model.intercept_:.4f}")
+
+        if hasattr(model, 'coef_'):
+            print("\nCoefficients:")
+            for i, coef in enumerate(model.coef_):
+                print(f"  PC{i+1}: {coef:.4f}")
+        elif model_name == "Quadratic":
+            # For polynomial pipeline, get the linear regression step
+            linear_model = model.named_steps['linear']
+            print(f"Intercept: {linear_model.intercept_:.4f}")
+            print(f"\nCoefficients (including polynomial terms): {len(linear_model.coef_)} terms")
+        elif model_name == "XGBoost":
+            print("\n(XGBoost feature importance shown in feature_importances_)")
+            if hasattr(model, 'feature_importances_'):
+                print("Feature importances:")
+                for i, importance in enumerate(model.feature_importances_):
+                    print(f"  PC{i+1}: {importance:.4f}")
 
     print(f"\n=== Explained Variance ===")
     variance_df = pd.DataFrame(
