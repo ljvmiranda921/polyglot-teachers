@@ -177,11 +177,6 @@ def main():
 def plot_predicted_vs_actual(
     y_true, y_pred, r2, rmse, model_name, output_path, languages=None
 ):
-    y_min = min(y_true.min(), y_pred.min())
-    y_max = max(y_true.max(), y_pred.max())
-    y_true_norm = (y_true - y_min) / (y_max - y_min) * 0.7
-    y_pred_norm = (y_pred - y_min) / (y_max - y_min) * 0.7
-
     fig, ax = plt.subplots(figsize=(8, 8))
 
     # Color by language if provided
@@ -200,8 +195,8 @@ def plot_predicted_vs_actual(
         mask = languages == lang
         lang_label = LANGUAGE_NAMES.get(lang, lang)
         ax.scatter(
-            y_true_norm[mask],
-            y_pred_norm[mask],
+            y_true[mask],
+            y_pred[mask],
             alpha=0.6,
             s=100,
             color=lang_colors[lang],
@@ -212,8 +207,8 @@ def plot_predicted_vs_actual(
 
     # Perfect prediction line (y=x)
     ax.plot(
-        [0, 0.7],
-        [0, 0.7],
+        [0, 1],
+        [0, 1],
         "--",
         color=COLORS["slate_3"],
         linewidth=2,
