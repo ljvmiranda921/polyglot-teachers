@@ -4,18 +4,17 @@ import logging
 import sys
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
+import xgboost as xgb
 from matplotlib.colors import LinearSegmentedColormap
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler, PolynomialFeatures
-from sklearn.linear_model import LinearRegression, Ridge, Lasso
-from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.linear_model import Lasso, LinearRegression, Ridge
+from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.pipeline import Pipeline
-import xgboost as xgb
-
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from utils.plot_theme import COLORS, OUTPUT_DIR, PLOT_PARAMS
 
 logging.basicConfig(
@@ -268,12 +267,10 @@ def plot_predicted_vs_actual(
     languages=None,
     norm_range=(0.3, 0.5),  # for better visualization
 ):
-    # Apply custom range normalization
     y_min = min(y_true.min(), y_pred.min())
     y_max = max(y_true.max(), y_pred.max())
     range_min, range_max = norm_range
 
-    # Normalize to custom range: new_val = (val - min) / (max - min) * (range_max - range_min) + range_min
     y_true_norm = (y_true - y_min) / (y_max - y_min) * (
         range_max - range_min
     ) + range_min
