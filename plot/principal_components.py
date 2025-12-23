@@ -204,7 +204,7 @@ def plot_predicted_vs_actual(
     colors = [
         COLORS["warm_blue"],
         COLORS["warm_green"],
-        COLORS["warm_cherry"],
+        COLORS["dark_cherry"],
         COLORS["warm_purple"],
         COLORS["crest"],
         COLORS["dark_indigo"],
