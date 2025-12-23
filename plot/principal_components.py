@@ -177,11 +177,10 @@ def main():
 def plot_predicted_vs_actual(
     y_true, y_pred, r2, rmse, model_name, output_path, languages=None
 ):
-    # Normalize to [0, 1] for visualization
     y_min = min(y_true.min(), y_pred.min())
     y_max = max(y_true.max(), y_pred.max())
-    y_true_norm = (y_true - y_min) / (y_max - y_min)
-    y_pred_norm = (y_pred - y_min) / (y_max - y_min)
+    y_true_norm = (y_true - y_min) / (y_max - y_min) * 0.7
+    y_pred_norm = (y_pred - y_min) / (y_max - y_min) * 0.7
 
     fig, ax = plt.subplots(figsize=(8, 8))
 
