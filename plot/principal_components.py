@@ -243,6 +243,7 @@ def plot_predicted_vs_actual(
         bbox_to_anchor=(0.5, -0.12),
         frameon=False,
         ncol=3,
+        columnspacing=1.0,
     )
 
     # Report R^2 and RMSE
