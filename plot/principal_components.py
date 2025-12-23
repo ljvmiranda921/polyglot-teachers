@@ -212,8 +212,8 @@ def plot_predicted_vs_actual(
 
     # Perfect prediction line (y=x)
     ax.plot(
-        [0, 1],
-        [0, 1],
+        [0, 0.7],
+        [0, 0.7],
         "--",
         color=COLORS["slate_3"],
         linewidth=2,
