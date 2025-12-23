@@ -54,6 +54,7 @@ def get_args():
     parser.add_argument("--n_components", type=int, default=None, help="Number of principal components to use. If not specified, uses all components.")
     parser.add_argument("--output_path", type=Path, default=None, help="Path to save results (CSV). If not provided, results are printed to stdout.")
     parser.add_argument("--results_key", type=str, default="result", help="Key in benchmark JSONL file to use as target variable.")
+    parser.add_argument("--models", type=str, nargs="+", default=None, help="Models to use. Options: linear, ridge, lasso, quadratic, xgboost. If not specified, uses all models.")
     # fmt: on
     return parser.parse_args()
 
@@ -88,15 +89,16 @@ def main():
     logging.info(f"Explained variance ratio: {pca.explained_variance_ratio_}")
     logging.info(f"Cumulative explained variance: {np.cumsum(pca.explained_variance_ratio_)}")  # fmt: skip
 
-    models = {
-        "Linear": LinearRegression(),
-        "Ridge": Ridge(alpha=1.0),
-        "Lasso": Lasso(alpha=0.1),
-        "Quadratic": Pipeline([
+    # Define all available models
+    all_models = {
+        "linear": LinearRegression(),
+        "ridge": Ridge(alpha=1.0),
+        "lasso": Lasso(alpha=0.1),
+        "quadratic": Pipeline([
             ("poly", PolynomialFeatures(degree=2, include_bias=False)),
             ("linear", LinearRegression())
         ]),
-        "XGBoost": xgb.XGBRegressor(
+        "xgboost": xgb.XGBRegressor(
             n_estimators=100,
             max_depth=3,
             learning_rate=0.1,
@@ -104,6 +106,19 @@ def main():
             verbosity=0
         ),
     }
+
+    # Select models based on user input
+    if args.models:
+        selected_model_names = [m.lower() for m in args.models]
+        invalid_models = [m for m in selected_model_names if m not in all_models]
+        if invalid_models:
+            logging.error(f"Invalid model(s): {invalid_models}. Available: {list(all_models.keys())}")
+            sys.exit(1)
+        models = {m.capitalize(): all_models[m] for m in selected_model_names}
+        logging.info(f"Using models: {list(models.keys())}")
+    else:
+        models = {m.capitalize(): model for m, model in all_models.items()}
+        logging.info(f"Using all models: {list(models.keys())}")
 
     results = {}
     for name, model in models.items():
@@ -149,17 +164,14 @@ def main():
 
         # Print model-specific parameters
         model = res['model']
-        if hasattr(model, 'intercept_'):
-            print(f"Intercept: {model.intercept_:.4f}")
 
-        if hasattr(model, 'coef_'):
-            print("\nCoefficients:")
-            for i, coef in enumerate(model.coef_):
-                print(f"  PC{i+1}: {coef:.4f}")
-        elif model_name == "Quadratic":
+        if model_name == "Quadratic":
             # For polynomial pipeline, get the linear regression step
             linear_model = model.named_steps['linear']
-            print(f"Intercept: {linear_model.intercept_:.4f}")
+            intercept = linear_model.intercept_
+            if isinstance(intercept, np.ndarray):
+                intercept = intercept.item() if intercept.size == 1 else intercept[0]
+            print(f"Intercept: {intercept:.4f}")
             print(f"\nCoefficients (including polynomial terms): {len(linear_model.coef_)} terms")
         elif model_name == "XGBoost":
             print("\n(XGBoost feature importance shown in feature_importances_)")
@@ -167,6 +179,18 @@ def main():
                 print("Feature importances:")
                 for i, importance in enumerate(model.feature_importances_):
                     print(f"  PC{i+1}: {importance:.4f}")
+        else:
+            # Standard linear models
+            if hasattr(model, 'intercept_'):
+                intercept = model.intercept_
+                if isinstance(intercept, np.ndarray):
+                    intercept = intercept.item() if intercept.size == 1 else intercept[0]
+                print(f"Intercept: {intercept:.4f}")
+
+            if hasattr(model, 'coef_'):
+                print("\nCoefficients:")
+                for i, coef in enumerate(model.coef_):
+                    print(f"  PC{i+1}: {coef:.4f}")
 
     print(f"\n=== Explained Variance ===")
     variance_df = pd.DataFrame(
@@ -187,20 +211,40 @@ def main():
     plot_predicted_vs_actual(y, y_pred, r2, rmse, best_model_name, pred_vs_actual_path, df["target_lang"])  # fmt: skip
 
     if args.output_path:
-        results = {
+        output_data = {
+            "best_model": best_model_name,
             "n_components": n_components,
             "r2_score": r2,
             "explained_variance_ratio": pca.explained_variance_ratio_.tolist(),
             "cumulative_variance": np.cumsum(pca.explained_variance_ratio_).tolist(),
-            "coefficients": model.coef_.tolist(),
-            "intercept": model.intercept_,
             "feature_names": feature_cols,
             "pca_components": pca.components_.tolist(),
         }
 
+        # Add model-specific parameters
+        if best_model_name == "Quadratic":
+            linear_model = model.named_steps['linear']
+            output_data["coefficients"] = linear_model.coef_.tolist()
+            intercept = linear_model.intercept_
+            if isinstance(intercept, np.ndarray):
+                intercept = intercept.item() if intercept.size == 1 else intercept[0]
+            output_data["intercept"] = intercept
+        elif best_model_name == "XGBoost":
+            if hasattr(model, 'feature_importances_'):
+                output_data["feature_importances"] = model.feature_importances_.tolist()
+        else:
+            # Standard linear models
+            if hasattr(model, 'coef_'):
+                output_data["coefficients"] = model.coef_.tolist()
+            if hasattr(model, 'intercept_'):
+                intercept = model.intercept_
+                if isinstance(intercept, np.ndarray):
+                    intercept = intercept.item() if intercept.size == 1 else intercept[0]
+                output_data["intercept"] = intercept
+
         args.output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(args.output_path, "w") as f:
-            json.dump(results, f, indent=2)
+            json.dump(output_data, f, indent=2)
         logging.info(f"Saved results to {args.output_path}")
 
 
