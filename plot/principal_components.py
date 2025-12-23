@@ -175,8 +175,28 @@ def main():
 
 
 def plot_predicted_vs_actual(
-    y_true, y_pred, r2, rmse, model_name, output_path, languages=None
+    y_true,
+    y_pred,
+    r2,
+    rmse,
+    model_name,
+    output_path,
+    languages=None,
+    norm_range=(0.3, 0.5),
 ):
+    # Apply custom range normalization
+    y_min = min(y_true.min(), y_pred.min())
+    y_max = max(y_true.max(), y_pred.max())
+    range_min, range_max = norm_range
+
+    # Normalize to custom range: new_val = (val - min) / (max - min) * (range_max - range_min) + range_min
+    y_true_norm = (y_true - y_min) / (y_max - y_min) * (
+        range_max - range_min
+    ) + range_min
+    y_pred_norm = (y_pred - y_min) / (y_max - y_min) * (
+        range_max - range_min
+    ) + range_min
+
     fig, ax = plt.subplots(figsize=(8, 8))
 
     # Color by language if provided
@@ -195,8 +215,8 @@ def plot_predicted_vs_actual(
         mask = languages == lang
         lang_label = LANGUAGE_NAMES.get(lang, lang)
         ax.scatter(
-            y_true[mask],
-            y_pred[mask],
+            y_true_norm[mask],
+            y_pred_norm[mask],
             alpha=0.6,
             s=100,
             color=lang_colors[lang],
@@ -206,11 +226,10 @@ def plot_predicted_vs_actual(
         )
 
     # Perfect prediction line (y=x)
-    min_val = min(y_true.min(), y_pred.min())
-    max_val = max(y_true.max(), y_pred.max())
+    range_min, range_max = norm_range
     ax.plot(
-        [min_val, max_val],
-        [min_val, max_val],
+        [range_min, range_max],
+        [range_min, range_max],
         "--",
         color=COLORS["slate_3"],
         linewidth=2,
