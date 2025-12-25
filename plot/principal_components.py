@@ -93,12 +93,7 @@ def main():
         "linear": LinearRegression(),
         "ridge": Ridge(alpha=1.0),
         "lasso": Lasso(alpha=0.1),
-        "quadratic": Pipeline(
-            [
-                ("poly", PolynomialFeatures(degree=2, include_bias=False)),
-                ("linear", LinearRegression()),
-            ]
-        ),
+        "quadratic": Pipeline([("poly", PolynomialFeatures(degree=2, include_bias=False)), ("linear", LinearRegression())]),  # fmt: skip
         "xgboost": xgb.XGBRegressor(
             n_estimators=100,
             max_depth=3,
@@ -108,15 +103,8 @@ def main():
         ),
     }
 
-    # Select models based on user input
     if args.models:
         selected_model_names = [m.lower() for m in args.models]
-        invalid_models = [m for m in selected_model_names if m not in all_models]
-        if invalid_models:
-            logging.error(
-                f"Invalid model(s): {invalid_models}. Available: {list(all_models.keys())}"
-            )
-            sys.exit(1)
         models = {m.capitalize(): all_models[m] for m in selected_model_names}
         logging.info(f"Using models: {list(models.keys())}")
     else:
@@ -137,6 +125,7 @@ def main():
         }
         logging.info(f"{name} - R^2: {r2:.4f}, RMSE: {rmse:.4f}")
 
+    # Get best model and use it for reporting and visualization
     best_model_name = max(results, key=lambda k: results[k]["r2"])
     model = results[best_model_name]["model"]
     r2 = results[best_model_name]["r2"]
