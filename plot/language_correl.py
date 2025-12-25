@@ -128,13 +128,13 @@ def main():
     rho, p_value = spearmanr(df_corr[args.property], df_corr["pg_score"])
 
     if p_value < 0.001:
-        p_text = "$p$ < 0.001"
+        p_text = r"$p < 0.001$"
     elif p_value < 0.01:
-        p_text = "$p$ < 0.01"
+        p_text = r"$p < 0.01$"
     elif p_value < 0.05:
-        p_text = "$p$ < 0.05"
+        p_text = r"$p < 0.05$"
     else:
-        p_text = f"$p$ = {p_value:.3f}"
+        p_text = f"$p = {p_value:.3f}$"
 
     ax.text(
         0.05,
