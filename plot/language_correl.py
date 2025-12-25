@@ -47,9 +47,9 @@ def main():
 
     # Create bins for the language property
     if args.property == "pct_commoncrawl":
-        bins = [0, 1, 5, 10]
-        labels = [r"$<$1\%", "1--5\%", r"$>$5\%"]
-        xlabel = "Percentage of a language\n in CommonCrawl"
+        bins = [0, 1, 2, 5, 10]
+        labels = [r"$<$1\%", "1--2\%", "2--5\%", r"$>$5\%"]
+        xlabel = "Percentage of a Language\n in CommonCrawl"
     elif args.property == "native_speakers_in_m":
         bins = [0, 50, 150, 600]
         labels = [r"$<$50M", "50--150M", r"$>$150M"]
