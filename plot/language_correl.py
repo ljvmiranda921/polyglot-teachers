@@ -43,10 +43,7 @@ def main():
         how="left",
     )
 
-    # Filter out rows with missing language properties
     df_plot = df_plot.dropna(subset=[args.property]).copy()
-
-    # Create bins for the language property
     if args.property == "pct_commoncrawl":
         bins = [0, 1, 2, 5, 10]
         labels = [r"$<$1\%", "1--2\%", "2--5\%", r"$>$5\%"]
@@ -55,13 +52,11 @@ def main():
         bins = [0, 50, 150, 600]
         labels = [r"$<$50M", "50--150M", r"$>$150M"]
         xlabel = "Native Speakers (millions)"
-    else:  # joshi_etal_resource_level
-        # For resource level, use discrete values
+    else:
         df_plot["resource_bin"] = df_plot[args.property].astype(str)
         labels = sorted(df_plot["resource_bin"].unique())
         xlabel = "Resource Level (Joshi et al.)"
 
-    # Create bins if not using discrete resource levels
     if args.property != "joshi_etal_resource_level":
         df_plot["resource_bin"] = pd.cut(
             df_plot[args.property],
@@ -69,15 +64,12 @@ def main():
             labels=labels,
             include_lowest=True,
         )
-
-    # Aggregate if using average
     if args.use_average:
         df_plot = df_plot.groupby(["resource_bin"], as_index=False)["pg_score"].mean()
         box_data = [[row["pg_score"]] for _, row in df_plot.iterrows()]
         positions = range(len(df_plot))
         tick_labels = df_plot["resource_bin"].tolist()
     else:
-        # Prepare data for box plot (group by resource bin)
         box_data = []
         tick_labels = []
         for label in labels:
@@ -87,10 +79,7 @@ def main():
                 tick_labels.append(label)
         positions = range(len(box_data))
 
-    # Plot
     fig, ax = plt.subplots(1, 1, figsize=args.figsize)
-
-    # Create box plot
     bp = ax.boxplot(
         box_data,
         positions=positions,
@@ -113,12 +102,10 @@ def main():
         ),
     )
 
-    # Add scatter points for individual observations if not averaging
     if not args.use_average:
         import numpy as np
 
         for i, (label, data) in enumerate(zip(tick_labels, box_data)):
-            # Add jitter to x-coordinates for better visualization
             x = np.random.normal(i, 0.04, size=len(data))
             ax.scatter(
                 x,
@@ -129,20 +116,17 @@ def main():
                 zorder=3,
             )
 
-    # Customize plot
     ax.set_xticks(positions)
     ax.set_xticklabels(tick_labels)
     ax.set_xlabel(xlabel)
     ax.set_ylabel("PG-Score")
     ax.grid(True, axis="y", linestyle="--", alpha=0.3)
 
-    # Compute Spearman correlation (language-level)
     df_corr = df_plot.groupby("target_lang", as_index=False).agg(
         {args.property: "first", "pg_score": "mean"}
     )
     rho, p_value = spearmanr(df_corr[args.property], df_corr["pg_score"])
 
-    # Add correlation text annotation in upper left
     ax.text(
         0.05,
         0.95,
@@ -154,7 +138,6 @@ def main():
         bbox=dict(boxstyle="round,pad=0.5", facecolor="white", alpha=0.8, edgecolor="none"),
     )
 
-    # Save figure
     args.output_path.parent.mkdir(parents=True, exist_ok=True)
     plt.tight_layout()
     plt.savefig(args.output_path)
