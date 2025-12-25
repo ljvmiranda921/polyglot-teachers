@@ -48,11 +48,11 @@ def main():
     # Create bins for the language property
     if args.property == "pct_commoncrawl":
         bins = [0, 1, 5, 10]
-        labels = ["<1%", "1-5%", ">5%"]
+        labels = [r"$<$1\%", "1--5\%", r"$>$5\%"]
         xlabel = "Percentage in CommonCrawl"
     elif args.property == "native_speakers_in_m":
         bins = [0, 50, 150, 600]
-        labels = ["<50M", "50-150M", ">150M"]
+        labels = [r"$<$50M", "50--150M", r"$>$150M"]
         xlabel = "Native Speakers (millions)"
     else:  # joshi_etal_resource_level
         # For resource level, use discrete values
