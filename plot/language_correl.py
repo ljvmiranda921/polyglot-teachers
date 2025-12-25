@@ -15,7 +15,7 @@ def get_args():
     parser = argparse.ArgumentParser(description="Plot language resource correlation with PG-scores")
     parser.add_argument("--input_path", type=Path, required=True, help="Results JSONL file to plot. Must contain the fields `teacher_model`, `target_lang`, and `pg_score`.")
     parser.add_argument("--output_path", type=Path, default=OUTPUT_DIR / "language_correl.pdf", help="Path to save the outputs.")
-    parser.add_argument("--figsize", type=lambda s: tuple(map(int, s.split(","))), default=(8, 6), help="Figure size as WIDTH,HEIGHT in inches. Default: 14,7")
+    parser.add_argument("--figsize", type=lambda s: tuple(map(int, s.split(","))), default=(6, 8), help="Figure size as WIDTH,HEIGHT in inches. Default: 14,7")
     parser.add_argument("--property", type=str, choices=["pct_commoncrawl", "native_speakers_in_m", "joshi_etal_resource_level"], default="pct_commoncrawl", help="Language property to use on x-axis.")
     parser.add_argument("--use_average", action="store_true", help="Use average PG-score per language instead of showing all models separately.")
     # fmt: on
@@ -49,7 +49,7 @@ def main():
     if args.property == "pct_commoncrawl":
         bins = [0, 1, 5, 10]
         labels = [r"$<$1\%", "1--5\%", r"$>$5\%"]
-        xlabel = "Percentage in CommonCrawl"
+        xlabel = "Percentage of a language\n in CommonCrawl"
     elif args.property == "native_speakers_in_m":
         bins = [0, 50, 150, 600]
         labels = [r"$<$50M", "50--150M", r"$>$150M"]
