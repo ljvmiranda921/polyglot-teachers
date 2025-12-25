@@ -134,8 +134,8 @@ def main():
         transform=ax.transAxes,
         va="top",
         ha="left",
-        fontsize=FONT_SIZES.get("medium"),
-        bbox=dict(boxstyle="round,pad=0.5", facecolor="white", alpha=0.8, edgecolor="none"),
+        fontsize=FONT_SIZES.get("large"),
+        bbox=dict(boxstyle="round,pad=0.5", facecolor="white", alpha=0.8, edgecolor="none"),  # fmt: skip
     )
 
     args.output_path.parent.mkdir(parents=True, exist_ok=True)
