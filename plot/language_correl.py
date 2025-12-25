@@ -3,6 +3,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from scipy.stats import spearmanr
 
 from plot.utils.plot_theme import PLOT_PARAMS, COLORS, OUTPUT_DIR, FONT_SIZES
 from plot.utils.metadata import MODEL_INFORMATION, LANGUAGE_INFORMATION
@@ -134,6 +135,24 @@ def main():
     ax.set_xlabel(xlabel)
     ax.set_ylabel("PG-Score")
     ax.grid(True, axis="y", linestyle="--", alpha=0.3)
+
+    # Compute Spearman correlation (language-level)
+    df_corr = df_plot.groupby("target_lang", as_index=False).agg(
+        {args.property: "first", "pg_score": "mean"}
+    )
+    rho, p_value = spearmanr(df_corr[args.property], df_corr["pg_score"])
+
+    # Add correlation text annotation in upper left
+    ax.text(
+        0.05,
+        0.95,
+        f"$\\rho$ = {rho:.3f}, $p$ = {p_value:.3f}",
+        transform=ax.transAxes,
+        va="top",
+        ha="left",
+        fontsize=FONT_SIZES.get("medium"),
+        bbox=dict(boxstyle="round,pad=0.5", facecolor="white", alpha=0.8, edgecolor="none"),
+    )
 
     # Save figure
     args.output_path.parent.mkdir(parents=True, exist_ok=True)
