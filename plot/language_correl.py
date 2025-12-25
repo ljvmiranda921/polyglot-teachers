@@ -149,7 +149,7 @@ def main():
 
     args.output_path.parent.mkdir(parents=True, exist_ok=True)
     plt.tight_layout()
-    plt.savefig(args.output_path)
+    plt.savefig(args.output_path, bbox_inches="tight")
     print(f"Saved figure to {args.output_path}")
 
 
