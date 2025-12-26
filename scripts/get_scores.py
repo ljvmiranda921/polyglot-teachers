@@ -293,7 +293,7 @@ def compute_extrinsic_pgr(
     def _cagg(group):
         matching = group[group["target_lang"] == group["eval_lang"]]
         data = matching if len(matching) > 0 else group
-        return data[["result"]].mean()
+        return data[["result", "result_stderr"]].mean()
 
     df_ext_avg = df_ext.groupby(["teacher_model", "target_lang"]).apply(_cagg).reset_index()  # fmt: skip
     df_base_avg = df_base.groupby(["eval_lang"]).agg({"result": "mean"}).reset_index()
