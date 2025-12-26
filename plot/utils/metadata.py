@@ -40,47 +40,50 @@ class LanguageInfo(BaseModel):
     native_speakers_in_m: Optional[float] = None
 
 
+# CommonCrawl percentages sourced from CC-MAIN-2025-51 crawl statistics
+# Reference: https://commoncrawl.github.io/cc-crawl-statistics/plots/languages
+# Percentages represent the primary language of documents (identified by CLD2)
 LANGUAGE_INFORMATION: list[LanguageInfo] = [
     LanguageInfo(
         name="Arabic",
         iso_639_1="ar",
         joshi_etal_resource_level=5,
-        pct_commoncrawl=0.65,
+        pct_commoncrawl=0.6672,  # CC-MAIN-2025-51
         native_speakers_in_m=380,
     ),
     LanguageInfo(
         name="Czech",
         iso_639_1="cs",
         joshi_etal_resource_level=4,
-        pct_commoncrawl=0.99,
+        pct_commoncrawl=1.1086,  # CC-MAIN-2025-51
         native_speakers_in_m=10.7,
     ),
     LanguageInfo(
         name="German",
         iso_639_1="de",
         joshi_etal_resource_level=5,
-        pct_commoncrawl=6.01,
+        pct_commoncrawl=5.7391,  # CC-MAIN-2025-51
         native_speakers_in_m=95,
     ),
     LanguageInfo(
         name="Spanish",
         iso_639_1="es",
         joshi_etal_resource_level=5,
-        pct_commoncrawl=4.37,
+        pct_commoncrawl=4.4118,  # CC-MAIN-2025-51
         native_speakers_in_m=500,
     ),
     LanguageInfo(
         name="Indonesian",
         iso_639_1="id",
         joshi_etal_resource_level=3,
-        pct_commoncrawl=0.95,
+        pct_commoncrawl=1.0383,  # CC-MAIN-2025-51
         native_speakers_in_m=43,
     ),
     LanguageInfo(
         name="Japanese",
         iso_639_1="ja",
         joshi_etal_resource_level=5,
-        pct_commoncrawl=5.20,
+        pct_commoncrawl=5.4564,  # CC-MAIN-2025-51
         native_speakers_in_m=120,
     ),
 ]
