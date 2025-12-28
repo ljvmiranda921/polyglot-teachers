@@ -18,7 +18,6 @@ def get_args():
     parser.add_argument("--output_path", type=Path, default=OUTPUT_DIR / "language_correl.pdf", help="Path to save the outputs.")
     parser.add_argument("--figsize", type=lambda s: tuple(map(int, s.split(","))), default=(6, 8), help="Figure size as WIDTH,HEIGHT in inches. Default: 14,7")
     parser.add_argument("--property", type=str, choices=["pct_commoncrawl", "native_speakers_in_m", "joshi_etal_resource_level"], default="pct_commoncrawl", help="Language property to use on x-axis.")
-    parser.add_argument("--use_average", action="store_true", help="Use average PG-score per language instead of showing all models separately.")
     # fmt: on
     return parser.parse_args()
 
@@ -55,7 +54,7 @@ def main():
     else:
         df_plot["resource_bin"] = df_plot[args.property].astype(str)
         labels = sorted(df_plot["resource_bin"].unique())
-        xlabel = "Resource Level (Joshi et al.)"
+        xlabel = "Resource Level (Joshi et al., 2020)"
 
     if args.property != "joshi_etal_resource_level":
         df_plot["resource_bin"] = pd.cut(
@@ -64,12 +63,7 @@ def main():
             labels=labels,
             include_lowest=True,
         )
-    if args.use_average:
-        df_plot = df_plot.groupby(["resource_bin"], as_index=False)["pg_score"].mean()
-        box_data = [[row["pg_score"]] for _, row in df_plot.iterrows()]
-        positions = range(len(df_plot))
-        tick_labels = df_plot["resource_bin"].tolist()
-    else:
+
         box_data = []
         tick_labels = []
         for label in labels:
@@ -87,34 +81,17 @@ def main():
         patch_artist=True,
         showfliers=True,
         notch=False,
-        boxprops=dict(
-            facecolor=COLORS.get("warm_blue"), color=COLORS.get("dark_blue"), alpha=0.7
-        ),
+        # fmt: off
+        boxprops=dict(facecolor=COLORS.get("warm_blue"), color=COLORS.get("dark_blue"), alpha=0.7),
         whiskerprops=dict(color=COLORS.get("dark_blue"), linewidth=1.5),
         capprops=dict(color=COLORS.get("dark_blue"), linewidth=1.5),
         medianprops=dict(color=COLORS.get("dark_crest"), linewidth=2.5),
-        flierprops=dict(
-            marker="o",
-            markerfacecolor=COLORS.get("slate_3"),
-            markersize=6,
-            alpha=0.5,
-            markeredgecolor="none",
-        ),
+        flierprops=dict(marker="o", markerfacecolor=COLORS.get("slate_3"), markersize=6, alpha=0.5, markeredgecolor="none"),
+        # fmt: on
     )
 
-    if not args.use_average:
-        import numpy as np
-
-        for i, (label, data) in enumerate(zip(tick_labels, box_data)):
-            x = np.random.normal(i, 0.04, size=len(data))
-            ax.scatter(
-                x,
-                data,
-                alpha=0.3,
-                s=40,
-                color=COLORS.get("dark_blue"),
-                zorder=3,
-            )
+    for i, (label, data) in enumerate(zip(tick_labels, box_data)):
+        ax.scatter(i, data, alpha=0.3, s=40, color=COLORS.get("dark_blue"), zorder=3)
 
     ax.set_xticks(positions)
     ax.set_xticklabels(tick_labels)
@@ -122,9 +99,7 @@ def main():
     ax.set_ylabel("PG-Score")
     ax.grid(True, axis="y", linestyle="--", alpha=0.3)
 
-    df_corr = df_plot.groupby("target_lang", as_index=False).agg(
-        {args.property: "first", "pg_score": "mean"}
-    )
+    df_corr = df_plot.groupby("target_lang", as_index=False).agg({args.property: "first", "pg_score": "mean"})  # fmt: skip
     rho, p_value = spearmanr(df_corr[args.property], df_corr["pg_score"])
 
     if p_value < 0.001:
