@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.stats import spearmanr
 
-from plot.utils.plot_theme import PLOT_PARAMS, COLORS, OUTPUT_DIR, FONT_SIZES
-from plot.utils.metadata import MODEL_INFORMATION, LANGUAGE_INFORMATION
+from plot.utils.metadata import LANGUAGE_INFORMATION, MODEL_INFORMATION
+from plot.utils.plot_theme import COLORS, FONT_SIZES, OUTPUT_DIR, PLOT_PARAMS
 
 plt.rcParams.update(PLOT_PARAMS)
 

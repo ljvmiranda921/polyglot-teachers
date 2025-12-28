@@ -1,5 +1,6 @@
+from typing import Any, Literal, Optional
+
 from pydantic import BaseModel
-from typing import Optional, Literal, Any
 
 
 class ModelInfo(BaseModel):
