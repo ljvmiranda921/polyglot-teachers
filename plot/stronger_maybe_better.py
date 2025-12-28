@@ -91,19 +91,19 @@ def main():
         [
             {
                 "Language": "German (de)",
-                "β": f"{results_lang_specific['de'].params['lang_benchmark_performance']:.3f}",
+                "beta": f"{results_lang_specific['de'].params['lang_benchmark_performance']:.3f}",
                 "SE": f"{results_lang_specific['de'].bse['lang_benchmark_performance']:.3f}",
                 "p": f"{results_lang_specific['de'].pvalues['lang_benchmark_performance']:.3f}",
             },
             {
                 "Language": "Spanish (es)",
-                "β": f"{results_lang_specific['es'].params['lang_benchmark_performance']:.3f}",
+                "beta": f"{results_lang_specific['es'].params['lang_benchmark_performance']:.3f}",
                 "SE": f"{results_lang_specific['es'].bse['lang_benchmark_performance']:.3f}",
                 "p": f"{results_lang_specific['es'].pvalues['lang_benchmark_performance']:.3f}",
             },
             {
                 "Language": "Japanese (ja)",
-                "β": f"{results_lang_specific['ja'].params['lang_benchmark_performance']:.3f}",
+                "beta": f"{results_lang_specific['ja'].params['lang_benchmark_performance']:.3f}",
                 "SE": f"{results_lang_specific['ja'].bse['lang_benchmark_performance']:.3f}",
                 "p": f"{results_lang_specific['ja'].pvalues['lang_benchmark_performance']:.3f}",
             },
