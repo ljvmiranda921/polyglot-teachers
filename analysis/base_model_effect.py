@@ -132,7 +132,7 @@ def plot_correlation_heatmap(
         *  : p < 0.05
     """
     # Define desired order for base models
-    desired_order = ["OLMo 3 7B", "Gemma 3 4B", "Llama 3 8B", "Qwen 3 8B"]
+    desired_order = ["OLMo 3 7B", "Gemma 3 4B", "Qwen 3 8B", "Llama 3 8B"]
 
     # Filter to only include models present in the matrix
     base_models = [m for m in desired_order if m in corr_matrix.index]
