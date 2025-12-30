@@ -130,7 +130,7 @@ def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> No
         [COLORS["white"], COLORS["light_blue"], COLORS["cambridge_blue"]],
     )
 
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(8, 8))
 
     # Plot heatmap with lower triangle and diagonal
     heatmap = sns.heatmap(
@@ -146,6 +146,7 @@ def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> No
         ax=ax,
         xticklabels=base_models,
         yticklabels=base_models,
+        annot_kws={"fontsize": 24},
     )
 
     # Reverse y-axis so diagonal goes from bottom-left to top-right
