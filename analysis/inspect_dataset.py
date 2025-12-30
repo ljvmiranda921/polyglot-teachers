@@ -16,6 +16,11 @@ def main():
     args = get_args()
 
     df = load_dataset(args.input_dataset, split="train").to_pandas()
+
+    strategy_by_language = (
+        df.groupby(["language", "strategy"]).size().unstack(fill_value=0)
+    )
+
     breakpoint()
 
 
