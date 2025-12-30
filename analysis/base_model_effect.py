@@ -53,7 +53,6 @@ def main():
 
     # Analyze which teacher model is the clear winner
     analyze_teacher_rankings(results_df)
-    breakpoint()
 
 
 def parse_base_model_input(s: str) -> tuple[str, Path]:
@@ -104,12 +103,15 @@ def analyze_teacher_rankings(results_df: pd.DataFrame) -> None:
     print("\n========== Teacher Model Rankings Analysis ==========")
 
     # Get overall statistics per teacher
-    teacher_stats = results_df.groupby("teacher_model").agg({
-        "pg_score": ["mean", "std", "min", "max"],
-        "pgr": ["mean", "std"]
-    }).round(4)
+    teacher_stats = (
+        results_df.groupby("teacher_model")
+        .agg({"pg_score": ["mean", "std", "min", "max"], "pgr": ["mean", "std"]})
+        .round(4)
+    )
 
-    teacher_stats.columns = ["_".join(col).strip() for col in teacher_stats.columns.values]
+    teacher_stats.columns = [
+        "_".join(col).strip() for col in teacher_stats.columns.values
+    ]
     teacher_stats = teacher_stats.sort_values("pg_score_mean", ascending=False)
 
     print("\nOverall Teacher Performance (averaged across all base models):")
@@ -124,7 +126,9 @@ def analyze_teacher_rankings(results_df: pd.DataFrame) -> None:
         top_3_count = 0
 
         for base_model in base_models:
-            base_subset = results_df[results_df["base_model"] == base_model].sort_values("pg_score", ascending=False)
+            base_subset = results_df[
+                results_df["base_model"] == base_model
+            ].sort_values("pg_score", ascending=False)
             rank = base_subset[base_subset["teacher_model"] == teacher].index[0]
             rank_position = list(base_subset.index).index(rank) + 1
 
@@ -133,14 +137,18 @@ def analyze_teacher_rankings(results_df: pd.DataFrame) -> None:
             if rank_position <= 3:
                 top_3_count += 1
 
-        top_rankings.append({
-            "teacher_model": teacher,
-            "times_ranked_1st": top_1_count,
-            "times_in_top_3": top_3_count,
-            "total_base_models": len(base_models)
-        })
+        top_rankings.append(
+            {
+                "teacher_model": teacher,
+                "times_ranked_1st": top_1_count,
+                "times_in_top_3": top_3_count,
+                "total_base_models": len(base_models),
+            }
+        )
 
-    top_rankings_df = pd.DataFrame(top_rankings).sort_values("times_ranked_1st", ascending=False)
+    top_rankings_df = pd.DataFrame(top_rankings).sort_values(
+        "times_ranked_1st", ascending=False
+    )
     print("\nRanking Frequency:")
     print(top_rankings_df.to_markdown(index=False))
 
@@ -152,8 +160,12 @@ def analyze_teacher_rankings(results_df: pd.DataFrame) -> None:
     print(f"\n{'='*60}")
     print(f"RECOMMENDATION: {best_teacher}")
     print(f"  - Mean PG Score: {best_score:.4f} (±{best_std:.4f})")
-    print(f"  - Ranked 1st: {top_rankings_df[top_rankings_df['teacher_model']==best_teacher]['times_ranked_1st'].values[0]}/{len(base_models)} times")
-    print(f"  - In Top 3: {top_rankings_df[top_rankings_df['teacher_model']==best_teacher]['times_in_top_3'].values[0]}/{len(base_models)} times")
+    print(
+        f"  - Ranked 1st: {top_rankings_df[top_rankings_df['teacher_model']==best_teacher]['times_ranked_1st'].values[0]}/{len(base_models)} times"
+    )
+    print(
+        f"  - In Top 3: {top_rankings_df[top_rankings_df['teacher_model']==best_teacher]['times_in_top_3'].values[0]}/{len(base_models)} times"
+    )
     print(f"{'='*60}")
 
 
