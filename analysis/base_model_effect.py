@@ -116,8 +116,8 @@ def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> No
     base_models = corr_matrix.index.tolist()
     corr_matrix = corr_matrix.loc[base_models, base_models]
 
-    # Mask upper triangle (including diagonal)
-    mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
+    # Mask upper triangle (excluding diagonal)
+    mask = np.triu(np.ones_like(corr_matrix, dtype=bool), k=1)
 
     # Create custom colormap using Cambridge colors
     cmap = LinearSegmentedColormap.from_list(
@@ -127,12 +127,12 @@ def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> No
 
     fig, ax = plt.subplots(figsize=(10, 8))
 
-    # Plot heatmap with lower triangle only
+    # Plot heatmap with lower triangle and diagonal
     heatmap = sns.heatmap(
         corr_matrix,
         mask=mask,
         annot=True,
-        fmt=".3f",
+        fmt=".2f",
         cmap=cmap,
         center=0.5,
         vmin=0,
@@ -140,12 +140,17 @@ def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> No
         square=True,
         cbar_kws={
             "label": "Spearman $\\rho$",
+            "orientation": "horizontal",
             "shrink": 0.8,
+            "pad": 0.15,
         },
         ax=ax,
         xticklabels=base_models,
         yticklabels=base_models,
     )
+
+    # Reverse y-axis so diagonal goes from bottom-left to top-right
+    ax.invert_yaxis()
 
     ax.set_xlabel("")
     ax.set_ylabel("")
