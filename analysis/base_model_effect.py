@@ -3,6 +3,7 @@ import argparse
 from pathlib import Path
 import logging
 import sys
+from scipy.stats import spearmanr
 
 
 logging.basicConfig(
@@ -42,9 +43,43 @@ def main():
         base_df = base_df.sort_values(by="pg_score", ascending=False)
         print(f"========== Results for {base_model} ==========")
         print(base_df.to_markdown())
-        results.append(base_df.reset_index(drop=True))
+        results.append(base_df.reset_index())
 
     results_df = pd.concat(results).reset_index(drop=True)
+
+    # Compute Spearman correlation for each base model against OLMo 3 7B
+    olmo_df = results_df[results_df["base_model"] == "OLMo 3 7B"].copy()
+    other_base_models = results_df[results_df["base_model"] != "OLMo 3 7B"]["base_model"].unique()  # fmt: skip
+
+    correlations = []
+    for base_model in other_base_models:
+        base_df = results_df[results_df["base_model"] == base_model].copy()
+        merged = olmo_df.merge(
+            base_df,
+            on="teacher_model",
+            suffixes=("_olmo", f"_{base_model.replace(' ', '_')}"),
+        )
+        rho, pvalue = spearmanr(
+            merged["pg_score_olmo"], merged[f"pg_score_{base_model.replace(' ', '_')}"]
+        )
+
+        correlations.append(
+            {
+                "base_model": base_model,
+                "spearman_rho": rho,
+                "p_value": pvalue,
+                "n_teachers": len(merged),
+            }
+        )
+
+        logging.info(
+            f"Spearman rho for {base_model} vs OLMo 3 7B: {rho:.4f} (p={pvalue:.4f}, n={len(merged)})"
+        )
+
+    correlations_df = pd.DataFrame(correlations)
+    print("\n========== Spearman Correlations vs OLMo 3 7B ==========")
+    print(correlations_df.to_markdown(index=False))
+
     breakpoint()
 
 
