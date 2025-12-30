@@ -55,6 +55,9 @@ def main():
 
     results_df = pd.concat(results).reset_index(drop=True)
 
+    # Print teacher x base model table
+    print_teacher_base_model_table(results_df)
+
     # Compute correlations
     corr_matrix, pval_matrix = compute_correlation_matrix(results_df)
     plot_correlation_heatmap(
@@ -73,6 +76,27 @@ def parse_base_model_input(s: str) -> tuple[str, Path]:
     if not Path(path).exists():
         raise ValueError(f"Cannot find file or input: {path}")
     return base_model, Path(path)
+
+
+def print_teacher_base_model_table(results_df: pd.DataFrame) -> None:
+    """Print a markdown table with teacher models as rows and base models as columns"""
+    desired_order = ["OLMo 3 7B", "Gemma 3 4B", "Qwen 3 8B", "Llama 3 8B"]
+    pivot_table = results_df.pivot(
+        index="teacher_model", columns="base_model", values="pg_score"
+    )
+
+    existing_cols = [col for col in desired_order if col in pivot_table.columns]
+    pivot_table = pivot_table[existing_cols]
+    pivot_table["mean"] = pivot_table.mean(axis=1)
+    pivot_table = pivot_table.sort_values("mean", ascending=False)
+    pivot_table = pivot_table.drop("mean", axis=1)
+
+    # Round values for readability
+    pivot_table = pivot_table.round(4)
+
+    print("\n========== Teacher Model Performance by Base Model ==========")
+    print(pivot_table.to_markdown())
+    print()
 
 
 def compute_correlation_matrix(
