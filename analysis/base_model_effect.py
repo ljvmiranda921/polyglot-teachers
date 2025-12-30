@@ -16,7 +16,7 @@ logging.basicConfig(
 def get_args():
     parser = argparse.ArgumentParser(description="Compute base model effect")
     # fmt: off
-    parser.add_argument("-b", "--base_model_result", nargs="+", type=str, help="Base model result in format <base_model>::<path/to/results.jsonl>")
+    parser.add_argument("-b", "--base_model_result", action="append", type=str, help="Base model result in format <base_model>::<path/to/results.jsonl>")
     parser.add_argument("-o", "--output_path", type=Path, default="results/base_model_effect.csv", help="Path to save the results in CSV format.")
     parser.add_argument("-l", "--languages", nargs="+", type=str, default=["ar", "id", "de"], help="Language code to include in computation.")
     # fmt: on
@@ -27,7 +27,6 @@ def main():
     args = get_args()
 
     base_model_results: list[tuple[str, Path]] = [parse_base_model_input(str_input) for str_input in args.base_model_result]  # fmt: skip
-    breakpoint()
     languages = args.languages
     logging.info(f"Using languages: {languages}")
 
