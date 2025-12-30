@@ -75,7 +75,9 @@ def parse_base_model_input(s: str) -> tuple[str, Path]:
     return base_model, Path(path)
 
 
-def compute_correlation_matrix(results_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+def compute_correlation_matrix(
+    results_df: pd.DataFrame,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Compute pairwise Spearman correlation matrix between all base models
 
     Returns:
@@ -120,7 +122,9 @@ def compute_correlation_matrix(results_df: pd.DataFrame) -> tuple[pd.DataFrame, 
     return corr_matrix, pval_matrix
 
 
-def plot_correlation_heatmap(corr_matrix: pd.DataFrame, pval_matrix: pd.DataFrame, output_path: Path) -> None:
+def plot_correlation_heatmap(
+    corr_matrix: pd.DataFrame, pval_matrix: pd.DataFrame, output_path: Path
+) -> None:
     """Plot correlation matrix as a lower-triangle heatmap with Cambridge colors
 
     Significance markers:
@@ -195,13 +199,15 @@ def plot_correlation_heatmap(corr_matrix: pd.DataFrame, pval_matrix: pd.DataFram
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="left", va="bottom")
     ax.set_yticklabels(ax.get_yticklabels(), rotation=0, ha="right", va="center")
 
-    # Add significance legend
-    fig.text(
-        0.15,
-        0.05,
-        "** $p < 0.01$, * $p < 0.05$",
-        fontsize=16,
-        ha="left",
+    # Add significance legend in the masked upper right area
+    ax.text(
+        0.95,
+        0.35,
+        "** :$p < 0.01$\n* :$p < 0.05$",
+        transform=ax.transAxes,
+        fontsize=20,
+        ha="right",
+        va="top",
     )
 
     plt.tight_layout()
