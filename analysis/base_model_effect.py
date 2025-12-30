@@ -16,6 +16,7 @@ logging.basicConfig(
 def get_args():
     parser = argparse.ArgumentParser(description="Compute base model effect")
     # fmt: off
+    parser.add_argument("--reference_result", type=Path, help="Path to the OLMo 3 7B results.")
     parser.add_argument("-b", "--base_model_result", action="append", type=str, help="Base model result in format <base_model>::<path/to/results.jsonl>")
     parser.add_argument("-o", "--output_path", type=Path, default="results/base_model_effect.csv", help="Path to save the results in CSV format.")
     parser.add_argument("-l", "--languages", nargs="+", type=str, default=["ar", "id", "de"], help="Language code to include in computation.")
@@ -29,6 +30,8 @@ def main():
     base_model_results: list[tuple[str, Path]] = [parse_base_model_input(str_input) for str_input in args.base_model_result]  # fmt: skip
     languages = args.languages
     logging.info(f"Using languages: {languages}")
+
+    base_model_results.append(("OLMo 3 7B", args.reference_result))
 
     results = []
     for base_model, fp in base_model_results:
