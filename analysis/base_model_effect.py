@@ -142,12 +142,7 @@ def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> No
         vmin=0,
         vmax=1,
         square=True,
-        cbar_kws={
-            "label": "Spearman $\\rho$",
-            "orientation": "horizontal",
-            "shrink": 0.8,
-            "pad": 0.15,
-        },
+        cbar=False,
         ax=ax,
         xticklabels=base_models,
         yticklabels=base_models,
@@ -156,9 +151,12 @@ def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> No
     # Reverse y-axis so diagonal goes from bottom-left to top-right
     ax.invert_yaxis()
 
+    # Move x-axis to top
+    ax.xaxis.tick_top()
+
     ax.set_xlabel("")
     ax.set_ylabel("")
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right", va="top")
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="left", va="bottom")
     ax.set_yticklabels(ax.get_yticklabels(), rotation=0, ha="right", va="center")
 
     plt.tight_layout()
