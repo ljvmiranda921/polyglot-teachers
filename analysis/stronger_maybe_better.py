@@ -6,7 +6,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf
-
 from plot.utils.metadata import MODEL_INFORMATION
 
 logging.basicConfig(
