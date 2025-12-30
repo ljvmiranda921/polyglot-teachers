@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from plot.utils.metadata import LANGUAGE_INFORMATION, MODEL_INFORMATION
-from plot.utils.plot_theme import COLORS, FONT_SIZES, OUTPUT_DIR, PLOT_PARAMS
+from analysis.utils.metadata import LANGUAGE_INFORMATION, MODEL_INFORMATION
+from analysis.utils.plot_theme import COLORS, FONT_SIZES, OUTPUT_DIR, PLOT_PARAMS
 
 plt.rcParams.update(PLOT_PARAMS)
 

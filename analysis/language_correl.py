@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.stats import spearmanr
 
-from plot.utils.metadata import LANGUAGE_INFORMATION, MODEL_INFORMATION
-from plot.utils.plot_theme import COLORS, FONT_SIZES, OUTPUT_DIR, PLOT_PARAMS
+from analysis.utils.metadata import LANGUAGE_INFORMATION, MODEL_INFORMATION
+from analysis.utils.plot_theme import COLORS, FONT_SIZES, OUTPUT_DIR, PLOT_PARAMS
 
 plt.rcParams.update(PLOT_PARAMS)
 
@@ -64,14 +64,14 @@ def main():
             include_lowest=True,
         )
 
-        box_data = []
-        tick_labels = []
-        for label in labels:
-            subset = df_plot[df_plot["resource_bin"] == label]
-            if len(subset) > 0:
-                box_data.append(subset["pg_score"].tolist())
-                tick_labels.append(label)
-        positions = range(len(box_data))
+    box_data = []
+    tick_labels = []
+    for label in labels:
+        subset = df_plot[df_plot["resource_bin"] == label]
+        if len(subset) > 0:
+            box_data.append(subset["pg_score"].tolist())
+            tick_labels.append(label)
+    positions = range(len(box_data))
 
     fig, ax = plt.subplots(1, 1, figsize=args.figsize)
     bp = ax.boxplot(
@@ -91,7 +91,7 @@ def main():
     )
 
     for i, (label, data) in enumerate(zip(tick_labels, box_data)):
-        ax.scatter(i, data, alpha=0.3, s=40, color=COLORS.get("dark_blue"), zorder=3)
+        ax.scatter([i] * len(data), data, alpha=0.3, s=40, color=COLORS.get("dark_blue"), zorder=3)
 
     ax.set_xticks(positions)
     ax.set_xticklabels(tick_labels)
