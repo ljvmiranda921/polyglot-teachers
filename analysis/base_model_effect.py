@@ -119,10 +119,10 @@ def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> No
     # Mask upper triangle (excluding diagonal)
     mask = np.triu(np.ones_like(corr_matrix, dtype=bool), k=1)
 
-    # Create custom colormap using Cambridge colors
+    # Create custom colormap using Cambridge colors (sequential)
     cmap = LinearSegmentedColormap.from_list(
         "cambridge_correlation",
-        [COLORS["cherry"], COLORS["white"], COLORS["cambridge_blue"]],
+        [COLORS["white"], COLORS["light_blue"], COLORS["cambridge_blue"]],
     )
 
     fig, ax = plt.subplots(figsize=(10, 8))
@@ -134,7 +134,6 @@ def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> No
         annot=True,
         fmt=".2f",
         cmap=cmap,
-        center=0.5,
         vmin=0,
         vmax=1,
         square=True,
