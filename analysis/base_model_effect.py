@@ -47,7 +47,21 @@ def main():
 
     results_df = pd.concat(results).reset_index(drop=True)
 
-    # Compute Spearman correlation for each base model against OLMo 3 7B
+    # Compute correlations
+    corr_olmo3_7b = compute_correlation_on_olmo3_7b(results_df)
+    breakpoint()
+
+
+def parse_base_model_input(s: str) -> tuple[str, Path]:
+    """Parse a string input <base_model>::<path/to/results.jsonl>"""
+    base_model, path = s.split("::")
+    if not Path(path).exists():
+        raise ValueError(f"Cannot find file or input: {path}")
+    return base_model, Path(path)
+
+
+def compute_correlation_on_olmo3_7b(results_df: pd.DataFrame) -> pd.DataFrame:
+    """Compute Spearman correlation for each base model against OLMo 3 7B"""
     olmo_df = results_df[results_df["base_model"] == "OLMo 3 7B"].copy()
     other_base_models = results_df[results_df["base_model"] != "OLMo 3 7B"]["base_model"].unique()  # fmt: skip
 
@@ -59,9 +73,7 @@ def main():
             on="teacher_model",
             suffixes=("_olmo", f"_{base_model.replace(' ', '_')}"),
         )
-        rho, pvalue = spearmanr(
-            merged["pg_score_olmo"], merged[f"pg_score_{base_model.replace(' ', '_')}"]
-        )
+        rho, pvalue = spearmanr(merged["pg_score_olmo"], merged[f"pg_score_{base_model.replace(' ', '_')}"])  # fmt: skip
 
         correlations.append(
             {
@@ -72,23 +84,12 @@ def main():
             }
         )
 
-        logging.info(
-            f"Spearman rho for {base_model} vs OLMo 3 7B: {rho:.4f} (p={pvalue:.4f}, n={len(merged)})"
-        )
+        logging.info(f"Spearman rho for {base_model} vs OLMo 3 7B: {rho:.4f} (p={pvalue:.4f}, n={len(merged)})")  # fmt: skip
 
     correlations_df = pd.DataFrame(correlations)
     print("\n========== Spearman Correlations vs OLMo 3 7B ==========")
     print(correlations_df.to_markdown(index=False))
-
-    breakpoint()
-
-
-def parse_base_model_input(s: str) -> tuple[str, Path]:
-    """Parse a string input <base_model>::<path/to/results.jsonl>"""
-    base_model, path = s.split("::")
-    if not Path(path).exists():
-        raise ValueError(f"Cannot find file or input: {path}")
-    return base_model, Path(path)
+    return correlations_df
 
 
 if __name__ == "__main__":
