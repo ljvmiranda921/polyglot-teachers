@@ -75,8 +75,12 @@ def parse_base_model_input(s: str) -> tuple[str, Path]:
     return base_model, Path(path)
 
 
-def compute_correlation_matrix(results_df: pd.DataFrame) -> pd.DataFrame:
-    """Compute pairwise Spearman correlation matrix between all base models"""
+def compute_correlation_matrix(results_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Compute pairwise Spearman correlation matrix between all base models
+
+    Returns:
+        tuple: (correlation matrix, p-value matrix)
+    """
     pivot_df = results_df.pivot(
         index="teacher_model", columns="base_model", values="pg_score"
     )
@@ -85,29 +89,35 @@ def compute_correlation_matrix(results_df: pd.DataFrame) -> pd.DataFrame:
     base_models = pivot_df.columns.tolist()
     n_models = len(base_models)
     corr_matrix = pd.DataFrame(index=base_models, columns=base_models, dtype=float)
+    pval_matrix = pd.DataFrame(index=base_models, columns=base_models, dtype=float)
 
     for i, model_a in enumerate(base_models):
         for j, model_b in enumerate(base_models):
             if i == j:
                 corr_matrix.loc[model_a, model_b] = 1.0
+                pval_matrix.loc[model_a, model_b] = 0.0
             elif i < j:
                 # Only compute upper triangle, then mirror
                 valid_mask = pivot_df[[model_a, model_b]].notna().all(axis=1)
                 valid_data = pivot_df.loc[valid_mask, [model_a, model_b]]
 
                 if len(valid_data) > 1:
-                    rho, _ = spearmanr(valid_data[model_a], valid_data[model_b])
+                    rho, pval = spearmanr(valid_data[model_a], valid_data[model_b])
                     corr_matrix.loc[model_a, model_b] = rho
                     corr_matrix.loc[model_b, model_a] = rho
+                    pval_matrix.loc[model_a, model_b] = pval
+                    pval_matrix.loc[model_b, model_a] = pval
                 else:
                     corr_matrix.loc[model_a, model_b] = float("nan")
                     corr_matrix.loc[model_b, model_a] = float("nan")
+                    pval_matrix.loc[model_a, model_b] = float("nan")
+                    pval_matrix.loc[model_b, model_a] = float("nan")
 
     logging.info(f"Computed {n_models}x{n_models} correlation matrix")
     print("\n========== Base Model Correlation Matrix (Spearman) ==========")
     print(corr_matrix.to_markdown())
 
-    return corr_matrix
+    return corr_matrix, pval_matrix
 
 
 def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> None:
