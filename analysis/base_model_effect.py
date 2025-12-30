@@ -56,9 +56,9 @@ def main():
     results_df = pd.concat(results).reset_index(drop=True)
 
     # Compute correlations
-    corr_matrix = compute_correlation_matrix(results_df)
+    corr_matrix, pval_matrix = compute_correlation_matrix(results_df)
     plot_correlation_heatmap(
-        corr_matrix, OUTPUT_DIR / "base_model_correlation_heatmap.pdf"
+        corr_matrix, pval_matrix, OUTPUT_DIR / "base_model_correlation_heatmap.pdf"
     )
 
     corr_olmo3_7b = compute_correlation_on_olmo3_7b(results_df)
@@ -120,16 +120,41 @@ def compute_correlation_matrix(results_df: pd.DataFrame) -> tuple[pd.DataFrame, 
     return corr_matrix, pval_matrix
 
 
-def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> None:
-    """Plot correlation matrix as a lower-triangle heatmap with Cambridge colors"""
+def plot_correlation_heatmap(corr_matrix: pd.DataFrame, pval_matrix: pd.DataFrame, output_path: Path) -> None:
+    """Plot correlation matrix as a lower-triangle heatmap with Cambridge colors
+
+    Significance markers:
+        ** : p < 0.01
+        *  : p < 0.05
+    """
     # Define desired order for base models
     desired_order = ["OLMo 3 7B", "Gemma 3 4B", "Llama 3 8B", "Qwen 3 8B"]
 
     # Filter to only include models present in the matrix
     base_models = [m for m in desired_order if m in corr_matrix.index]
 
-    # Reorder the matrix
+    # Reorder the matrices
     corr_matrix = corr_matrix.loc[base_models, base_models]
+    pval_matrix = pval_matrix.loc[base_models, base_models]
+
+    # Create annotation labels with significance markers
+    annot_labels = corr_matrix.copy().astype(str)
+    for i in range(len(base_models)):
+        for j in range(len(base_models)):
+            val = corr_matrix.iloc[i, j]
+            pval = pval_matrix.iloc[i, j]
+            if pd.notna(val) and pd.notna(pval):
+                # Don't add asterisks to diagonal (self-correlation)
+                if i == j:
+                    annot_labels.iloc[i, j] = f"{val:.2f}"
+                elif pval < 0.01:
+                    annot_labels.iloc[i, j] = f"{val:.2f}**"
+                elif pval < 0.05:
+                    annot_labels.iloc[i, j] = f"{val:.2f}*"
+                else:
+                    annot_labels.iloc[i, j] = f"{val:.2f}"
+            else:
+                annot_labels.iloc[i, j] = ""
 
     # Mask upper triangle (excluding diagonal)
     mask = np.triu(np.ones_like(corr_matrix, dtype=bool), k=1)
@@ -146,8 +171,8 @@ def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> No
     heatmap = sns.heatmap(
         corr_matrix,
         mask=mask,
-        annot=True,
-        fmt=".2f",
+        annot=annot_labels,
+        fmt="",
         cmap=cmap,
         vmin=0,
         vmax=1,
@@ -169,6 +194,15 @@ def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> No
     ax.set_ylabel("")
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="left", va="bottom")
     ax.set_yticklabels(ax.get_yticklabels(), rotation=0, ha="right", va="center")
+
+    # Add significance legend
+    fig.text(
+        0.15,
+        0.05,
+        "** $p < 0.01$, * $p < 0.05$",
+        fontsize=16,
+        ha="left",
+    )
 
     plt.tight_layout()
     output_path.parent.mkdir(parents=True, exist_ok=True)
