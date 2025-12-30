@@ -112,8 +112,13 @@ def compute_correlation_matrix(results_df: pd.DataFrame) -> pd.DataFrame:
 
 def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> None:
     """Plot correlation matrix as a lower-triangle heatmap with Cambridge colors"""
-    # Ensure the matrix is symmetric with same order on both axes
-    base_models = corr_matrix.index.tolist()
+    # Define desired order for base models
+    desired_order = ["OLMo 3 7B", "Gemma 3 4B", "Llama 3 8B", "Qwen 3 8B"]
+
+    # Filter to only include models present in the matrix
+    base_models = [m for m in desired_order if m in corr_matrix.index]
+
+    # Reorder the matrix
     corr_matrix = corr_matrix.loc[base_models, base_models]
 
     # Mask upper triangle (excluding diagonal)
