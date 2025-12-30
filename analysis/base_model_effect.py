@@ -4,6 +4,11 @@ from pathlib import Path
 import logging
 import sys
 from scipy.stats import spearmanr
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from matplotlib.colors import LinearSegmentedColormap
+from analysis.utils.plot_theme import COLORS, OUTPUT_DIR, PLOT_PARAMS
 
 
 logging.basicConfig(
@@ -12,6 +17,8 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
     level=logging.INFO,
 )
+
+plt.rcParams.update(PLOT_PARAMS)
 
 
 def get_args():
@@ -49,6 +56,10 @@ def main():
 
     # Compute correlations
     corr_matrix = compute_correlation_matrix(results_df)
+    plot_correlation_heatmap(
+        corr_matrix, OUTPUT_DIR / "base_model_correlation_heatmap.pdf"
+    )
+
     corr_olmo3_7b = compute_correlation_on_olmo3_7b(results_df)
 
     # Analyze which teacher model is the clear winner
@@ -96,6 +107,54 @@ def compute_correlation_matrix(results_df: pd.DataFrame) -> pd.DataFrame:
     print(corr_matrix.to_markdown())
 
     return corr_matrix
+
+
+def plot_correlation_heatmap(corr_matrix: pd.DataFrame, output_path: Path) -> None:
+    """Plot correlation matrix as a lower-triangle heatmap with Cambridge colors"""
+    # Ensure the matrix is symmetric with same order on both axes
+    base_models = corr_matrix.index.tolist()
+    corr_matrix = corr_matrix.loc[base_models, base_models]
+
+    # Mask upper triangle (including diagonal)
+    mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
+
+    # Create custom colormap using Cambridge colors
+    cmap = LinearSegmentedColormap.from_list(
+        "cambridge_correlation",
+        [COLORS["cherry"], COLORS["white"], COLORS["cambridge_blue"]],
+    )
+
+    fig, ax = plt.subplots(figsize=(10, 8))
+
+    # Plot heatmap with lower triangle only
+    heatmap = sns.heatmap(
+        corr_matrix,
+        mask=mask,
+        annot=True,
+        fmt=".3f",
+        cmap=cmap,
+        center=0.5,
+        vmin=0,
+        vmax=1,
+        square=True,
+        cbar_kws={
+            "label": "Spearman $\\rho$",
+            "shrink": 0.8,
+        },
+        ax=ax,
+        xticklabels=base_models,
+        yticklabels=base_models,
+    )
+
+    ax.set_xlabel("")
+    ax.set_ylabel("")
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right", va="top")
+    ax.set_yticklabels(ax.get_yticklabels(), rotation=0, ha="right", va="center")
+
+    plt.tight_layout()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(output_path, format="pdf", bbox_inches="tight")
+    logging.info(f"Saved correlation heatmap to {output_path}")
 
 
 def analyze_teacher_rankings(results_df: pd.DataFrame) -> None:
