@@ -41,7 +41,7 @@ def main():
         print(base_df.to_markdown())
         results.append(base_df.reset_index(drop=True))
 
-    results_df = pd.concat(results)
+    results_df = pd.concat(results).reset_index(drop=True)
     breakpoint()
 
 
