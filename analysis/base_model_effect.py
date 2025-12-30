@@ -229,7 +229,7 @@ def plot_correlation_heatmap(
         0.35,
         "** :$p < 0.01$\n* :$p < 0.05$",
         transform=ax.transAxes,
-        fontsize=20,
+        fontsize=25,
         ha="right",
         va="top",
     )
