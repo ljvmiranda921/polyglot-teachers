@@ -85,6 +85,7 @@ def main():
         input_dataset_filter=args.input_dataset_filter,
         apply_subsampling=args.apply_subsampling,
         max_train_samples=args.max_train_samples,
+        show_samples=True,
     )
 
     trainer = SFTTrainer(
@@ -186,6 +187,7 @@ def prepare_training_data(
     messages_key: str = "messages",
     apply_subsampling: bool = False,
     max_train_samples: int = None,
+    show_samples: bool = False,
 ) -> Dataset:
     """Apply chat template to the post-training dataset. Expects a 'messages' field in the dataset."""
 
@@ -221,6 +223,17 @@ def prepare_training_data(
         dataset = dataset.shuffle(seed=42).select(range(max_train_samples))
 
     dataset = dataset.map(_formatting_prompts_func, batched=True)
+
+    if show_samples:
+        logging.info("=" * 80)
+        logging.info("Showing first 3 instances of the dataset:")
+        logging.info("=" * 80)
+        for i in range(min(3, len(dataset))):
+            logging.info(f"\n[Instance {i+1}]")
+            logging.info(f"Messages field:")
+            logging.info(json.dumps(dataset[i][messages_key], indent=2))
+            logging.info("-" * 80)
+
     return dataset
 
 
