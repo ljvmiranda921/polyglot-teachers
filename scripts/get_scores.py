@@ -263,6 +263,10 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
     language = lang_teacher_parts[0]
     teacher_model_raw = lang_teacher_parts[1] if len(lang_teacher_parts) > 1 else ""
     teacher_model = teacher_model_raw.replace("_", ".")
+    # If .generate, .translate, and .respond suffixes exist, remove them
+    for suffix in [".generate", ".translate", ".respond"]:
+        if teacher_model.endswith(suffix):
+            teacher_model = teacher_model[: -len(suffix)]
     # Check for lora/qlora in the model info
     is_lora_model = "lora" in model_info_raw.lower()
     is_qlora_model = is_lora_model and "4bit" in model_info_raw.lower() or "8bit" in model_info_raw.lower()  # fmt: skip
