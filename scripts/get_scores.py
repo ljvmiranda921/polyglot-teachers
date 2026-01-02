@@ -49,6 +49,7 @@ def get_args():
     parser.add_argument("--extrinsic_kwargs", type=str, default="{}", help="Extra arguments to pass when processing the extrinsic metrics.")
     parser.add_argument("--ref_model_results", type=str, default="ljvmiranda921/details_allenai__Olmo-3-7B-Instruct-SFT_private", help="Huggingface Dataset containing the reference model results.")
     parser.add_argument("--base_model_results", type=str, default="ljvmiranda921/details_allenai__Olmo-3-1025-7B_private", help="Huggingface Dataset containing the base model results.")
+    parser.add_argument("--show_per_language", action="store_true", help="Whether to show per-language PG-Scores.")
     # fmt: on
     return parser.parse_args()
 
@@ -97,8 +98,13 @@ def main():
     df_merged["pg_score"] = (df_merged["pgr"] + df_merged["z_score"]) / 2
 
     print("\n====== PGR (grouped-by teacher model across languages) ======")
+    group_by_cols = (
+        ["teacher_model", "target_lang"]
+        if args.show_per_language
+        else ["teacher_model"]
+    )
     print(
-        df_merged.groupby("teacher_model")
+        df_merged.groupby(group_by_cols)
         .agg({"pg_score": "mean"})
         .reset_index()
         .to_markdown(index=False)
@@ -263,6 +269,10 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
     language = lang_teacher_parts[0]
     teacher_model_raw = lang_teacher_parts[1] if len(lang_teacher_parts) > 1 else ""
     teacher_model = teacher_model_raw.replace("_", ".")
+    # If .generate, .translate, and .respond suffixes exist, remove them
+    for suffix in [".generate", ".translate", ".respond"]:
+        if teacher_model.endswith(suffix):
+            teacher_model = teacher_model[: -len(suffix)]
     # Check for lora/qlora in the model info
     is_lora_model = "lora" in model_info_raw.lower()
     is_qlora_model = is_lora_model and "4bit" in model_info_raw.lower() or "8bit" in model_info_raw.lower()  # fmt: skip
