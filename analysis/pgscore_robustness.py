@@ -47,6 +47,12 @@ def main():
             axis=1,
         )
 
+    pairs = list(itertools.product(col_name_tracker, col_name_tracker))
+    pairs_spearman_rho = []
+    for set1, set2 in pairs:
+        rho, p = spearmanr(df[set1], df[set2])
+        print(set1, set2, f"{rho} (p={p})")
+
     breakpoint()
 
 
