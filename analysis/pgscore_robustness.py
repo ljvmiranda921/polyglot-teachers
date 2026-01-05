@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 import logging
 import sys
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import seaborn as sns
@@ -57,7 +58,7 @@ def main():
         print(set1, set2, f"{rho} (p={p})")
         pairs_spearman_rho.append((set1, set2, rho, p))
 
-    fig, ax = plt.subplots(figsize=(6, 6))
+    fig, ax = plt.subplots(figsize=(5, 6))
     cmap = LinearSegmentedColormap.from_list(
         "cambridge_diverging",
         [COLORS["cherry"], COLORS["white"], COLORS["green"]],
@@ -65,10 +66,12 @@ def main():
     rankings_df = pd.DataFrame(0, index=ALPHA_VALUES, columns=ALPHA_VALUES)
     for set1, set2, rho, p in pairs_spearman_rho:
         rankings_df.loc[set1, set2] = rho
+    mask = np.triu(np.ones_like(rankings_df, dtype=bool), k=1)
     heatmap = sns.heatmap(
         rankings_df,
         annot=True,
-        fmt=".3f",
+        fmt=".2f",
+        mask=mask,
         cmap=cmap,
         center=0,
         cbar_kws={
