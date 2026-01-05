@@ -16,10 +16,8 @@ def main():
     args = get_args()
 
     df = load_dataset(args.input_dataset, split="train").to_pandas()
-
     df_report = df.groupby(["model", "strategy"]).size().unstack(fill_value=0)
-
-    breakpoint()
+    print(df_report.to_markdown())
 
 
 if __name__ == "__main__":
