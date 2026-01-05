@@ -35,20 +35,18 @@ def main():
 
     for alpha in ALPHA_VALUES:
         df[f"pg_score_{alpha}"] = df.apply(
-            compute_pgscore,
+            lambda row: compute_pgscore(
+                alpha=alpha,
+                intrinsic=row[args.intrinsic_col],
+                extrinsic=row[args.extrinsic_col],
+            ),
             axis=1,
-            **{
-                "alpha": alpha,
-                "intrinsic": x[args.intrinsic_col],
-                "extrinsic": x[args.extrinsic_col],
-            },
         )
 
     breakpoint()
 
 
 def compute_pgscore(alpha: float, intrinsic: float, extrinsic: float) -> float:
-    breakpoint()
     return ((alpha * intrinsic) + (1 - alpha) * extrinsic) / 2
 
 
