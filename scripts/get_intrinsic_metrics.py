@@ -8,8 +8,8 @@ import time
 from pathlib import Path
 from typing import Optional
 
-import torch
 import pandas as pd
+import torch
 from datasets import Dataset, load_dataset
 from langcodes import Language
 from tqdm import tqdm
@@ -244,9 +244,9 @@ def _compute_distinct_ri(
     tensor_parallel_size: int = 2,
 ) -> dict[str, float]:
     """Compute the distinctiveness of the instructions and responses in the dataset."""
+    from sentence_transformers.util import cos_sim
     from vllm import LLM
     from vllm.outputs import EmbeddingRequestOutput
-    from sentence_transformers.util import cos_sim
 
     if "prompt" not in dataset.column_names or "response" not in dataset.column_names:
         raise ValueError("Dataset must contain 'prompt' and 'response' fields!")
@@ -436,8 +436,8 @@ def _compute_rubric_score(
         feedback: str
 
     if provider == "llamacpp":
-        from llama_cpp import Llama
         from huggingface_hub import hf_hub_download
+        from llama_cpp import Llama
 
         # Extract filename from model name
         # (e.g., "M-Prometheus-3B-Q4_K_M-GGUF" -> "m-prometheus-3b-q4_k_m.gguf")
@@ -482,9 +482,9 @@ def _compute_rubric_score(
                 logging.error(f"Validation error: {output} | Error: {e}")
                 results.append(Feedback(score=1, feedback="Invalid output"))
     elif provider == "vllm":
+        from transformers import AutoTokenizer
         from vllm import LLM, SamplingParams
         from vllm.sampling_params import GuidedDecodingParams
-        from transformers import AutoTokenizer
 
         llm = LLM(model=model_name, tensor_parallel_size=tensor_parallel_size)
 
@@ -522,6 +522,7 @@ def _compute_rubric_score(
 
     elif provider == "openai_server":
         import asyncio
+
         from openai import AsyncOpenAI
 
         async def process_with_openai(inputs, base_url, api_key, max_concurrent):

@@ -1,16 +1,17 @@
 import argparse
-import pandas as pd
-from pathlib import Path
+import itertools
 import logging
 import sys
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap
-import seaborn as sns
-import itertools
+from pathlib import Path
 
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from matplotlib.colors import LinearSegmentedColormap
 from scipy.stats import spearmanr
-from analysis.utils.plot_theme import PLOT_PARAMS, COLORS, OUTPUT_DIR, FONT_SIZES
+
+from analysis.utils.plot_theme import COLORS, FONT_SIZES, OUTPUT_DIR, PLOT_PARAMS
 
 plt.rcParams.update(PLOT_PARAMS)
 
