@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 import logging
 import sys
+import itertools
 
 from scipy.stats import spearmanr
 
@@ -33,8 +34,11 @@ def main():
     spearman_rho, spearman_p = spearmanr(df[args.intrinsic_col], df[args.extrinsic_col])
     logging.info(f"Rank correlation between intr-extr: {spearman_rho} (p={spearman_p})")
 
+    col_name_tracker = []
     for alpha in ALPHA_VALUES:
-        df[f"pg_score_{alpha}"] = df.apply(
+        col_name = f"pg_score_{alpha}"
+        col_name_tracker.append(col_name)
+        df[col_name] = df.apply(
             lambda row: compute_pgscore(
                 alpha=alpha,
                 intrinsic=row[args.intrinsic_col],
