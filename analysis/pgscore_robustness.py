@@ -4,6 +4,8 @@ from pathlib import Path
 import logging
 import sys
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
+import seaborn as sns
 import itertools
 
 from scipy.stats import spearmanr
@@ -37,10 +39,8 @@ def main():
     spearman_rho, spearman_p = spearmanr(df[args.intrinsic_col], df[args.extrinsic_col])
     logging.info(f"Rank correlation between intr-extr: {spearman_rho} (p={spearman_p})")
 
-    col_name_tracker = []
     for alpha in ALPHA_VALUES:
         col_name = f"pg_score_{alpha}"
-        col_name_tracker.append(col_name)
         df[col_name] = df.apply(
             lambda row: compute_pgscore(
                 alpha=alpha,
@@ -50,7 +50,7 @@ def main():
             axis=1,
         )
 
-    pairs = list(itertools.product(col_name_tracker, col_name_tracker))
+    pairs = list(itertools.product(ALPHA_VALUES, ALPHA_VALUES))
     pairs_spearman_rho = []
     for set1, set2 in pairs:
         rho, p = spearmanr(df[set1], df[set2])
@@ -58,20 +58,28 @@ def main():
         pairs_spearman_rho.append((set1, set2, rho, p))
 
     fig, ax = plt.subplots(figsize=(6, 6))
-    im = ax.matshow(
-        [
-            [x[2] for x in pairs_spearman_rho[i : i + len(col_name_tracker)]]
-            for i in range(0, len(pairs_spearman_rho), len(col_name_tracker))
-        ],
-        cmap="viridis",
-        vmin=0,
-        vmax=1,
+    cmap = LinearSegmentedColormap.from_list(
+        "cambridge_diverging",
+        [COLORS["cherry"], COLORS["white"], COLORS["green"]],
     )
-    fig.colorbar(im, ax=ax)
-    ax.set_xticks(range(len(col_name_tracker)))
-    ax.set_yticks(range(len(col_name_tracker)))
-    ax.set_xticklabels([ALPHA_VALUES])
-    ax.set_yticklabels([ALPHA_VALUES])
+    rankings_df = pd.DataFrame(0, index=ALPHA_VALUES, columns=ALPHA_VALUES)
+    for set1, set2, rho, p in pairs_spearman_rho:
+        rankings_df.loc[set1, set2] = rho
+    heatmap = sns.heatmap(
+        rankings_df,
+        annot=True,
+        fmt=".3f",
+        cmap=cmap,
+        center=0,
+        cbar_kws={
+            "label": "Loading Strength",
+            "orientation": "horizontal",
+            "shrink": 0.8,
+            "pad": 0.1,
+        },
+        ax=ax,
+    )
+
     plt.savefig(OUTPUT_DIR / "pgscore_robustness_heatmap.pdf", bbox_inches="tight")
 
 
