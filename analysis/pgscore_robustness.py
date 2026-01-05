@@ -103,19 +103,12 @@ def main():
 
     # Add significance legend
     ax.text(
-        0.02,
+        0.30,
         0.98,
-        r"*$p < 0.05$  **$p < 0.01$",
+        r"*:$p < 0.05$~~**:$p < 0.01$",
         transform=ax.transAxes,
-        fontsize=FONT_SIZES["small"],
+        fontsize=FONT_SIZES["medium"],
         verticalalignment="top",
-        bbox=dict(
-            # boxstyle="round",
-            facecolor="white",
-            alpha=0.8,
-            # edgecolor="gray",
-            # linewidth=0.5,
-        ),
     )
 
     plt.savefig(OUTPUT_DIR / "pgscore_robustness_heatmap.pdf", bbox_inches="tight")
