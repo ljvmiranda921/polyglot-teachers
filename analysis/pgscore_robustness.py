@@ -47,7 +47,7 @@ def main():
 
 
 def compute_pgscore(alpha: float, intrinsic: float, extrinsic: float) -> float:
-    return ((alpha * intrinsic) + (1 - alpha) * extrinsic) / 2
+    return (alpha * intrinsic) + (1 - alpha) * extrinsic
 
 
 if __name__ == "__main__":
