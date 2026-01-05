@@ -40,7 +40,7 @@ def main():
     logging.info(f"Rank correlation between intr-extr: {spearman_rho} (p={spearman_p})")
 
     for alpha in ALPHA_VALUES:
-        col_name = f"pg_score_{alpha}"
+        col_name = alpha
         df[col_name] = df.apply(
             lambda row: compute_pgscore(
                 alpha=alpha,
@@ -72,7 +72,7 @@ def main():
         cmap=cmap,
         center=0,
         cbar_kws={
-            "label": "Loading Strength",
+            "label": "Spearman rank $\\rho$",
             "orientation": "horizontal",
             "shrink": 0.8,
             "pad": 0.1,
