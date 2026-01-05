@@ -64,13 +64,31 @@ def main():
         [COLORS["cherry"], COLORS["white"], COLORS["green"]],
     )
     rankings_df = pd.DataFrame(0, index=ALPHA_VALUES, columns=ALPHA_VALUES)
+    pvalues_df = pd.DataFrame(1.0, index=ALPHA_VALUES, columns=ALPHA_VALUES)
     for set1, set2, rho, p in pairs_spearman_rho:
         rankings_df.loc[set1, set2] = rho
+        pvalues_df.loc[set1, set2] = p
+
+    annotations = rankings_df.copy()
+    for i in range(len(ALPHA_VALUES)):
+        for j in range(len(ALPHA_VALUES)):
+            if i == j:
+                annotations.iloc[i, j] = f"{rankings_df.iloc[i, j]:.2f}"
+            else:
+                rho_val = rankings_df.iloc[i, j]
+                p_val = pvalues_df.iloc[i, j]
+                if p_val < 0.01:
+                    annotations.iloc[i, j] = f"{rho_val:.2f}**"
+                elif p_val < 0.05:
+                    annotations.iloc[i, j] = f"{rho_val:.2f}*"
+                else:
+                    annotations.iloc[i, j] = f"{rho_val:.2f}"
+
     mask = np.triu(np.ones_like(rankings_df, dtype=bool), k=1)
     heatmap = sns.heatmap(
         rankings_df,
-        annot=True,
-        fmt=".2f",
+        annot=annotations,
+        fmt="",
         mask=mask,
         cmap=cmap,
         center=0,
@@ -81,6 +99,23 @@ def main():
             "pad": 0.1,
         },
         ax=ax,
+    )
+
+    # Add significance legend
+    ax.text(
+        0.02,
+        0.98,
+        r"*$p < 0.05$  **$p < 0.01$",
+        transform=ax.transAxes,
+        fontsize=FONT_SIZES["small"],
+        verticalalignment="top",
+        bbox=dict(
+            # boxstyle="round",
+            facecolor="white",
+            alpha=0.8,
+            # edgecolor="gray",
+            # linewidth=0.5,
+        ),
     )
 
     plt.savefig(OUTPUT_DIR / "pgscore_robustness_heatmap.pdf", bbox_inches="tight")
