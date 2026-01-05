@@ -3,10 +3,13 @@ import pandas as pd
 from pathlib import Path
 import logging
 import sys
+import matplotlib.pyplot as plt
 import itertools
 
 from scipy.stats import spearmanr
+from analysis.utils.plot_theme import PLOT_PARAMS, COLORS, OUTPUT_DIR, FONT_SIZES
 
+plt.rcParams.update(PLOT_PARAMS)
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -52,8 +55,24 @@ def main():
     for set1, set2 in pairs:
         rho, p = spearmanr(df[set1], df[set2])
         print(set1, set2, f"{rho} (p={p})")
+        pairs_spearman_rho.append((set1, set2, rho, p))
 
-    breakpoint()
+    fig, ax = plt.subplots(figsize=(6, 6))
+    im = ax.matshow(
+        [
+            [x[2] for x in pairs_spearman_rho[i : i + len(col_name_tracker)]]
+            for i in range(0, len(pairs_spearman_rho), len(col_name_tracker))
+        ],
+        cmap="viridis",
+        vmin=0,
+        vmax=1,
+    )
+    fig.colorbar(im, ax=ax)
+    ax.set_xticks(range(len(col_name_tracker)))
+    ax.set_yticks(range(len(col_name_tracker)))
+    ax.set_xticklabels([ALPHA_VALUES])
+    ax.set_yticklabels([ALPHA_VALUES])
+    plt.savefig(OUTPUT_DIR / "pgscore_robustness_heatmap.pdf", bbox_inches="tight")
 
 
 def compute_pgscore(alpha: float, intrinsic: float, extrinsic: float) -> float:
