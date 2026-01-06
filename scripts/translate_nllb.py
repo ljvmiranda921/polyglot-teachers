@@ -90,6 +90,8 @@ def main():
                 }
             )
             # Translate prompts from English to target language
+            texts = df["prompt_en"].tolist()
+            nllb_translate(texts, model_name=args.model, lang_code=lang_with_script)
 
             input_dataset = (
                 None  # TODO: replace input_dataset with nllb-translated version
