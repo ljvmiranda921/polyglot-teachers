@@ -6,6 +6,11 @@ import json
 from datasets import load_dataset
 from pathlib import Path
 from langcodes import Language
+from datasets import Dataset
+
+from scripts.utils.llm_inference import get_strategy
+from scripts.utils.prompts import SYSTEM_PROMPT
+from scripts.synthesize_data import filter_by_token_length
 
 
 logging.basicConfig(
@@ -25,26 +30,24 @@ def get_args():
     parser.add_argument("--teacher_model", type=str, default="google/gemma-3-27b-it", help="The teacher model to use for generating responses after translation.")
     parser.add_argument("--prompts_key", type=str, default="prompt", help="Field containing the prompt to translate.")
     parser.add_argument("--responses_key", type=str, default="response", help="Field containing the response to translate.")
-    parser.add_argument("--strategy", choices=["translate_baseline", "translate_then_respond", "translate_both"], required=True, help="The synthesis strategy to use.")
+    parser.add_argument("--strategy", choices=["translate", "nllb_translate_then_respond", "nllb_translate_both"], required=True, help="The synthesis strategy to use.")
     parser.add_argument("--append", action="store_true", help="If set, will append to existing output dataset instead of overwriting.")
     parser.add_argument("-l", "--target_lang", type=str, required=True, help="The ISO-2 target language code.")
     parser.add_argument("--limit", default=None, help="If set, then will only run the synthesis strategy on the first N instances.")
     parser.add_argument("--shuffle", default=None, help="If set, will shuffle the dataset using the seed provided before synthesizing. If --limit is set, then THIS command will be run first before shuffling.")
     parser.add_argument("--backend_params", type=str, default=None, help="If set, will pass these additional parameters (in JSON format) to the backend LLM inference calls.")
-    parser.add_argument("--generation_params", type=str, default="{'temperature': 0.8, 'top_p': 0.9}", help="If set, will pass these additional generation parameters (in JSON format) to the LLM generation calls.")
+    parser.add_argument("--generation_params", type=str, default=None, help="If set, will pass these additional generation parameters (in JSON format) to the LLM generation calls.")
     # fmt: on
     return parser.parse_args()
 
 
 def main():
     args = get_args()
+    use_lm = False  # tracks whether we'll use an LM
     # Must not be msde-S1 so that apply_subsampling works correctly
     if "msde-S1" in args.output_dataset:
         raise ValueError("Output dataset cannot be msde-S1-* when using NLLB translation.")  # fmt: skip
-    df = load_dataset(args.input_dataset, split="train").to_pandas()
-
-    backend_params = json.loads(args.backend_params) if args.backend_params else None
-    generation_params = json.loads(args.generation_params) if args.generation_params else None  # fmt: skip
+    dataset = load_dataset(args.input_dataset, split="train")
 
     if args.shuffle:
         logging.info(f"Shuffling the dataset using seed {args.shuffle}")
@@ -52,6 +55,40 @@ def main():
     if args.limit:
         logging.info(f"Getting the first {args.limit} instances")
         dataset = dataset.select(range(min(int(args.limit), len(dataset))))
+    if args.strategy in ("translate", "nllb_translate_then_respond"):
+        logging.info(f"Will load an LM ({args.teacher_model}) due to chosen strategy.")
+        backend_params = json.loads(args.backend_params) if args.backend_params else None  # fmt: skip
+        generation_params = json.loads(args.generation_params) if args.generation_params else None  # fmt: skip
+        use_lm = True
+
+    lang_name = Language.make(args.target_lang).display_name()
+    lang_with_script = convert_to_nllb_code(args.target_lang)
+    if "Unknown language" in lang_name:
+        raise ValueError(f"Unknown language: {args.target_lang}. Please input a two-letter ISO 693-2 code.")  # fmt: skip
+
+    logging.info(f"Using '{args.strategy}' synthesis strategy")
+    logging.info(f"No. of instances: {len(dataset)}")
+
+    if use_lm:
+        match args.strategy:
+            case "translate":
+                format_fn, distiller_fn = get_strategy(name=args.strategy)
+            case "nllb_translate_then_respond":
+                format_fn, distiller_fn = get_strategy(name="respond")
+
+    else:
+        pass
+
+    input_dataset: Dataset = format_fn(dataset, lang_name=lang_name)
+    system_prompt = SYSTEM_PROMPT.format(lang_name=lang_name)
+    if backend_params and "max_model_length" in backend_params:
+        max_model_len = int(backend_params.get("max_model_length"))
+        input_dataset = filter_by_token_length(
+            input_dataset,
+            max_model_len,
+            system_prompt=system_prompt,
+            prompt_key="synth_prompt",
+        )
 
 
 def convert_to_nllb_code(lang_code: str) -> str:
