@@ -1,4 +1,9 @@
 #!/bin/bash
+# Job execution script for NLLB translation experiments
+# Task IDs 0-2: Strategies translate, nllb_translate_then_respond, nllb_translate_both with language ar (Arabic)
+# Task IDs 3-5: Strategies translate, nllb_translate_then_respond, nllb_translate_both with language de (German)
+# Task IDs 6-8: Strategies translate, nllb_translate_then_respond, nllb_translate_both with language id (Indonesian)
+
 export CUDA_VISIBLE_DEVICES=0
 
 STRATEGIES=("translate", "nllb_translate_then_respond", "nllb_translate_both")
