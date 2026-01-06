@@ -11,6 +11,7 @@ from datasets import Dataset
 from bespokelabs.curator.types.curator_response import CuratorResponse
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 from transformers import pipeline
+from typing import Union
 
 from scripts.utils.llm_inference import get_strategy
 from scripts.utils.prompts import SYSTEM_PROMPT
@@ -94,16 +95,13 @@ def main():
             )
             # Translate prompts from English to target language
             texts = df["prompt_en"].tolist()
-            nllb_translate(
+            df["prompt"] = nllb_translate(
                 texts,
                 model_name=args.translate_model,
                 tgt_lang=lang_with_script,
                 device=args.device,
             )
-
-            input_dataset = (
-                None  # TODO: replace input_dataset with nllb-translated version
-            )
+            dataset = Dataset.from_pandas(df)
 
         input_dataset: Dataset = format_fn(dataset, lang_name=lang_name)
         system_prompt = SYSTEM_PROMPT.format(lang_name=lang_name)
@@ -132,6 +130,7 @@ def main():
             input_dataset=input_dataset,
             strategy=args.strategy,
             model=args.model,
+            drop_columns_from_input=None,
         )
         output_dataset = output_dataset.filter(lambda ex: ex["response"] is not None)
 
@@ -145,7 +144,25 @@ def main():
         )
 
     else:
-        pass
+        df = dataset.to_pandas().rename(
+            columns={
+                args.prompts_key: "prompt_en",
+                args.responses_key: "response_en",
+            }
+        )
+        df["prompt"] = nllb_translate(
+            df["prompt_en"].tolist(),
+            model_name=args.translate_model,
+            tgt_lang=lang_with_script,
+            device=args.device,
+        )
+        df["response"] = nllb_translate(
+            df["response_en"].tolist(),
+            model_name=args.translate_model,
+            tgt_lang=lang_with_script,
+            device=args.device,
+        )
+        dataset = Dataset.from_pandas(df)
 
 
 def nllb_translate(
@@ -163,9 +180,10 @@ def nllb_translate(
         tgt_lang=tgt_lang,
         dtype=torch.float16,
         device=device,
+        max_length=max_length,
     )
-    translated_texts = hf_pipeline(texts)
-    breakpoint()
+    outputs = hf_pipeline(texts)
+    translated_texts = [out["translation_text"] for out in outputs]
     return translated_texts
 
 
