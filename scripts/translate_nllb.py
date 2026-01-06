@@ -21,13 +21,15 @@ def get_args():
     parser.add_argument("-i", "--input_dataset", type=str, required=True, help="HuggingFace dataset to translate.")
     parser.add_argument("-o", "--output_dataset", type=str, required=True, help="HuggingFace dataset to store the outputs.")
     parser.add_argument("--model", type=str, default="facebook/nllb-200-3.3B", help="The NLLB model to use for translation.")
+    parser.add_argument("--messages_key", type=str, default="messages", help="Field containing the conversation in ChatML format.")
     parser.add_argument("--target_lang", type=str, required=True, help="The ISO-2 target language code.")
     # fmt: on
     return parser.parse_args()
 
 
 def main():
-    pass
+    args = get_args()
+    df = load_dataset(args.input_dataset, split="train").to_pandas()
 
 
 def convert_to_nllb_code(lang_code: str) -> str:
