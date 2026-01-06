@@ -3,12 +3,14 @@ import sys
 import logging
 import json
 
+import torch
 from datasets import load_dataset
 from pathlib import Path
 from langcodes import Language
 from datasets import Dataset
 from bespokelabs.curator.types.curator_response import CuratorResponse
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from transformers import pipeline
 
 from scripts.utils.llm_inference import get_strategy
 from scripts.utils.prompts import SYSTEM_PROMPT
@@ -91,7 +93,11 @@ def main():
             )
             # Translate prompts from English to target language
             texts = df["prompt_en"].tolist()
-            nllb_translate(texts, model_name=args.model, lang_code=lang_with_script)
+            nllb_translate(
+                texts,
+                model_name=args.translate_model,
+                lang_code=lang_with_script,
+            )
 
             input_dataset = (
                 None  # TODO: replace input_dataset with nllb-translated version
@@ -141,10 +147,16 @@ def main():
 
 
 def nllb_translate(
-    texts: list[str], model_name: str, lang_code: str, max_length: int = 4096
+    texts: list[str], model_name: str, lang_code: str, max_length: int = 1024
 ) -> list[str]:
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_name, dtype="auto", attn_implementation="sdpa")  # fmt: skip
+    hf_pipeline = pipeline(
+        task="translation",
+        model=model_name,
+        src_lang="eng_Latn",
+        tgt_lang="fra_Latn",
+        dtype=torch.float16,
+        device=0,
+    )
     breakpoint()
     inputs = tokenizer(texts, return_tensors="pt")
     translated_tokens = model.generate(
