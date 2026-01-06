@@ -6,6 +6,7 @@ import logging
 import os
 import sys
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 import tiktoken
@@ -157,10 +158,13 @@ def prepare_output_dataset(
     input_dataset: Dataset,
     strategy: str,
     model: str,
+    drop_columns_from_input: Optional[list[str]] = ["prompt", "response"],
 ) -> Dataset:
 
     # Merge input dataset and synthesized dataset to keep some metadata
-    input_df = input_dataset.to_pandas().drop(columns=["prompt", "response"])
+    input_df = input_dataset.to_pandas()
+    if drop_columns_from_input:
+        input_df = input_df.drop(columns=drop_columns_from_input)
     input_df["strategy"] = strategy  # Keep track of the synthesis strategy used
     input_df["model"] = model  # Keep track of the model used for synthesis
     synth_df = synth_dataset.to_pandas()
