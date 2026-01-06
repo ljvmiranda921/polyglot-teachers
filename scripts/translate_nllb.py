@@ -8,10 +8,15 @@ from pathlib import Path
 from langcodes import Language
 from datasets import Dataset
 from bespokelabs.curator.types.curator_response import CuratorResponse
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 from scripts.utils.llm_inference import get_strategy
 from scripts.utils.prompts import SYSTEM_PROMPT
-from scripts.synthesize_data import filter_by_token_length
+from scripts.synthesize_data import (
+    filter_by_token_length,
+    prepare_output_dataset,
+    upload_to_huggingface,
+)
 
 
 logging.basicConfig(
@@ -78,6 +83,14 @@ def main():
                 format_fn, distiller_fn = get_strategy(name="respond")
 
         if args.strategy == "nllb_translate_then_respond":
+            df = dataset.to_pandas().rename(
+                columns={
+                    args.prompts_key: "prompt_en",
+                    args.responses_key: "response_en",
+                }
+            )
+            # Translate prompts from English to target language
+
             input_dataset = (
                 None  # TODO: replace input_dataset with nllb-translated version
             )
@@ -102,12 +115,44 @@ def main():
             generation_params=generation_params,
         )
         curator_response: CuratorResponse = distiller(input_dataset)
-        logging.info(
-            f"Data synthesis cost: {curator_response.cost_info.total_cost} USD"
+        logging.info(f"Data synthesis cost: {curator_response.cost_info.total_cost} USD")  # fmt: skip
+
+        output_dataset = prepare_output_dataset(
+            curator_response.dataset,
+            input_dataset=input_dataset,
+            strategy=args.strategy,
+            model=args.model,
+        )
+        output_dataset = output_dataset.filter(lambda ex: ex["response"] is not None)
+
+        # Upload output to HuggingFace
+        logging.info(f"Uploading output dataset to HuggingFace: {args.output_dataset}")
+        upload_to_huggingface(
+            dataset=output_dataset,
+            dataset_name=args.output_dataset,
+            append=args.append,
+            drop_columns_from_input=None,
         )
 
     else:
         pass
+
+
+def nllb_translate(
+    texts: list[str], model_name: str, lang_code: str, max_length: int = 4096
+) -> list[str]:
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForSeq2SeqLM.from_pretrained(model_name, dtype="auto", attn_implementation="sdpa")  # fmt: skip
+    breakpoint()
+    inputs = tokenizer(texts, return_tensors="pt")
+    translated_tokens = model.generate(
+        **inputs,
+        forced_bos_token_id=tokenizer.convert_tokens_to_ids(lang_code),
+        max_length=max_length,
+    )
+    translated_texts = tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)[0]  # fmt: skip
+    breakpoint()
+    return translated_texts
 
 
 def convert_to_nllb_code(lang_code: str) -> str:
