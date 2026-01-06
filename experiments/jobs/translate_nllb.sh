@@ -22,7 +22,5 @@ python -m scripts.translate_nllb \
     --strategy ${STRATEGY} \
     --translate_model "facebook/nllb-200-3.3B" \
     --teacher_model "google/gemma-3-27b-it" \
-    --shuffle 921 \
-    --limit 15000 \
     --backend_params '{"tensor_parallel_size":1,"gpu_memory_utilization":0.95, "max_model_length":4096, "require_all_responses": false}' \
     --generation_params '{"temperature": 0.8, "top_p": 0.9}'
