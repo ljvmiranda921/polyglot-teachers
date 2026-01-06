@@ -7,6 +7,7 @@ from datasets import load_dataset
 from pathlib import Path
 from langcodes import Language
 from datasets import Dataset
+from bespokelabs.curator.types.curator_response import CuratorResponse
 
 from scripts.utils.llm_inference import get_strategy
 from scripts.utils.prompts import SYSTEM_PROMPT
@@ -76,19 +77,37 @@ def main():
             case "nllb_translate_then_respond":
                 format_fn, distiller_fn = get_strategy(name="respond")
 
+        if args.strategy == "nllb_translate_then_respond":
+            input_dataset = (
+                None  # TODO: replace input_dataset with nllb-translated version
+            )
+
+        input_dataset: Dataset = format_fn(dataset, lang_name=lang_name)
+        system_prompt = SYSTEM_PROMPT.format(lang_name=lang_name)
+        if backend_params and "max_model_length" in backend_params:
+            max_model_len = int(backend_params.get("max_model_length"))
+            input_dataset = filter_by_token_length(
+                input_dataset,
+                max_model_len,
+                system_prompt=system_prompt,
+                prompt_key="synth_prompt",
+            )
+
+        distiller = distiller_fn(
+            model_name=args.model,
+            batch=args.batch_mode,
+            system_prompt=system_prompt,
+            backend=args.backend,
+            backend_params=backend_params,
+            generation_params=generation_params,
+        )
+        curator_response: CuratorResponse = distiller(input_dataset)
+        logging.info(
+            f"Data synthesis cost: {curator_response.cost_info.total_cost} USD"
+        )
+
     else:
         pass
-
-    input_dataset: Dataset = format_fn(dataset, lang_name=lang_name)
-    system_prompt = SYSTEM_PROMPT.format(lang_name=lang_name)
-    if backend_params and "max_model_length" in backend_params:
-        max_model_len = int(backend_params.get("max_model_length"))
-        input_dataset = filter_by_token_length(
-            input_dataset,
-            max_model_len,
-            system_prompt=system_prompt,
-            prompt_key="synth_prompt",
-        )
 
 
 def convert_to_nllb_code(lang_code: str) -> str:
