@@ -6,7 +6,7 @@
 
 export CUDA_VISIBLE_DEVICES=0
 
-STRATEGIES=("translate", "nllb_translate_then_respond", "nllb_translate_both")
+STRATEGIES=("translate" "nllb_translate_then_respond" "nllb_translate_both")
 LANGUAGES=(ar de id)
 
 STRATEGY=${STRATEGIES[SLURM_ARRAY_TASK_ID % ${#STRATEGIES[@]}]}
