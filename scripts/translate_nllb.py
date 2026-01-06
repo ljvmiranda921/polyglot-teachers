@@ -125,24 +125,6 @@ def main():
         curator_response: CuratorResponse = distiller(input_dataset)
         logging.info(f"Data synthesis cost: {curator_response.cost_info.total_cost} USD")  # fmt: skip
 
-        output_dataset = prepare_output_dataset(
-            curator_response.dataset,
-            input_dataset=input_dataset,
-            strategy=args.strategy,
-            model=args.model,
-            drop_columns_from_input=None,
-        )
-        output_dataset = output_dataset.filter(lambda ex: ex["response"] is not None)
-
-        # Upload output to HuggingFace
-        logging.info(f"Uploading output dataset to HuggingFace: {args.output_dataset}")
-        upload_to_huggingface(
-            dataset=output_dataset,
-            dataset_name=args.output_dataset,
-            append=args.append,
-            drop_columns_from_input=None,
-        )
-
     else:
         df = dataset.to_pandas().rename(
             columns={
@@ -163,6 +145,24 @@ def main():
             device=args.device,
         )
         dataset = Dataset.from_pandas(df)
+
+    output_dataset = prepare_output_dataset(
+        curator_response.dataset,
+        input_dataset=input_dataset,
+        strategy=args.strategy,
+        model=args.model,
+        drop_columns_from_input=None,
+    )
+    output_dataset = output_dataset.filter(lambda ex: ex["response"] is not None)
+
+    # Upload output to HuggingFace
+    logging.info(f"Uploading output dataset to HuggingFace: {args.output_dataset}")
+    upload_to_huggingface(
+        dataset=output_dataset,
+        dataset_name=args.output_dataset,
+        append=args.append,
+        drop_columns_from_input=None,
+    )
 
 
 def nllb_translate(
