@@ -115,9 +115,9 @@ def main():
 
         distiller = distiller_fn(
             model_name=args.teacher_model,
-            batch=args.batch_mode,
+            batch=False,
             system_prompt=system_prompt,
-            backend=args.backend,
+            backend="vllm",
             backend_params=backend_params,
             generation_params=generation_params,
         )
