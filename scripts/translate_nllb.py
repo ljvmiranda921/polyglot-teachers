@@ -80,8 +80,10 @@ def main():
         match args.strategy:
             case "translate":
                 format_fn, distiller_fn = get_strategy(name=args.strategy)
+                model_name = args.teacher_model
             case "nllb_translate_then_respond":
                 format_fn, distiller_fn = get_strategy(name="respond")
+                model_name = f"{args.translate_model} + {args.teacher_model}"
 
         if args.strategy == "nllb_translate_then_respond":
             df = dataset.to_pandas().rename(
@@ -112,7 +114,7 @@ def main():
             )
 
         distiller = distiller_fn(
-            model_name=args.model,
+            model_name=args.teacher_model,
             batch=args.batch_mode,
             system_prompt=system_prompt,
             backend=args.backend,
@@ -123,6 +125,7 @@ def main():
         logging.info(f"Data synthesis cost: {curator_response.cost_info.total_cost} USD")  # fmt: skip
 
     else:
+        model_name = args.translate_model
         df = dataset.to_pandas().rename(
             columns={
                 args.prompts_key: "prompt_en",
@@ -147,7 +150,7 @@ def main():
         curator_response.dataset,
         input_dataset=input_dataset,
         strategy=args.strategy,
-        model=args.model,
+        model=model_name,
         drop_columns_from_input=None,
     )
     output_dataset = output_dataset.filter(lambda ex: ex["response"] is not None)
