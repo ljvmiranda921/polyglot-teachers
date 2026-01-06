@@ -1,26 +1,23 @@
 import argparse
-import sys
-import logging
 import json
-
-import torch
-from datasets import load_dataset
+import logging
+import sys
 from pathlib import Path
-from langcodes import Language
-from datasets import Dataset
-from bespokelabs.curator.types.curator_response import CuratorResponse
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-from transformers import pipeline
 from typing import Union
 
-from scripts.utils.llm_inference import get_strategy
-from scripts.utils.prompts import SYSTEM_PROMPT
+import torch
+from bespokelabs.curator.types.curator_response import CuratorResponse
+from datasets import Dataset, load_dataset
+from langcodes import Language
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
+
 from scripts.synthesize_data import (
     filter_by_token_length,
     prepare_output_dataset,
     upload_to_huggingface,
 )
-
+from scripts.utils.llm_inference import get_strategy
+from scripts.utils.prompts import SYSTEM_PROMPT
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
