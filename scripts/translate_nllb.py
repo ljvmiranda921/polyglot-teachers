@@ -45,6 +45,7 @@ def get_args():
     parser.add_argument("--shuffle", default=None, help="If set, will shuffle the dataset using the seed provided before synthesizing. If --limit is set, then THIS command will be run first before shuffling.")
     parser.add_argument("--backend_params", type=str, default=None, help="If set, will pass these additional parameters (in JSON format) to the backend LLM inference calls.")
     parser.add_argument("--generation_params", type=str, default=None, help="If set, will pass these additional generation parameters (in JSON format) to the LLM generation calls.")
+    parser.add_argument("--device", type=str, default="cuda", help="The device to run NLLB translation on.")
     # fmt: on
     return parser.parse_args()
 
@@ -96,7 +97,8 @@ def main():
             nllb_translate(
                 texts,
                 model_name=args.translate_model,
-                lang_code=lang_with_script,
+                tgt_lang=lang_with_script,
+                device=args.device,
             )
 
             input_dataset = (
@@ -147,30 +149,31 @@ def main():
 
 
 def nllb_translate(
-    texts: list[str], model_name: str, lang_code: str, max_length: int = 1024
+    texts: list[str],
+    model_name: str,
+    tgt_lang: str,
+    src_lang: str = "eng_Latn",
+    max_length: int = 1024,
+    device: Union[int, str] = "cuda",
 ) -> list[str]:
     hf_pipeline = pipeline(
         task="translation",
         model=model_name,
-        src_lang="eng_Latn",
-        tgt_lang="fra_Latn",
+        src_lang=src_lang,
+        tgt_lang=tgt_lang,
         dtype=torch.float16,
-        device=0,
+        device=device,
     )
-    breakpoint()
-    inputs = tokenizer(texts, return_tensors="pt")
-    translated_tokens = model.generate(
-        **inputs,
-        forced_bos_token_id=tokenizer.convert_tokens_to_ids(lang_code),
-        max_length=max_length,
-    )
-    translated_texts = tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)[0]  # fmt: skip
+    translated_texts = hf_pipeline(texts)
     breakpoint()
     return translated_texts
 
 
 def convert_to_nllb_code(lang_code: str) -> str:
     """Convert ISO language code to NLLB format."""
+    if lang_code == "ar":
+        return "arb_Arab"  # Modern Standard Arabic
+
     lang = Language.get(lang_code)
     lang_3 = lang.to_alpha3()
     script = lang.assume_script().script
