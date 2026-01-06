@@ -225,14 +225,14 @@ def prepare_training_data(
     dataset = dataset.map(_formatting_prompts_func, batched=True)
 
     if show_samples:
-        logging.info("=" * 80)
-        logging.info("Showing first 3 instances of the dataset:")
-        logging.info("=" * 80)
+        print("=" * 80)
+        print("Showing first 3 instances of the dataset:")
+        print("=" * 80)
         for i in range(min(3, len(dataset))):
-            logging.info(f"\n[Instance {i+1}]")
-            logging.info(f"Messages field:")
-            logging.info(json.dumps(dataset[i][messages_key], indent=2))
-            logging.info("-" * 80)
+            print(f"\n[Instance {i+1}]")
+            print(f"Messages field:")
+            print(json.dumps(dataset[i][messages_key], indent=2))
+            print("-" * 80)
 
     return dataset
 
