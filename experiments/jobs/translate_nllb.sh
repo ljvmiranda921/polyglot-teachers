@@ -10,7 +10,7 @@ STRATEGIES=("translate" "nllb_translate_then_respond" "nllb_translate_both")
 LANGUAGES=(ar de id)
 
 STRATEGY=${STRATEGIES[SLURM_ARRAY_TASK_ID % ${#STRATEGIES[@]}]}
-LANGUAGE=${LANGUAGES[SLURM_ARRAY_TASK_ID] / ${#STRATEGIES[@]}}
+LANGUAGE=${LANGUAGES[SLURM_ARRAY_TASK_ID / ${#STRATEGIES[@]}]}
 
 echo "Creating synthetic dataset for language: ${LANGUAGE} using strategy: ${STRATEGY}"
 
