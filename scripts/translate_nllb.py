@@ -168,12 +168,7 @@ def main():
 
     # Upload output to HuggingFace
     logging.info(f"Uploading output dataset to HuggingFace: {args.output_dataset}")
-    upload_to_huggingface(
-        dataset=output_dataset,
-        dataset_name=args.output_dataset,
-        append=args.append,
-        drop_columns_from_input=None,
-    )
+    upload_to_huggingface(dataset=output_dataset, dataset_name=args.output_dataset, append=args.append)  # fmt: skip
 
 
 def nllb_translate(
