@@ -215,7 +215,7 @@ def nllb_translate(
         total=len(texts),
         desc="Translating",
     ):
-        translated_texts.append(out["translation_text"])
+        translated_texts.extend([item["translation_text"] for item in out])
 
     logging.info(f"Sample translations: {translated_texts[:5]}")
     return translated_texts
