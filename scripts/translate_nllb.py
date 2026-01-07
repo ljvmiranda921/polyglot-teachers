@@ -9,7 +9,8 @@ import torch
 from bespokelabs.curator.types.curator_response import CuratorResponse
 from datasets import Dataset, load_dataset
 from langcodes import Language
-from tqdm import tqdm
+from tqdm.auto import tqdm
+from transformers.pipelines.pt_utils import KeyDataset
 
 # For some reason, vllm must be imported before transformers
 # https://github.com/vllm-project/vllm/issues/17618
@@ -201,15 +202,13 @@ def nllb_translate(
         max_length=max_length,
     )
 
-    # Convert to dataset for better pipeline performance
     text_dataset = Dataset.from_dict({"text": texts})
-
-    # Use pipeline with dataset and batch processing
+    # Use KeyDataset for efficient streaming with batching
     translated_texts = []
     for out in tqdm(
-        hf_pipeline(text_dataset["text"], batch_size=batch_size),
+        hf_pipeline(KeyDataset(text_dataset, "text"), batch_size=batch_size),
         total=len(texts),
-        desc="Translating"
+        desc="Translating",
     ):
         translated_texts.append(out["translation_text"])
 
