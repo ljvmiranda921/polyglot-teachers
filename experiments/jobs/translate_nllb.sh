@@ -20,6 +20,8 @@ python -m scripts.translate_nllb \
     --output_dataset ljvmiranda921/msde-T1-${LANGUAGE} \
     --target_lang ${LANGUAGE} \
     --strategy ${STRATEGY} \
+    --limit 15000 \
+    --shuffle 21 \
     --translate_model "facebook/nllb-200-3.3B" \
     --teacher_model "google/gemma-3-27b-it" \
     --backend_params '{"tensor_parallel_size":2,"gpu_memory_utilization":0.80, "max_model_length":4096, "require_all_responses": false}' \
