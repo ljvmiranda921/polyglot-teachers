@@ -199,7 +199,6 @@ def nllb_translate(
         dtype=torch.float16,
         device=device,
         max_length=max_length,
-        batch_size=batch_size,
     )
 
     translated_texts = []
