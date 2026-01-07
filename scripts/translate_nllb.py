@@ -9,6 +9,7 @@ import torch
 from bespokelabs.curator.types.curator_response import CuratorResponse
 from datasets import Dataset, load_dataset
 from langcodes import Language
+from tqdm import tqdm
 
 # For some reason, vllm must be imported before transformers
 # https://github.com/vllm-project/vllm/issues/17618
@@ -46,6 +47,7 @@ def get_args():
     parser.add_argument("--limit", default=None, help="If set, then will only run the synthesis strategy on the first N instances.")
     parser.add_argument("--shuffle", default=None, help="If set, will shuffle the dataset using the seed provided before synthesizing. If --limit is set, then THIS command will be run first before shuffling.")
     parser.add_argument("--backend_params", type=str, default=None, help="If set, will pass these additional parameters (in JSON format) to the backend LLM inference calls.")
+    parser.add_argument("--batch_size", type=int, default=128, help="Batch size for NLLB translation.")
     parser.add_argument("--generation_params", type=str, default=None, help="If set, will pass these additional generation parameters (in JSON format) to the LLM generation calls.")
     parser.add_argument("--device", type=str, default="cuda", help="The device to run NLLB translation on.")
     # fmt: on
@@ -114,6 +116,7 @@ def main():
                 model_name=args.translate_model,
                 tgt_lang=lang_with_script,
                 device=args.device,
+                batch_size=args.batch_size,
             )
             dataset = Dataset.from_pandas(df)
 
@@ -152,12 +155,14 @@ def main():
             model_name=args.translate_model,
             tgt_lang=lang_with_script,
             device=args.device,
+            batch_size=args.batch_size,
         )
         df["response"] = nllb_translate(
             df["response_en"].tolist(),
             model_name=args.translate_model,
             tgt_lang=lang_with_script,
             device=args.device,
+            batch_size=args.batch_size,
         )
         dataset = Dataset.from_pandas(df)
 
@@ -182,7 +187,10 @@ def nllb_translate(
     src_lang: str = "eng_Latn",
     max_length: int = 1024,
     device: Union[int, str] = "cuda",
+    batch_size: int = 128,
 ) -> list[str]:
+    """Translate a list of texts using NLLB model."""
+
     hf_pipeline = pipeline(
         task="translation",
         model=model_name,
@@ -191,10 +199,16 @@ def nllb_translate(
         dtype=torch.float16,
         device=device,
         max_length=max_length,
+        batch_size=batch_size,
     )
-    outputs = hf_pipeline(texts)
-    translated_texts = [out["translation_text"] for out in outputs]
-    logging.info(translated_texts[:5])
+
+    translated_texts = []
+    for i in tqdm(range(0, len(texts), batch_size), desc="Translating batches"):
+        batch = texts[i : i + batch_size]
+        outputs = hf_pipeline(batch)
+        translated_texts.extend([out["translation_text"] for out in outputs])
+
+    logging.info(f"Sample translations: {translated_texts[:5]}")
     return translated_texts
 
 
