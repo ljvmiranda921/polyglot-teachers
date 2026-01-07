@@ -201,11 +201,17 @@ def nllb_translate(
         max_length=max_length,
     )
 
+    # Convert to dataset for better pipeline performance
+    text_dataset = Dataset.from_dict({"text": texts})
+
+    # Use pipeline with dataset and batch processing
     translated_texts = []
-    for i in tqdm(range(0, len(texts), batch_size), desc="Translating batches"):
-        batch = texts[i : i + batch_size]
-        outputs = hf_pipeline(batch)
-        translated_texts.extend([out["translation_text"] for out in outputs])
+    for out in tqdm(
+        hf_pipeline(text_dataset["text"], batch_size=batch_size),
+        total=len(texts),
+        desc="Translating"
+    ):
+        translated_texts.append(out["translation_text"])
 
     logging.info(f"Sample translations: {translated_texts[:5]}")
     return translated_texts
