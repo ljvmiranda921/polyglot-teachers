@@ -33,6 +33,8 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
+CTRANSLATE_MODELS_DIR = Path("ctranslate2")
+
 
 def get_args():
     # fmt: off
@@ -188,7 +190,16 @@ def nllb_translate(
 ) -> list[str]:
     """Translate a list of texts using NLLB model with CTranslate2."""
 
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    # If model_name is a local CTranslate2 path, derive the HuggingFace model name for tokenizer
+    if model_name.startswith(str(CTRANSLATE_MODELS_DIR)):
+        # Extract model variant from path (e.g., "ctranslate2/ct2-nllb-200-3.3B" -> "nllb-200-3.3B")
+        model_variant = model_name.split("ct2-")[-1]
+        hf_model_name = f"facebook/{model_variant}"
+        tokenizer = AutoTokenizer.from_pretrained(hf_model_name)
+    else:
+        # Use the model_name directly for both tokenizer and translator
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+
     translator = ctranslate2.Translator(model_name, device="cuda", compute_type="float16")  # fmt: skip
 
     translated_texts = []
