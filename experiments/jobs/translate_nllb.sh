@@ -4,7 +4,7 @@
 # Task IDs 3-5: Strategies translate, nllb_translate_then_respond, nllb_translate_both with language de (German)
 # Task IDs 6-8: Strategies translate, nllb_translate_then_respond, nllb_translate_both with language id (Indonesian)
 
-export CUDA_VISIBLE_DEVICES=0
+export CUDA_VISIBLE_DEVICES=0,1
 
 STRATEGIES=("translate" "nllb_translate_then_respond" "nllb_translate_both")
 LANGUAGES=(ar de id)
@@ -22,5 +22,5 @@ python -m scripts.translate_nllb \
     --strategy ${STRATEGY} \
     --translate_model "facebook/nllb-200-3.3B" \
     --teacher_model "google/gemma-3-27b-it" \
-    --backend_params '{"tensor_parallel_size":1,"gpu_memory_utilization":0.95, "max_model_length":4096, "require_all_responses": false}' \
+    --backend_params '{"tensor_parallel_size":2,"gpu_memory_utilization":0.80, "max_model_length":4096, "require_all_responses": false}' \
     --generation_params '{"temperature": 0.8, "top_p": 0.9}'

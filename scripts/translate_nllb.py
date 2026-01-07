@@ -9,8 +9,11 @@ import torch
 from bespokelabs.curator.types.curator_response import CuratorResponse
 from datasets import Dataset, load_dataset
 from langcodes import Language
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
 
+# For some reason, vllm must be imported before transformers
+# https://github.com/vllm-project/vllm/issues/17618
+# may the lord have mercy
+import vllm
 from scripts.synthesize_data import (
     filter_by_token_length,
     prepare_output_dataset,
@@ -18,6 +21,7 @@ from scripts.synthesize_data import (
 )
 from scripts.utils.llm_inference import get_strategy
 from scripts.utils.prompts import SYSTEM_PROMPT
+from transformers import pipeline
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -190,6 +194,7 @@ def nllb_translate(
     )
     outputs = hf_pipeline(texts)
     translated_texts = [out["translation_text"] for out in outputs]
+    logging.info(translated_texts[:5])
     return translated_texts
 
 
