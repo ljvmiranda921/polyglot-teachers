@@ -190,6 +190,7 @@ def nllb_translate(
     )
     outputs = hf_pipeline(texts)
     translated_texts = [out["translation_text"] for out in outputs]
+    logging.info(translated_texts[:5])
     return translated_texts
 
 
