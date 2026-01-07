@@ -237,3 +237,6 @@ lighteval-results
 # Singularity containers
 *.sif
 *.simg
+
+# Ctranslate2 models
+ctranslate2
