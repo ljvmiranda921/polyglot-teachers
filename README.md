@@ -33,7 +33,8 @@ uv sync \
     --no-install-package torchaudio \
     --no-install-package torchvision \
     --no-install-package vllm \
-    --no-install-package llama-cpp-python
+    --no-install-package llama-cpp-python \
+    --no-install-package ctranslate2 
 sbatch experiments/slurm_submit.isambard experiments/jobs/sync_isambard.sh
 ```
 
