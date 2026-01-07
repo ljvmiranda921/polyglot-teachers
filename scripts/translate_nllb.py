@@ -207,10 +207,7 @@ def nllb_translate(
     translated_texts = []
     for out in tqdm(
         hf_pipeline(
-            KeyDataset(text_dataset, "text"),
-            batch_size=batch_size,
-            truncation=True,
-            padding=True,
+            KeyDataset(text_dataset, "text"), batch_size=batch_size, truncation=True
         ),
         total=len(texts),
         desc="Translating",
