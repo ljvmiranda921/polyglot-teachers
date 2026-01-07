@@ -25,4 +25,5 @@ python -m scripts.translate_nllb \
     --translate_model "facebook/nllb-200-3.3B" \
     --teacher_model "google/gemma-3-27b-it" \
     --backend_params '{"tensor_parallel_size":2,"gpu_memory_utilization":0.80, "max_model_length":4096, "require_all_responses": false}' \
-    --generation_params '{"temperature": 0.8, "top_p": 0.9}'
+    --generation_params '{"temperature": 0.8, "top_p": 0.9}' \
+    --append
