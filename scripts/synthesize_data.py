@@ -158,16 +158,24 @@ def prepare_output_dataset(
     input_dataset: Dataset,
     strategy: str,
     model: str,
-    drop_columns_from_input: Optional[list[str]] = ["prompt", "response"],
+    include_input_columns: bool = True,
 ) -> Dataset:
 
     # Merge input dataset and synthesized dataset to keep some metadata
     input_df = input_dataset.to_pandas()
-    if drop_columns_from_input:
-        input_df = input_df.drop(columns=drop_columns_from_input)
+    if include_input_columns:
+        if "prompt" in input_df.columns:
+            input_df = input_df.rename(columns={"prompt": "prompt_input"})
+        if "response" in input_df.columns:
+            input_df = input_df.rename(columns={"response": "response_input"})
+    else:
+        input_df = input_df.drop(columns=["prompt", "response"], errors="ignore")
+    print(input_df.head(5))
+    print(f"Columns of input: {input_df.columns.tolist()}")
     input_df["strategy"] = strategy  # Keep track of the synthesis strategy used
     input_df["model"] = model  # Keep track of the model used for synthesis
     synth_df = synth_dataset.to_pandas()
+    print(f"Columns of synth: {synth_df.columns.tolist()}")
     output_df = pd.merge(input_df, synth_df, on="id", how="left")
 
     ds = Dataset.from_pandas(output_df)

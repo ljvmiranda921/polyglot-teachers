@@ -85,6 +85,17 @@ def main():
                 format_fn, distiller_fn = get_strategy(name="respond")
                 model_name = f"{args.translate_model} + {args.teacher_model}"
 
+        if args.strategy == "translate":
+            # I still want to see the original English versions
+            df = dataset.to_pandas().rename(
+                columns={
+                    args.prompts_key: "prompt_en",
+                    args.responses_key: "response_en",
+                }
+            )
+            df["prompt"] = df["prompt_en"].to_list()  # copy so the template works
+            dataset = Dataset.from_pandas(df)
+
         if args.strategy == "nllb_translate_then_respond":
             df = dataset.to_pandas().rename(
                 columns={
@@ -151,7 +162,7 @@ def main():
         input_dataset=input_dataset,
         strategy=args.strategy,
         model=model_name,
-        drop_columns_from_input=None,
+        include_input_columns=True,
     )
     output_dataset = output_dataset.filter(lambda ex: ex["response"] is not None)
 
