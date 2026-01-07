@@ -105,7 +105,7 @@ def main():
     )
     print(
         df_merged.groupby(group_by_cols)
-        .agg({"pg_score": "mean"})
+        .agg({"pg_score": "mean", "result": "mean", "pgr": "mean"})
         .reset_index()
         .to_markdown(index=False)
     )
@@ -270,7 +270,10 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
     teacher_model_raw = lang_teacher_parts[1] if len(lang_teacher_parts) > 1 else ""
     teacher_model = teacher_model_raw.replace("_", ".")
     # If .generate, .translate, and .respond suffixes exist, remove them
-    for suffix in [".generate", ".translate", ".respond"]:
+    to_remove_method = [".generate", ".translate", ".respond"]
+    # If .sz{number} suffix exists, remove it
+    to_remove_number = [f".sz{num}k" for num in [1, 5, 10, 25, 50]]
+    for suffix in to_remove_method + to_remove_number:
         if teacher_model.endswith(suffix):
             teacher_model = teacher_model[: -len(suffix)]
     # Check for lora/qlora in the model info
