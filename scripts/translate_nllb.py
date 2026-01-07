@@ -5,7 +5,6 @@ import logging
 import sys
 import time
 from pathlib import Path
-from typing import Union
 
 import torch
 from bespokelabs.curator.types.curator_response import CuratorResponse
@@ -118,7 +117,6 @@ def main():
                 texts,
                 model_name=args.translate_model,
                 tgt_lang=lang_with_script,
-                device=args.device,
                 batch_size=args.batch_size,
             )
             dataset = Dataset.from_pandas(df)
@@ -157,14 +155,12 @@ def main():
             df["prompt_en"].tolist(),
             model_name=args.translate_model,
             tgt_lang=lang_with_script,
-            device=args.device,
             batch_size=args.batch_size,
         )
         df["response"] = nllb_translate(
             df["response_en"].tolist(),
             model_name=args.translate_model,
             tgt_lang=lang_with_script,
-            device=args.device,
             batch_size=args.batch_size,
         )
         dataset = Dataset.from_pandas(df)
@@ -189,7 +185,6 @@ def nllb_translate(
     tgt_lang: str,
     src_lang: str = "eng_Latn",
     max_length: int = 1024,
-    device: Union[int, str] = "cuda",
     batch_size: int = 128,
 ) -> list[str]:
     """Translate a list of texts using NLLB model."""
@@ -200,7 +195,6 @@ def nllb_translate(
         src_lang=src_lang,
         tgt_lang=tgt_lang,
         dtype=torch.float16,
-        device=device,
         device_map="auto",
         max_length=max_length,
     )
