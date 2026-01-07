@@ -1,7 +1,9 @@
 import argparse
+import gc
 import json
 import logging
 import sys
+import time
 from pathlib import Path
 from typing import Union
 
@@ -199,6 +201,7 @@ def nllb_translate(
         tgt_lang=tgt_lang,
         dtype=torch.float16,
         device=device,
+        device_map="auto",
         max_length=max_length,
     )
 
@@ -213,6 +216,13 @@ def nllb_translate(
         desc="Translating",
     ):
         translated_texts.extend([item["translation_text"] for item in out])
+
+    logging.info("Deleting HF pipeline to free up memory.")
+    del hf_pipeline
+    gc.collect()
+    torch.cuda.empty_cache()
+    logging.info(f"Allocated: {torch.cuda.memory_allocated() / 1e9:.2f} GB. Sleeping for 30 seconds...")  # fmt: skip
+    time.sleep(30)
 
     logging.info(f"Sample translations: {translated_texts[:5]}")
     return translated_texts
