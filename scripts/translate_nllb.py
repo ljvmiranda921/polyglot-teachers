@@ -206,7 +206,12 @@ def nllb_translate(
     # Use KeyDataset for efficient streaming with batching
     translated_texts = []
     for out in tqdm(
-        hf_pipeline(KeyDataset(text_dataset, "text"), batch_size=batch_size),
+        hf_pipeline(
+            KeyDataset(text_dataset, "text"),
+            batch_size=batch_size,
+            truncation=True,
+            padding=True,
+        ),
         total=len(texts),
         desc="Translating",
     ):
