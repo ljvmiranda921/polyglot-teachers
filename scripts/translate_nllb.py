@@ -6,12 +6,13 @@ import sys
 import time
 from pathlib import Path
 
+import ctranslate2
 import torch
 from bespokelabs.curator.types.curator_response import CuratorResponse
 from datasets import Dataset, load_dataset
 from langcodes import Language
 from tqdm.auto import tqdm
-from transformers.pipelines.pt_utils import KeyDataset
+from transformers import AutoTokenizer
 
 # For some reason, vllm must be imported before transformers
 # https://github.com/vllm-project/vllm/issues/17618
@@ -24,7 +25,6 @@ from scripts.synthesize_data import (
 )
 from scripts.utils.llm_inference import get_strategy
 from scripts.utils.prompts import SYSTEM_PROMPT
-from transformers import pipeline
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -183,36 +183,41 @@ def nllb_translate(
     texts: list[str],
     model_name: str,
     tgt_lang: str,
-    src_lang: str = "eng_Latn",
     max_length: int = 1024,
     batch_size: int = 128,
 ) -> list[str]:
-    """Translate a list of texts using NLLB model."""
+    """Translate a list of texts using NLLB model with CTranslate2."""
 
-    hf_pipeline = pipeline(
-        task="translation",
-        model=model_name,
-        src_lang=src_lang,
-        tgt_lang=tgt_lang,
-        dtype=torch.float16,
-        device_map="auto",
-        max_length=max_length,
-    )
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    translator = ctranslate2.Translator(model_name, device="cuda", compute_type="float16")  # fmt: skip
 
-    text_dataset = Dataset.from_dict({"text": texts})
-    # Use KeyDataset for efficient streaming with batching
     translated_texts = []
-    for out in tqdm(
-        hf_pipeline(
-            KeyDataset(text_dataset, "text"), batch_size=batch_size, truncation=True
-        ),
-        total=len(texts),
-        desc="Translating",
-    ):
-        translated_texts.extend([item["translation_text"] for item in out])
+    for i in tqdm(range(0, len(texts), batch_size), desc="Translating"):
+        batch_texts = texts[i : i + batch_size]
+        tokenized = tokenizer(
+            batch_texts,
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
+            max_length=max_length,
+        )
+        source_tokens = [tokenizer.convert_ids_to_tokens(ids) for ids in tokenized["input_ids"]]  # fmt: skip
+        target_prefix = [[tgt_lang]] * len(batch_texts)
+        results = translator.translate_batch(
+            source_tokens,
+            target_prefix=target_prefix,
+            max_batch_size=batch_size,
+            beam_size=1,
+            max_decoding_length=max_length,
+        )
+        for result in results:
+            tokens = result.hypotheses[0]
+            translated_text = tokenizer.decode(tokenizer.convert_tokens_to_ids(tokens), skip_special_tokens=True)  # fmt: skip
+            translated_texts.append(translated_text)
 
-    logging.info("Deleting HF pipeline to free up memory.")
-    del hf_pipeline
+    logging.info("Deleting translator to free up memory.")
+    del translator
+    del tokenizer
     gc.collect()
     torch.cuda.empty_cache()
     logging.info(f"Allocated: {torch.cuda.memory_allocated() / 1e9:.2f} GB. Sleeping for 30 seconds...")  # fmt: skip
