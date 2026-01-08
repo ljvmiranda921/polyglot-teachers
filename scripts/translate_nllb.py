@@ -137,7 +137,6 @@ def main():
             dataset.push_to_hub(
                 f"{args.output_dataset}-translated",
                 config_name=datetime_str,
-                exist_ok=True,
             )
 
         input_dataset: Dataset = format_fn(dataset, lang_name=lang_name)
