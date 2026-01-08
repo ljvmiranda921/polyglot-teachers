@@ -64,7 +64,11 @@ def main():
     use_lm = False  # tracks whether we'll use an LM
 
     # Select translation backend
-    nllb_translate = nllb_translate_hf if args.translate_backend == "hf" else nllb_translate_ctranslate2
+    nllb_translate = (
+        nllb_translate_hf
+        if args.translate_backend == "hf"
+        else nllb_translate_ctranslate2
+    )
 
     # Must not be msde-S1 so that apply_subsampling works correctly
     if "msde-S1" in args.output_dataset:
@@ -209,7 +213,7 @@ def nllb_translate_hf(
         tgt_lang=tgt_lang,
         dtype=torch.float16 if device == "cuda" else torch.float32,
         device_map="auto" if device == "cuda" else device,
-        max_length=max_length,
+        # max_length=max_length,
     )
 
     text_dataset = Dataset.from_dict({"text": texts})
