@@ -1,0 +1,15 @@
+{"teacher_model":"gemma-3-27b-it","target_lang":"ar","result":0.6273223332,"result_stderr":0.0120800404,"pg_score":0.2707624229, "scale": 50000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"ar","result":0.6143417624,"result_stderr":0.0117820793,"pg_score":0.2738983439, "scale": 25000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"ar","result":0.6165669837,"result_stderr":0.0118491587,"pg_score":0.289385719732, "scale": 10000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"ar","result":0.5403006506,"result_stderr":0.0115704917,"pg_score":0.4292169527, "scale": 5000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"ar","result":0.4404506895,"result_stderr":0.0122527474,"pg_score":0.7503718586, "scale": 1000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"de","result":0.64235396,"result_stderr":0.0119331789,"pg_score":1.0655446296, "scale": 50000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"de","result":0.6419718652,"result_stderr":0.0125909118,"pg_score":1.0655446296, "scale": 25000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"de","result":0.639160045,"result_stderr":0.0125504432,"pg_score":1.4024636524, "scale": 10000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"de","result":0.5523813765,"result_stderr":0.0113485406,"pg_score":1.8437009222, "scale": 5000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"de","result":0.2957653741,"result_stderr":0.0104531599,"pg_score":2.543635621, "scale": 1000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"id","result":0.5968135478,"result_stderr":0.0126735818,"pg_score":0.5704111947, "scale": 50000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"id","result":0.5808248571,"result_stderr":0.0126152312,"pg_score":0.5802854767, "scale": 25000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"id","result":0.5561671914,"result_stderr":0.0125015184,"pg_score":0.6026932654, "scale": 10000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"id","result":0.4834538218,"result_stderr":0.012460442,"pg_score":0.6943556008, "scale": 5000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"id","result":0.4511398051,"result_stderr":0.0124512467,"pg_score":0.7725271014, "scale": 1000}
