@@ -1,4 +1,6 @@
-# Multilingual Teacher Evaluation Project
+<img src="assets/ltl_logo2.svg" height="125" align="right" /><img src="assets/cambridge_logo.png" width="125" height="125" align="right" />
+
+# Polyglot Teachers: Evaluating Language Models for Multilingual Synthetic Data Generation
 
 In this project, we ask the question: "what makes a good multilingual teacher for synthetic data generation?"
 Specifically, we perform a comprehensive analysis of several language models and evaluate their data quality as teacher models, *(intrinsic)* and the performance gain of the resulting student model on some benchmarks *(extrinsic)*.
