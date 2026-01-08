@@ -213,7 +213,7 @@ def nllb_translate_hf(
         tgt_lang=tgt_lang,
         dtype=torch.float16 if device == "cuda" else torch.float32,
         device_map="auto" if device == "cuda" else device,
-        # max_length=max_length,
+        max_new_tokens=max_length,
     )
 
     text_dataset = Dataset.from_dict({"text": texts})
