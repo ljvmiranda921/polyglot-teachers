@@ -120,6 +120,7 @@ def main():
                 model_name=args.translate_model,
                 tgt_lang=lang_with_script,
                 batch_size=args.batch_size,
+                device=args.device,
             )
             dataset = Dataset.from_pandas(df)
 
@@ -158,12 +159,14 @@ def main():
             model_name=args.translate_model,
             tgt_lang=lang_with_script,
             batch_size=args.batch_size,
+            device=args.device,
         )
         df["response"] = nllb_translate(
             df["response_en"].tolist(),
             model_name=args.translate_model,
             tgt_lang=lang_with_script,
             batch_size=args.batch_size,
+            device=args.device,
         )
         dataset = Dataset.from_pandas(df)
 
@@ -187,6 +190,7 @@ def nllb_translate(
     tgt_lang: str,
     max_length: int = 1024,
     batch_size: int = 128,
+    device: str = "cuda",
 ) -> list[str]:
     """Translate a list of texts using NLLB model with CTranslate2."""
 
@@ -200,7 +204,7 @@ def nllb_translate(
         # Use the model_name directly for both tokenizer and translator
         tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    translator = ctranslate2.Translator(model_name, device="cuda", compute_type="float16")  # fmt: skip
+    translator = ctranslate2.Translator(model_name, device=device, compute_type="float16")  # fmt: skip
 
     translated_texts = []
     for i in tqdm(range(0, len(texts), batch_size), desc="Translating"):
