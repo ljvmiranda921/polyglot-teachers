@@ -6,12 +6,13 @@ import sys
 import time
 from pathlib import Path
 
+import ctranslate2
 import torch
 from bespokelabs.curator.types.curator_response import CuratorResponse
 from datasets import Dataset, load_dataset
 from langcodes import Language
 from tqdm.auto import tqdm
-from transformers.pipelines.pt_utils import KeyDataset
+from transformers import AutoTokenizer
 
 # For some reason, vllm must be imported before transformers
 # https://github.com/vllm-project/vllm/issues/17618
@@ -24,7 +25,6 @@ from scripts.synthesize_data import (
 )
 from scripts.utils.llm_inference import get_strategy
 from scripts.utils.prompts import SYSTEM_PROMPT
-from transformers import pipeline
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -32,6 +32,8 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
     level=logging.INFO,
 )
+
+CTRANSLATE_MODELS_DIR = Path("ctranslate2")
 
 
 def get_args():
@@ -52,6 +54,7 @@ def get_args():
     parser.add_argument("--batch_size", type=int, default=128, help="Batch size for NLLB translation.")
     parser.add_argument("--generation_params", type=str, default=None, help="If set, will pass these additional generation parameters (in JSON format) to the LLM generation calls.")
     parser.add_argument("--device", type=str, default="cuda", help="The device to run NLLB translation on.")
+    parser.add_argument("--translate_backend", type=str, choices=["hf", "ctranslate2"], default="hf", help="Backend to use for NLLB translation.")
     # fmt: on
     return parser.parse_args()
 
@@ -59,6 +62,14 @@ def get_args():
 def main():
     args = get_args()
     use_lm = False  # tracks whether we'll use an LM
+
+    # Select translation backend
+    nllb_translate = (
+        nllb_translate_hf
+        if args.translate_backend == "hf"
+        else nllb_translate_ctranslate2
+    )
+
     # Must not be msde-S1 so that apply_subsampling works correctly
     if "msde-S1" in args.output_dataset:
         raise ValueError("Output dataset cannot be msde-S1-* when using NLLB translation.")  # fmt: skip
@@ -118,6 +129,7 @@ def main():
                 model_name=args.translate_model,
                 tgt_lang=lang_with_script,
                 batch_size=args.batch_size,
+                device=args.device,
             )
             dataset = Dataset.from_pandas(df)
 
@@ -156,12 +168,14 @@ def main():
             model_name=args.translate_model,
             tgt_lang=lang_with_script,
             batch_size=args.batch_size,
+            device=args.device,
         )
         df["response"] = nllb_translate(
             df["response_en"].tolist(),
             model_name=args.translate_model,
             tgt_lang=lang_with_script,
             batch_size=args.batch_size,
+            device=args.device,
         )
         dataset = Dataset.from_pandas(df)
 
@@ -179,40 +193,106 @@ def main():
     upload_to_huggingface(dataset=output_dataset, dataset_name=args.output_dataset, append=args.append)  # fmt: skip
 
 
-def nllb_translate(
+def nllb_translate_hf(
     texts: list[str],
     model_name: str,
     tgt_lang: str,
     src_lang: str = "eng_Latn",
     max_length: int = 1024,
     batch_size: int = 128,
+    device: str = "cuda",
 ) -> list[str]:
-    """Translate a list of texts using NLLB model."""
+    """Translate a list of texts using NLLB model with HuggingFace pipeline."""
+    from transformers import pipeline
+    from transformers.pipelines.pt_utils import KeyDataset
 
     hf_pipeline = pipeline(
         task="translation",
         model=model_name,
         src_lang=src_lang,
         tgt_lang=tgt_lang,
-        dtype=torch.float16,
-        device_map="auto",
-        max_length=max_length,
+        dtype=torch.float16 if device == "cuda" else torch.float32,
+        device_map="auto" if device == "cuda" else device,
+        max_new_tokens=max_length,
     )
 
     text_dataset = Dataset.from_dict({"text": texts})
-    # Use KeyDataset for efficient streaming with batching
     translated_texts = []
     for out in tqdm(
         hf_pipeline(
             KeyDataset(text_dataset, "text"), batch_size=batch_size, truncation=True
         ),
         total=len(texts),
-        desc="Translating",
+        desc="Translating (HF)",
     ):
         translated_texts.extend([item["translation_text"] for item in out])
 
     logging.info("Deleting HF pipeline to free up memory.")
     del hf_pipeline
+    gc.collect()
+    torch.cuda.empty_cache()
+    logging.info(f"Allocated: {torch.cuda.memory_allocated() / 1e9:.2f} GB. Sleeping for 30 seconds...")  # fmt: skip
+    time.sleep(30)
+
+    logging.info(f"Sample translations: {translated_texts[:5]}")
+    return translated_texts
+
+
+def nllb_translate_ctranslate2(
+    texts: list[str],
+    model_name: str,
+    tgt_lang: str,
+    src_lang: str = "eng_Latn",
+    max_length: int = 1024,
+    batch_size: int = 128,
+    device: str = "cuda",
+) -> list[str]:
+    """Translate a list of texts using NLLB model with CTranslate2."""
+
+    # If model_name is a local CTranslate2 path, derive the HuggingFace model name for tokenizer
+    if model_name.startswith(str(CTRANSLATE_MODELS_DIR)):
+        # Extract model variant from path (e.g., "ctranslate2/ct2-nllb-200-3.3B" -> "nllb-200-3.3B")
+        model_variant = model_name.split("ct2-")[-1]
+        hf_model_name = f"facebook/{model_variant}"
+        tokenizer = AutoTokenizer.from_pretrained(hf_model_name)
+    else:
+        # Use the model_name directly for both tokenizer and translator
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+    compute_type = "float32" if device == "cpu" else "float16"
+    translator = ctranslate2.Translator(
+        model_name,
+        device=device,
+        compute_type=compute_type,
+    )
+
+    translated_texts = []
+    for i in tqdm(range(0, len(texts), batch_size), desc="Translating (CTranslate2)"):
+        batch_texts = texts[i : i + batch_size]
+        tokenized = tokenizer(
+            batch_texts,
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
+            max_length=max_length,
+        )
+        source_tokens = [tokenizer.convert_ids_to_tokens(ids) for ids in tokenized["input_ids"]]  # fmt: skip
+        target_prefix = [[tgt_lang]] * len(batch_texts)
+        results = translator.translate_batch(
+            source_tokens,
+            target_prefix=target_prefix,
+            max_batch_size=batch_size,
+            beam_size=1,
+            max_decoding_length=max_length,
+        )
+        for result in results:
+            tokens = result.hypotheses[0]
+            translated_text = tokenizer.decode(tokenizer.convert_tokens_to_ids(tokens), skip_special_tokens=True)  # fmt: skip
+            translated_texts.append(translated_text)
+
+    logging.info("Deleting translator to free up memory.")
+    del translator
+    del tokenizer
     gc.collect()
     torch.cuda.empty_cache()
     logging.info(f"Allocated: {torch.cuda.memory_allocated() / 1e9:.2f} GB. Sleeping for 30 seconds...")  # fmt: skip
