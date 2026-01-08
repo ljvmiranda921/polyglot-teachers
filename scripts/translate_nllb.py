@@ -204,7 +204,12 @@ def nllb_translate(
         # Use the model_name directly for both tokenizer and translator
         tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    translator = ctranslate2.Translator(model_name, device=device, compute_type="float16")  # fmt: skip
+    compute_type = "float32" if device == "cpu" else "float16"
+    translator = ctranslate2.Translator(
+        model_name,
+        device=device,
+        compute_type=compute_type,
+    )
 
     translated_texts = []
     for i in tqdm(range(0, len(texts), batch_size), desc="Translating"):
