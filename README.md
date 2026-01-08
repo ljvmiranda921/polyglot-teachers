@@ -1,4 +1,4 @@
-<img src="assets/ltl_logo2.svg" height="70" align="right" /><img src="assets/cambridge_logo.png" height="70" align="right" />
+<img src="assets/ltl_logo2.svg" height="70" align="right" style="margin-top: 20px;" /><img src="assets/cambridge_logo.png" height="70" align="right" style="margin-top: 20px;" />
 
 # Polyglot Teachers: Evaluating LLMs for Multilingual Synthetic Data Generation 
 
