@@ -1,6 +1,5 @@
 <img src="assets/ltl_logo2.svg" height="80" align="right" />
 <!-- <img src="assets/cambridge_logo.png" height="70" align="right" /> -->
-
 # Polyglot Teachers: Evaluating LLMs for Multilingual Synthetic Data Generation 
 
 In this project, we ask the question: "what makes a good multilingual teacher for synthetic data generation?"
