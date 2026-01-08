@@ -132,6 +132,13 @@ def main():
                 device=args.device,
             )
             dataset = Dataset.from_pandas(df)
+            # Save dataset to HF just so we won't run again (this is very expensive)
+            datetime_str = time.strftime("%Y%m%dT%H%M%S")
+            dataset.push_to_hub(
+                f"{args.output_dataset}-translated",
+                config_name=datetime_str,
+                exist_ok=True,
+            )
 
         input_dataset: Dataset = format_fn(dataset, lang_name=lang_name)
         system_prompt = SYSTEM_PROMPT.format(lang_name=lang_name)
@@ -142,6 +149,7 @@ def main():
                 max_model_len,
                 system_prompt=system_prompt,
                 prompt_key="synth_prompt",
+                buffer=800,
             )
 
         distiller = distiller_fn(
