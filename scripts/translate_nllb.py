@@ -54,6 +54,7 @@ def get_args():
     parser.add_argument("--batch_size", type=int, default=128, help="Batch size for NLLB translation.")
     parser.add_argument("--generation_params", type=str, default=None, help="If set, will pass these additional generation parameters (in JSON format) to the LLM generation calls.")
     parser.add_argument("--device", type=str, default="cuda", help="The device to run NLLB translation on.")
+    parser.add_argument("--translate_backend", type=str, choices=["hf", "ctranslate2"], default="hf", help="Backend to use for NLLB translation.")
     # fmt: on
     return parser.parse_args()
 
@@ -61,6 +62,10 @@ def get_args():
 def main():
     args = get_args()
     use_lm = False  # tracks whether we'll use an LM
+
+    # Select translation backend
+    nllb_translate = nllb_translate_hf if args.translate_backend == "hf" else nllb_translate_ctranslate2
+
     # Must not be msde-S1 so that apply_subsampling works correctly
     if "msde-S1" in args.output_dataset:
         raise ValueError("Output dataset cannot be msde-S1-* when using NLLB translation.")  # fmt: skip
@@ -184,10 +189,56 @@ def main():
     upload_to_huggingface(dataset=output_dataset, dataset_name=args.output_dataset, append=args.append)  # fmt: skip
 
 
-def nllb_translate(
+def nllb_translate_hf(
     texts: list[str],
     model_name: str,
     tgt_lang: str,
+    src_lang: str = "eng_Latn",
+    max_length: int = 1024,
+    batch_size: int = 128,
+    device: str = "cuda",
+) -> list[str]:
+    """Translate a list of texts using NLLB model with HuggingFace pipeline."""
+    from transformers import pipeline
+    from transformers.pipelines.pt_utils import KeyDataset
+
+    hf_pipeline = pipeline(
+        task="translation",
+        model=model_name,
+        src_lang=src_lang,
+        tgt_lang=tgt_lang,
+        dtype=torch.float16 if device == "cuda" else torch.float32,
+        device_map="auto" if device == "cuda" else device,
+        max_length=max_length,
+    )
+
+    text_dataset = Dataset.from_dict({"text": texts})
+    translated_texts = []
+    for out in tqdm(
+        hf_pipeline(
+            KeyDataset(text_dataset, "text"), batch_size=batch_size, truncation=True
+        ),
+        total=len(texts),
+        desc="Translating (HF)",
+    ):
+        translated_texts.extend([item["translation_text"] for item in out])
+
+    logging.info("Deleting HF pipeline to free up memory.")
+    del hf_pipeline
+    gc.collect()
+    torch.cuda.empty_cache()
+    logging.info(f"Allocated: {torch.cuda.memory_allocated() / 1e9:.2f} GB. Sleeping for 30 seconds...")  # fmt: skip
+    time.sleep(30)
+
+    logging.info(f"Sample translations: {translated_texts[:5]}")
+    return translated_texts
+
+
+def nllb_translate_ctranslate2(
+    texts: list[str],
+    model_name: str,
+    tgt_lang: str,
+    src_lang: str = "eng_Latn",
     max_length: int = 1024,
     batch_size: int = 128,
     device: str = "cuda",
@@ -212,7 +263,7 @@ def nllb_translate(
     )
 
     translated_texts = []
-    for i in tqdm(range(0, len(texts), batch_size), desc="Translating"):
+    for i in tqdm(range(0, len(texts), batch_size), desc="Translating (CTranslate2)"):
         batch_texts = texts[i : i + batch_size]
         tokenized = tokenizer(
             batch_texts,
