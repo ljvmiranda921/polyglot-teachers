@@ -1,10 +1,4 @@
-<div style="display: flex; justify-content: space-between; align-items: center;">
-  <h1>Polyglot Teachers: Evaluating Language Models for Multilingual Synthetic Data Generation</h1>
-  <div>
-    <img src="assets/ltl_logo2.svg" height="70" />
-    <img src="assets/cambridge_logo.png" height="70" />
-  </div>
-</div>
+# Polyglot Teachers: Evaluating Language Models for Multilingual Synthetic Data Generation <img src="assets/ltl_logo2.svg" height="70" align="right" /><img src="assets/cambridge_logo.png" height="70" align="right" />
 
 In this project, we ask the question: "what makes a good multilingual teacher for synthetic data generation?"
 Specifically, we perform a comprehensive analysis of several language models and evaluate their data quality as teacher models, *(intrinsic)* and the performance gain of the resulting student model on some benchmarks *(extrinsic)*.
