@@ -193,7 +193,7 @@ def main():
 
     output_dataset = prepare_output_dataset(
         output_dataset,
-        input_dataset=input_dataset,
+        input_dataset=dataset,
         strategy=args.strategy,
         model=model_name,
         include_input_columns=True,
