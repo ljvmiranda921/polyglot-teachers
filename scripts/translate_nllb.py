@@ -23,6 +23,7 @@ from scripts.synthesize_data import (
     filter_by_token_length,
     prepare_output_dataset,
     upload_to_huggingface,
+    to_conversation_format,
 )
 from scripts.utils.llm_inference import get_strategy
 from scripts.utils.prompts import SYSTEM_PROMPT
@@ -166,6 +167,14 @@ def main():
         logging.info(f"Data synthesis cost: {curator_response.cost_info.total_cost} USD")  # fmt: skip
         output_dataset = curator_response.dataset
 
+        output_dataset = prepare_output_dataset(
+            output_dataset,
+            input_dataset=input_dataset,
+            strategy=args.strategy,
+            model=model_name,
+            include_input_columns=True,
+        )
+        output_dataset = output_dataset.filter(lambda ex: ex["response"] is not None)
     else:
         model_name = args.translate_model
         df = dataset.to_pandas().rename(
@@ -188,17 +197,19 @@ def main():
             batch_size=args.batch_size,
             device=args.device,
         )
-        dataset = Dataset.from_pandas(df)
-        output_dataset = dataset
 
-    output_dataset = prepare_output_dataset(
-        output_dataset,
-        input_dataset=dataset,
-        strategy=args.strategy,
-        model=model_name,
-        include_input_columns=True,
-    )
-    output_dataset = output_dataset.filter(lambda ex: ex["response"] is not None)
+        df["synth_prompt"] = "None"
+        df["strategy"] = args.strategy  # Keep track of the synthesis strategy used
+        df["model"] = model_name  # Keep track of the model used for synthesis
+
+        dataset = Dataset.from_pandas(df)
+        output_dataset = dataset.map(to_conversation_format)
+        # Cache the result just to be sure
+        datetime_str = time.strftime("%Y%m%dT%H%M%S")
+        output_dataset.push_to_hub(
+            f"{args.output_dataset}-nllb-translated",
+            config_name=datetime_str,
+        )
 
     # Upload output to HuggingFace
     logging.info(f"Uploading output dataset to HuggingFace: {args.output_dataset}")
