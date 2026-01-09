@@ -164,6 +164,7 @@ def main():
         )
         curator_response: CuratorResponse = distiller(input_dataset)
         logging.info(f"Data synthesis cost: {curator_response.cost_info.total_cost} USD")  # fmt: skip
+        output_dataset = curator_response.dataset
 
     else:
         model_name = args.translate_model
@@ -188,9 +189,10 @@ def main():
             device=args.device,
         )
         dataset = Dataset.from_pandas(df)
+        output_dataset = dataset
 
     output_dataset = prepare_output_dataset(
-        curator_response.dataset,
+        output_dataset,
         input_dataset=input_dataset,
         strategy=args.strategy,
         model=model_name,
