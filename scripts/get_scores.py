@@ -51,6 +51,7 @@ def get_args():
     parser.add_argument("--base_model_results", type=str, default="ljvmiranda921/details_allenai__Olmo-3-1025-7B_private", help="Huggingface Dataset containing the base model results.")
     parser.add_argument("--show_per_language", action="store_true", help="Whether to show per-language PG-Scores.")
     parser.add_argument("--add_metadata", type=str, default="{}", help="Additional metadata to add to the output JSONL file. Must be valid JSON. Will be added as a field for each row.")
+    parser.add_argument("--append", action="store_true", help="Whether to append to the output file if it exists.")
     # fmt: on
     return parser.parse_args()
 
@@ -115,6 +116,9 @@ def main():
         .reset_index()
         .to_markdown(index=False)
     )
+    if args.append and (CACHE_DIR / args.output_file).exists():
+        df_existing = pd.read_json(CACHE_DIR / args.output_file, lines=True)
+        df_merged = pd.concat([df_existing, df_merged]).reset_index(drop=True)
     df_merged.to_json(CACHE_DIR / args.output_file, orient="records", lines=True)
     logging.info(f"Saved PG-Scores to {CACHE_DIR / args.output_file}")
 
