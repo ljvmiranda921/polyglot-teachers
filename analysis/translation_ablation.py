@@ -3,7 +3,7 @@ import logging
 import sys
 from pathlib import Path
 
-from analysis.utils.plot_theme import FONT_SIZES, PLOT_PARAMS, COLORS, OUTPUT_DIR
+from analysis.utils.plot_theme import PLOT_PARAMS, COLORS, OUTPUT_DIR
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -34,7 +34,12 @@ def main():
     methods = ["nllb-translate-both", "translate-then-respond", "translate-synthetic"]
     langs = ["ar", "id", "de"]
 
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=args.figsize)
+    # Customize labels here (optional, set to None to use method names as-is)
+    method_labels = None  # e.g., ["NLLB Both", "Translate Then Respond", "Translate Synthetic"]
+
+    display_labels = method_labels if method_labels else methods
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=args.figsize, sharex=True)
 
     x = range(len(methods))
     width = 0.6
@@ -44,14 +49,11 @@ def main():
         method_data = df[df["translate_method"] == method]
         avg_values.append(method_data["pg_score"].mean())
 
-    ax1.bar(x, avg_values, width, color=COLORS["warm_blue"])
-    for i, (method, val) in enumerate(zip(methods, avg_values)):
-        ax1.text(i, val + 0.05, f"{val:.2f}", ha="center", va="bottom", fontsize=FONT_SIZES["small"])
+    ax1.bar(x, avg_values, width, color=COLORS["warm_blue"], edgecolor="black")
 
     ax1.set_ylabel("Average PG-Score")
     ax1.set_xticks(x)
-    ax1.set_xticklabels(methods, rotation=15, ha="right")
-    ax1.grid(True, axis="y", alpha=0.3)
+    ax1.set_xticklabels(display_labels, rotation=15, ha="right")
 
     width = 0.25
     offsets = [-width, 0, width]
@@ -65,13 +67,12 @@ def main():
             values.append(method_data["pg_score"].values[0])
 
         positions = [xi + offsets[i] for xi in x]
-        ax2.bar(positions, values, width, label=lang, color=colors_list[i])
+        ax2.bar(positions, values, width, label=lang, color=colors_list[i], edgecolor="black")
 
     ax2.set_ylabel("PG-Score")
     ax2.set_xticks(x)
-    ax2.set_xticklabels(methods, rotation=15, ha="right")
+    ax2.set_xticklabels(display_labels, rotation=15, ha="right")
     ax2.legend(loc="best")
-    ax2.grid(True, axis="y", alpha=0.3)
 
     plt.tight_layout()
     args.output_path.parent.mkdir(parents=True, exist_ok=True)
