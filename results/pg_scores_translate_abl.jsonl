@@ -1,0 +1,9 @@
+{"teacher_model":"gemma-3-27b-it","target_lang":"ar","result":0.4231909263,"result_stderr":0.011953763,"pgr":-0.0188015226,"z_score":0.3636420059,"pg_score":0.1724202416,"translate_method":"nllb-translate-both"}
+{"teacher_model":"gemma-3-27b-it","target_lang":"de","result":0.3446244265,"result_stderr":0.0125177648,"pgr":1.8415770974,"z_score":0.6759509051,"pg_score":1.2587640012,"translate_method":"nllb-translate-both"}
+{"teacher_model":"gemma-3-27b-it","target_lang":"id","result":0.4411874172,"result_stderr":0.0122036503,"pgr":1.9869678001,"z_score":0.2305042743,"pg_score":1.1087360372,"translate_method":"nllb-translate-both"}
+{"teacher_model":"gemma-3-27b-it","target_lang":"ar","result":0.4431351384,"result_stderr":0.0120757185,"pgr":1.3168818858,"z_score":0.3636420059,"pg_score":0.8402619458,"translate_method":"translate-synthetic"}
+{"teacher_model":"gemma-3-27b-it","target_lang":"de","result":0.3126523763,"result_stderr":0.0121225344,"pgr":3.5231479827,"z_score":0.6759509051,"pg_score":2.0995494439,"translate_method":"translate-synthetic"}
+{"teacher_model":"gemma-3-27b-it","target_lang":"id","result":0.44023626,"result_stderr":0.0123154545,"pgr":2.0512312829,"z_score":0.2305042743,"pg_score":1.1408677786,"translate_method":"translate-synthetic"}
+{"teacher_model":"gemma-3-27b-it","target_lang":"ar","result":0.4252216897,"result_stderr":0.0118473593,"pgr":0.1172006869,"z_score":0.3636420059,"pg_score":0.2404213464,"translate_method":"translate-then-respond"}
+{"teacher_model":"gemma-3-27b-it","target_lang":"de","result":0.3288850122,"result_stderr":0.0107110977,"pgr":2.6693920353,"z_score":0.6759509051,"pg_score":1.6726714702,"translate_method":"translate-then-respond"}
+{"teacher_model":"gemma-3-27b-it","target_lang":"id","result":0.4598951856,"result_stderr":0.0124790062,"pgr":0.7230060292,"z_score":0.2305042743,"pg_score":0.4767551518,"translate_method":"translate-then-respond"}

@@ -289,7 +289,7 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
     to_remove_method += [
         ".translate.ablation",
         ".nllb.translate.both",
-        ".nllb.translate.then.respond",
+        ".nllb.ttr",
     ]
 
     for suffix in to_remove_method + to_remove_number:
