@@ -50,6 +50,7 @@ def get_args():
     parser.add_argument("--ref_model_results", type=str, default="ljvmiranda921/details_allenai__Olmo-3-7B-Instruct-SFT_private", help="Huggingface Dataset containing the reference model results.")
     parser.add_argument("--base_model_results", type=str, default="ljvmiranda921/details_allenai__Olmo-3-1025-7B_private", help="Huggingface Dataset containing the base model results.")
     parser.add_argument("--show_per_language", action="store_true", help="Whether to show per-language PG-Scores.")
+    parser.add_argument("--add_metadata", type=str, default="{}", help="Additional metadata to add to the output JSONL file. Must be valid JSON. Will be added as a field for each row.")
     # fmt: on
     return parser.parse_args()
 
@@ -96,6 +97,11 @@ def main():
     ).drop(columns=["model_short", "language"])
     # Compute PG-Score as average of PGR and z-score
     df_merged["pg_score"] = (df_merged["pgr"] + df_merged["z_score"]) / 2
+
+    # Add additional metadata if provided
+    additional_metadata = json.loads(args.add_metadata)
+    for key, value in additional_metadata.items():
+        df_merged[key] = value
 
     print("\n====== PGR (grouped-by teacher model across languages) ======")
     group_by_cols = (
@@ -263,16 +269,25 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
     # parts: ['allenai_Olmo-3-1025-7B-lora-4bit', 'es_Llama-3_1-8B-Instruct']
     # model_info_raw: 'allenai_Olmo-3-1025-7B-lora-4bit'
     # lang_and_teacher: 'es_Llama-3_1-8B-Instruct'
-    model_info_raw, lang_and_teacher = relevant_part.split("-msde-S1-")
+    model_info_raw, lang_and_teacher = relevant_part.split("-msde-T1-")
     # Extract language and teacher model
     lang_teacher_parts = lang_and_teacher.split("_", 1)
     language = lang_teacher_parts[0]
     teacher_model_raw = lang_teacher_parts[1] if len(lang_teacher_parts) > 1 else ""
     teacher_model = teacher_model_raw.replace("_", ".")
+
+    # Filtering
     # If .generate, .translate, and .respond suffixes exist, remove them
     to_remove_method = [".generate", ".translate", ".respond"]
     # If .sz{number} suffix exists, remove it
     to_remove_number = [f".sz{num}k" for num in [1, 5, 10, 25, 50]]
+    # if .translate.ablation and other exists, remove it
+    to_remove_method += [
+        ".translate.ablation",
+        ".nllb.translate.both",
+        ".nllb.translate.then.respond",
+    ]
+
     for suffix in to_remove_method + to_remove_number:
         if teacher_model.endswith(suffix):
             teacher_model = teacher_model[: -len(suffix)]
