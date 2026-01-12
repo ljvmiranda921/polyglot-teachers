@@ -39,7 +39,7 @@ def main():
     method_labels = [
         "NLLB\nTranslate Both",
         "NLLB Translate\nthen Respond",
-        "Full Synthetic",
+        "LM Translate",
     ]
 
     display_labels = method_labels if method_labels else methods
