@@ -35,14 +35,18 @@ def main():
     langs = ["ar", "id", "de"]
 
     # Customize labels here (optional, set to None to use method names as-is)
-    method_labels = None  # e.g., ["NLLB Both", "Translate Then Respond", "Translate Synthetic"]
+    method_labels = [
+        "NLLB\nTranslate",
+        "NLLB Translate\nthen Respond",
+        "Full Synthetic",
+    ]
 
     display_labels = method_labels if method_labels else methods
 
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=args.figsize)
 
     x = range(len(methods))
-    width = 0.6
+    width = 0.4
 
     avg_values = []
     for method in methods:
@@ -53,7 +57,7 @@ def main():
 
     ax1.set_ylabel("Average PG-Score")
     ax1.set_xticks(x)
-    ax1.set_xticklabels(display_labels, rotation=15, ha="right")
+    ax1.set_xticklabels(display_labels, ha="center")
 
     width = 0.25
     offsets = [-width, 0, width]
@@ -67,11 +71,18 @@ def main():
             values.append(method_data["pg_score"].values[0])
 
         positions = [xi + offsets[i] for xi in x]
-        ax2.bar(positions, values, width, label=lang, color=colors_list[i], edgecolor="black")
+        ax2.bar(
+            positions,
+            values,
+            width,
+            label=lang,
+            color=colors_list[i],
+            edgecolor="black",
+        )
 
     ax2.set_ylabel("PG-Score")
     ax2.set_xticks(x)
-    ax2.set_xticklabels(display_labels, rotation=15, ha="right")
+    ax2.set_xticklabels(display_labels, ha="center")
     ax2.legend(loc="best")
 
     plt.tight_layout()
