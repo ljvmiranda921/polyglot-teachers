@@ -11,7 +11,9 @@ from pathlib import Path
 
 # Unsloth must be imported before torch and trl so that it can patch them properly.
 from unsloth import FastLanguageModel  # isort: skip
+from unsloth import is_bfloat16_supported  # isort: skip
 from unsloth.chat_templates import CHAT_TEMPLATES, get_chat_template  # isort: skip
+from unsloth.models.load_utils import prepare_device_map  # isort: skip
 import torch
 from datasets import Dataset, load_dataset
 from dotenv import load_dotenv
@@ -70,12 +72,14 @@ def main():
         run_name += f"-{args.run_name}"
     logging.info(f"Starting finetuning run: {run_name}")
 
+    device_map, distributed = prepare_device_map()
     model, tokenizer = get_model_and_tokenizer(
         model_name=args.base_model,
         max_seq_length=args.max_seq_length,
         load_in_4bit=args.load_in_4bit,
         use_lora=args.use_lora,
         token=hf_token,
+        device_map=device_map,
     )
 
     dataset = prepare_training_data(
@@ -114,7 +118,10 @@ def main():
             run_name=run_name,
             hub_private_repo=True,
             # Multi-GPU training
-            ddp_find_unused_parameters=False,
+            dataset_num_proc=2,
+            ddp_find_unused_parameters=False if distributed else None,
+            fp16=not is_bfloat16_supported(),
+            bf16=is_bfloat16_supported(),
         ),
     )
 
@@ -142,6 +149,7 @@ def get_model_and_tokenizer(
     use_lora: bool = False,
     lora_r: int = 16,
     token: str = None,
+    device_map=None,
 ):
     local_rank = int(os.environ.get("LOCAL_RANK", 0))
     model, tokenizer = FastLanguageModel.from_pretrained(
@@ -151,6 +159,7 @@ def get_model_and_tokenizer(
         load_in_4bit=load_in_4bit,
         full_finetuning=not use_lora,
         token=token,
+        device_map=device_map,
     )
 
     if use_lora:
