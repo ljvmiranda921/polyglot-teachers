@@ -263,17 +263,21 @@ def plot_predicted_vs_actual(
     y_pred_norm = (y_pred - y_min) / (y_max - y_min) * (range_max - range_min) + range_min  # fmt: skip
     fig, ax = plt.subplots(figsize=(7, 7))
 
-    # Color by language if provided
+    # Color by language if provided - colorblind-friendly palette
     unique_langs = sorted(languages.unique())
     colors = [
-        COLORS["warm_blue"],
-        COLORS["warm_green"],
-        COLORS["dark_cherry"],
-        COLORS["warm_purple"],
+        COLORS["cambridge_blue"],
         COLORS["crest"],
+        COLORS["warm_purple"],
         COLORS["dark_indigo"],
+        COLORS["judge_yellow"],
+        COLORS["slate_3"],
     ]
+    markers = ["o", "s", "^", "+", "v", "p"]
     lang_colors = {lang: colors[i % len(colors)] for i, lang in enumerate(unique_langs)}
+    lang_markers = {
+        lang: markers[i % len(markers)] for i, lang in enumerate(unique_langs)
+    }
 
     for lang in unique_langs:
         mask = languages == lang
@@ -281,9 +285,10 @@ def plot_predicted_vs_actual(
         ax.scatter(
             y_true_norm[mask],
             y_pred_norm[mask],
-            alpha=0.6,
-            s=100,
+            alpha=0.7,
+            s=120,
             color=lang_colors[lang],
+            marker=lang_markers[lang],
             edgecolors=COLORS["dark_blue"],
             linewidth=1.5,
             label=lang_label,
@@ -348,10 +353,10 @@ def plot_loading_factors_heatmap(pca, feature_names, n_components, output_path):
         index=beautiful_names,
     )
 
-    # Create custom colormap using Cambridge colors
+    # Create custom colormap using Cambridge colors (colorblind-friendly)
     cmap = LinearSegmentedColormap.from_list(
         "cambridge_diverging",
-        [COLORS["cherry"], COLORS["white"], COLORS["green"]],
+        [COLORS["warm_crest"], COLORS["white"], COLORS["cambridge_blue"]],
     )
 
     fig, ax = plt.subplots(figsize=(8, 8))
