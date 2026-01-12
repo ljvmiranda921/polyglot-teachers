@@ -39,7 +39,7 @@ def main():
 
     display_labels = method_labels if method_labels else methods
 
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=args.figsize, sharex=True)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=args.figsize)
 
     x = range(len(methods))
     width = 0.6
