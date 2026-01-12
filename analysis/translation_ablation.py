@@ -3,7 +3,7 @@ import logging
 import sys
 from pathlib import Path
 
-from analysis.utils.plot_theme import PLOT_PARAMS, COLORS, OUTPUT_DIR
+from analysis.utils.plot_theme import PLOT_PARAMS, COLORS, OUTPUT_DIR, FONT_SIZES
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -33,6 +33,7 @@ def main():
 
     methods = ["nllb-translate-both", "translate-then-respond", "translate-synthetic"]
     langs = ["ar", "id", "de"]
+    lang_labels = {"ar": "Arabic", "id": "Indonesian", "de": "German"}
 
     # Customize labels here (optional, set to None to use method names as-is)
     method_labels = [
@@ -55,7 +56,18 @@ def main():
 
     ax1.bar(x, avg_values, width, color=COLORS["warm_blue"], edgecolor="black")
 
+    for i, val in enumerate(avg_values):
+        ax1.text(
+            i,
+            val + 0.05,
+            f"{val:.2f}",
+            ha="center",
+            va="bottom",
+            fontsize=FONT_SIZES["large"],
+        )
+
     ax1.set_ylabel("Average PG-Score")
+    ax1.set_ylim(0, 1.7)
     ax1.set_xticks(x)
     ax1.set_xticklabels(display_labels, ha="center")
 
@@ -75,7 +87,7 @@ def main():
             positions,
             values,
             width,
-            label=lang,
+            label=lang_labels[lang],
             color=colors_list[i],
             edgecolor="black",
         )
@@ -83,7 +95,7 @@ def main():
     ax2.set_ylabel("PG-Score")
     ax2.set_xticks(x)
     ax2.set_xticklabels(display_labels, ha="center")
-    ax2.legend(loc="best")
+    ax2.legend(loc="best", frameon=False)
 
     plt.tight_layout()
     args.output_path.parent.mkdir(parents=True, exist_ok=True)
