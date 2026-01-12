@@ -74,6 +74,7 @@ def main():
     width = 0.25
     offsets = [-width, 0, width]
     colors_list = [COLORS["warm_blue"], COLORS["warm_crest"], COLORS["warm_green"]]
+    hatches_list = ["", "//", "\\\\"]
 
     for i, lang in enumerate(langs):
         lang_data = df[df["target_lang"] == lang]
@@ -90,6 +91,7 @@ def main():
             label=lang_labels[lang],
             color=colors_list[i],
             edgecolor="black",
+            hatch=hatches_list[i],
         )
 
     ax2.set_ylabel("PG-Score")
