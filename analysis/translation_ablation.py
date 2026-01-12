@@ -37,7 +37,7 @@ def main():
 
     # Customize labels here (optional, set to None to use method names as-is)
     method_labels = [
-        "NLLB\nTranslate",
+        "NLLB\nTranslate Both",
         "NLLB Translate\nthen Respond",
         "Full Synthetic",
     ]
