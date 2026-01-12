@@ -53,3 +53,8 @@ sbatch experiments/slurm_submit.isambard experiments/jobs/sync_isambard.sh
 
 For more information on how to use this codebase, please refer to the [documentation](DOCUMENTATION.md).
 For information on running experiments on the cluster, see the [experiment documentation](experiments/README.md).
+
+## Acknowledgements
+
+LJVM and AK acknowledge the support of the UKRI Frontier Grant EP/Y031350/1 ([EQUATE](https://gtr.ukri.org/projects?ref=EP%2FY031350%2F1)).
+This work was performed using joint resources provided by the [Cambridge Service for Data Driven Discovery (CSD3)](https://www.csd3.cam.ac.uk/) EP/T022159/1 and the [Isambard AI National AI Research Resource (AIRR)](https://docs.isambard.ac.uk/) ST/AIRR/I-A-I/1023.
