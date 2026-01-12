@@ -5,6 +5,7 @@ import logging
 import sys
 import time
 from pathlib import Path
+from typing import Optional
 
 import ctranslate2
 import torch
@@ -22,6 +23,7 @@ from scripts.synthesize_data import (
     filter_by_token_length,
     prepare_output_dataset,
     upload_to_huggingface,
+    to_conversation_format,
 )
 from scripts.utils.llm_inference import get_strategy
 from scripts.utils.prompts import SYSTEM_PROMPT
@@ -55,6 +57,7 @@ def get_args():
     parser.add_argument("--generation_params", type=str, default=None, help="If set, will pass these additional generation parameters (in JSON format) to the LLM generation calls.")
     parser.add_argument("--device", type=str, default="cuda", help="The device to run NLLB translation on.")
     parser.add_argument("--translate_backend", type=str, choices=["hf", "ctranslate2"], default="hf", help="Backend to use for NLLB translation.")
+    parser.add_argument("--use_hf_dataset_cache", type=str, default=None, help="If set, will use cached HF files if available. Only for nllb_translate_then_respond strategy")
     # fmt: on
     return parser.parse_args()
 
@@ -73,14 +76,14 @@ def main():
     # Must not be msde-S1 so that apply_subsampling works correctly
     if "msde-S1" in args.output_dataset:
         raise ValueError("Output dataset cannot be msde-S1-* when using NLLB translation.")  # fmt: skip
-    dataset = load_dataset(args.input_dataset, split="train")
 
-    if args.shuffle:
-        logging.info(f"Shuffling the dataset using seed {args.shuffle}")
-        dataset = dataset.shuffle(seed=int(args.shuffle))
-    if args.limit:
-        logging.info(f"Getting the first {args.limit} instances")
-        dataset = dataset.select(range(min(int(args.limit), len(dataset))))
+    if not args.use_hf_dataset_cache:
+        dataset = load_hf_dataset(args.input_dataset, shuffle=args.shuffle, limit=args.limit)  # fmt: skip
+    else:
+        logging.info(f"Loading cached dataset from: {args.use_hf_dataset_cache}")
+        dataset = load_dataset(args.use_hf_dataset_cache, split="train")
+        logging.info(f"Loaded dataset with {len(dataset)} instances.")
+
     if args.strategy in ("translate", "nllb_translate_then_respond"):
         logging.info(f"Will load an LM ({args.teacher_model}) due to chosen strategy.")
         backend_params = json.loads(args.backend_params) if args.backend_params else None  # fmt: skip
@@ -116,22 +119,29 @@ def main():
             dataset = Dataset.from_pandas(df)
 
         if args.strategy == "nllb_translate_then_respond":
-            df = dataset.to_pandas().rename(
-                columns={
-                    args.prompts_key: "prompt_en",
-                    args.responses_key: "response_en",
-                }
-            )
-            # Translate prompts from English to target language
-            texts = df["prompt_en"].tolist()
-            df["prompt"] = nllb_translate(
-                texts,
-                model_name=args.translate_model,
-                tgt_lang=lang_with_script,
-                batch_size=args.batch_size,
-                device=args.device,
-            )
-            dataset = Dataset.from_pandas(df)
+            if not args.use_hf_dataset_cache:
+                df = dataset.to_pandas().rename(
+                    columns={
+                        args.prompts_key: "prompt_en",
+                        args.responses_key: "response_en",
+                    }
+                )
+                # Translate prompts from English to target language
+                texts = df["prompt_en"].tolist()
+                df["prompt"] = nllb_translate(
+                    texts,
+                    model_name=args.translate_model,
+                    tgt_lang=lang_with_script,
+                    batch_size=args.batch_size,
+                    device=args.device,
+                )
+                dataset = Dataset.from_pandas(df)
+                # Save dataset to HF just so we won't run again (this is very expensive)
+                datetime_str = time.strftime("%Y%m%dT%H%M%S")
+                dataset.push_to_hub(
+                    f"{args.output_dataset}-translated",
+                    config_name=datetime_str,
+                )
 
         input_dataset: Dataset = format_fn(dataset, lang_name=lang_name)
         system_prompt = SYSTEM_PROMPT.format(lang_name=lang_name)
@@ -142,6 +152,7 @@ def main():
                 max_model_len,
                 system_prompt=system_prompt,
                 prompt_key="synth_prompt",
+                buffer=800,
             )
 
         distiller = distiller_fn(
@@ -154,7 +165,16 @@ def main():
         )
         curator_response: CuratorResponse = distiller(input_dataset)
         logging.info(f"Data synthesis cost: {curator_response.cost_info.total_cost} USD")  # fmt: skip
+        output_dataset = curator_response.dataset
 
+        output_dataset = prepare_output_dataset(
+            output_dataset,
+            input_dataset=input_dataset,
+            strategy=args.strategy,
+            model=model_name,
+            include_input_columns=True,
+        )
+        output_dataset = output_dataset.filter(lambda ex: ex["response"] is not None)
     else:
         model_name = args.translate_model
         df = dataset.to_pandas().rename(
@@ -177,20 +197,36 @@ def main():
             batch_size=args.batch_size,
             device=args.device,
         )
-        dataset = Dataset.from_pandas(df)
 
-    output_dataset = prepare_output_dataset(
-        curator_response.dataset,
-        input_dataset=input_dataset,
-        strategy=args.strategy,
-        model=model_name,
-        include_input_columns=True,
-    )
-    output_dataset = output_dataset.filter(lambda ex: ex["response"] is not None)
+        df["synth_prompt"] = "None"
+        df["strategy"] = args.strategy  # Keep track of the synthesis strategy used
+        df["model"] = model_name  # Keep track of the model used for synthesis
+
+        dataset = Dataset.from_pandas(df)
+        output_dataset = dataset.map(to_conversation_format)
+        # Cache the result just to be sure
+        datetime_str = time.strftime("%Y%m%dT%H%M%S")
+        output_dataset.push_to_hub(
+            f"{args.output_dataset}-nllb-translated",
+            config_name=datetime_str,
+        )
 
     # Upload output to HuggingFace
     logging.info(f"Uploading output dataset to HuggingFace: {args.output_dataset}")
     upload_to_huggingface(dataset=output_dataset, dataset_name=args.output_dataset, append=args.append)  # fmt: skip
+
+
+def load_hf_dataset(
+    dataset_id: str, shuffle: bool = False, limit: Optional[int] = None
+) -> Dataset:
+    dataset = load_dataset(dataset_id, split="train")
+    if shuffle:
+        logging.info(f"Shuffling the dataset using seed {shuffle}")
+        dataset = dataset.shuffle(seed=int(shuffle))
+    if limit:
+        logging.info(f"Getting the first {limit} instances")
+        dataset = dataset.select(range(min(int(limit), len(dataset))))
+    return dataset
 
 
 def nllb_translate_hf(
