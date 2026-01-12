@@ -3,9 +3,10 @@ import logging
 import sys
 from pathlib import Path
 
-from analysis.utils.plot_theme import PLOT_PARAMS, COLORS, OUTPUT_DIR, FONT_SIZES
 import matplotlib.pyplot as plt
 import pandas as pd
+
+from analysis.utils.plot_theme import COLORS, FONT_SIZES, OUTPUT_DIR, PLOT_PARAMS
 
 plt.rcParams.update(PLOT_PARAMS)
 
