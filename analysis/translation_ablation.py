@@ -17,7 +17,10 @@ logging.basicConfig(
 
 
 def get_args():
-    pass
+    # fmt: off
+    parser = argparse.ArgumentParser(description="Analyze translation ablation results and plot a bar chart.")
+    parser.add_argument("--input_path", type=Path, required=True, help="Path to the iput JSONL file containing the results. Must have a 'translate_method' field.")
+    # fmt: on
 
 
 def main():
