@@ -13,7 +13,7 @@ However, collecting this data from native-speakers demands substantial human eff
 However, research is scarce on how we can leverage the synthetic data pipeline to create high-quality multilingual data.
 
 In this work, we ask the question: **"what makes a good multilingual teacher for synthetic data generation?"**
-Specifically, we perform a comprehensive analysis of several language models and evaluate their data quality as teacher models, *(intrinsic)* and the performance gain of the resulting student model on some benchmarks *(extrinsic)*.
+Specifically, we perform a comprehensive analysis of several language models and evaluate their data quality as teacher models, and the performance gain of the resulting student model on some benchmarks.
 
 
 <p align="center">
