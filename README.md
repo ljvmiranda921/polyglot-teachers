@@ -1,9 +1,9 @@
 <img src="assets/ltl_logo2.svg" height="80" align="right" />
-<img src="assets/cambridge_logo.png" height="70" align="right" />
+<img src="assets/cambridge_logo.png" height="60" align="right" />
 
 <!-- # Polyglot Teachers: Evaluating LLMs for Multilingual Synt. Data Generation  -->
 
-# Open Multilingual Synthetic Data Research
+# Open Multilingual Synthetic Data Research Project
 
 Supervised finetuning (SFT) has been a dominant approach in building multilingual language models (LMs).
 Central to its success is the availability of high-quality multilingual datasets.
@@ -14,13 +14,13 @@ However, research is scarce on how we can leverage the synthetic data pipeline t
 
 This codebase serves as a repository of research efforts on understanding the multilingual synthetic data pipeline:
 
-- **Polyglot Teachers**: in this project, we ask the question: "what makes a good multilingual teacher for synthetic data generation?" Specifically, we perform a comprehensive analysis of several language models and evaluate their data quality as teacher models, *(intrinsic)* and the performance gain of the resulting student model on some benchmarks *(extrinsic)*.
+- **Polyglot Teachers**: in this work, we ask the question: "what makes a good multilingual teacher for synthetic data generation?" Specifically, we perform a comprehensive analysis of several language models and evaluate their data quality as teacher models, *(intrinsic)* and the performance gain of the resulting student model on some benchmarks *(extrinsic)*.
 
-<p align="center">
-<img src="/assets/distillation_workflow.png" alt="Distillation Workflow" width="700" style="display: block; margin: 0 auto;"/>
-<br/>
-<i>Overview of the Polyglot Score and how it fits into the distillation workflow.</i>
-</p>
+    <p align="center">
+    <img src="/assets/distillation_workflow.png" alt="Distillation Workflow" width="700" style="display: block; margin: 0 auto;"/>
+    <br/>
+    <i>Overview of the Polyglot Score and how it fits into the distillation workflow.</i>
+    </p>
 
 ## Setup & Installation
 
