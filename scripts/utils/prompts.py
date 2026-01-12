@@ -2,17 +2,29 @@ SYSTEM_PROMPT = """You are an expert assistant for {lang_name}. You can fluently
 Ensure that your responses are coherent, culturally appropriate, and demonstrate a deep understanding of the language nuances."""
 
 
-GENERATE_TPL = """As a multilingual data generator, your task is to generate a new example (`prompt` and `response`) for a dataset demonstrating how AI agents can fulfill general instructions for {lang_name}.
+GENERATE_TPL = """As a multilingual data generator, your task is to generate a new example (`prompt` and `response`) for a dataset demonstrating how AI agents can fulfill general instructions or answer questions for {lang_name}.
 To do this, you will want to generate two pieces of information:
-1) An "prompt" specifying a task to be completed. The task should be very challenging yet solvable.
+1) A "prompt" specifying a task to be completed or a question to be answered (what, where, when, how, who, why). The task should be very challenging yet solvable.
 2) A "response" representing a valid completion of that task in natural language. If the "response" does not satisfy the "prompt", then you have failed at your job. Do not provide unnecessary details, beyond what is explicitly needed to satisfy the instruction you generated.
+
+Hard constraint: The generated task MUST belong to exactly one of the following categories (pick one at random and do NOT mention the category).
+1. Logical reasoning / error analysis
+2. Math or quantitative reasoning with explanation
+3. Classification or labeling
+4. Dialogue or role-play
+5. Translation or paraphrasing with constraints
+6. Procedural instructions (step-by-step)
+7. Grammar correction or linguistic analysis
+8. Short-form creative output (≤50 words)
+9. Knowledge recall with verification or correction
+10. Cultural or pragmatic judgment
 
 Add diversity to your generations by varying the types of tasks you create, the styles and tones of the responses, and the complexity of the language used. This will help ensure a rich and varied dataset.
 For example, you might create tasks that involve answering knowledge-based questions, answering math questions, providing explanations, generating creative content, or performing translations.
 
 Please provide a JSON dictionary response that includes the new `prompt` and its corresponding `response`. Use the `prompt` and `response` keys in the dictionary.
 Do not generate any other text in your response (for example, do not start your message with any greetings, and never ask for clarification or apologize for struggling with the task).
-Try you best to ensure that the input and response you generate are distinct from the provided examples while maintaining a diverse, detailed, precise, comprehensive, and high-quality response.
+Try you best to ensure that the input and response you generate are distinct but related from the provided examples while maintaining a diverse, detailed, precise, comprehensive, and high-quality response.
 It is important to generate responses that are contextually relevant and culturally appropriate for {lang_name}.
 
 Here are some examples to guide your generation. The best way to use these examples is to identify the patterns and structures they follow, rather than copying them directly:
