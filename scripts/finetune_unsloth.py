@@ -13,7 +13,7 @@ from pathlib import Path
 from unsloth import FastLanguageModel  # isort: skip
 from unsloth import is_bfloat16_supported  # isort: skip
 from unsloth.chat_templates import CHAT_TEMPLATES, get_chat_template  # isort: skip
-from unsloth.models.load_utils import prepare_device_map  # isort: skip
+from unsloth.models.loader_utils import prepare_device_map  # isort: skip
 import torch
 from datasets import Dataset, load_dataset
 from dotenv import load_dotenv
