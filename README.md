@@ -22,6 +22,10 @@ This codebase serves as a repository of research efforts on understanding the mu
     <i>Overview of the Polyglot Score and how it fits into the distillation workflow.</i>
     </p>
 
+## News
+
+- **2026-07-15**: Polyglot Teachers has been accepted at EMNLP 2026 Main as an Oral Presentation!
+
 ## Setup & Installation
 
 Make sure that you have `uv` in your system (see [download instructions](https://docs.astral.sh/uv/getting-started/installation/)).
