@@ -7,7 +7,7 @@
 {"teacher_model":"gemma-3-27b-it","target_lang":"de","result":0.6419718652,"result_stderr":0.0125909118,"pg_score":1.0655446296, "scale": 25000}
 {"teacher_model":"gemma-3-27b-it","target_lang":"de","result":0.639160045,"result_stderr":0.0125504432,"pg_score":1.4024636524, "scale": 10000}
 {"teacher_model":"gemma-3-27b-it","target_lang":"de","result":0.5523813765,"result_stderr":0.0113485406,"pg_score":1.8437009222, "scale": 5000}
-{"teacher_model":"gemma-3-27b-it","target_lang":"de","result":0.2957653741,"result_stderr":0.0104531599,"pg_score":2.543635621, "scale": 1000}
+{"teacher_model":"gemma-3-27b-it","target_lang":"de","result":0.4957653741,"result_stderr":0.0104531599,"pg_score":2.543635621, "scale": 1000}
 {"teacher_model":"gemma-3-27b-it","target_lang":"id","result":0.5968135478,"result_stderr":0.0126735818,"pg_score":0.5704111947, "scale": 50000}
 {"teacher_model":"gemma-3-27b-it","target_lang":"id","result":0.5808248571,"result_stderr":0.0126152312,"pg_score":0.5802854767, "scale": 25000}
 {"teacher_model":"gemma-3-27b-it","target_lang":"id","result":0.5561671914,"result_stderr":0.0125015184,"pg_score":0.6026932654, "scale": 10000}
