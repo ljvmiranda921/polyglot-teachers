@@ -52,6 +52,7 @@ def get_args():
     parser.add_argument("--show_per_language", action="store_true", help="Whether to show per-language PG-Scores.")
     parser.add_argument("--add_metadata", type=str, default="{}", help="Additional metadata to add to the output JSONL file. Must be valid JSON. Will be added as a field for each row.")
     parser.add_argument("--append", action="store_true", help="Whether to append to the output file if it exists.")
+    parser.add_argument("--data_lineage", type=str, default="S1", help="Data lineage tag for searching.")
     # fmt: on
     return parser.parse_args()
 
@@ -130,6 +131,7 @@ def get_intrinsic_metrics(
     directory_path: str = "csd3",
     local_path: str = "data",
     cache_results: bool = False,
+    data_lineage: str = "S1",
 ) -> pd.DataFrame:
     """Downloads all JSON files containing the metrics and returns a collated DataFrame"""
     if not use_cache:
@@ -146,7 +148,9 @@ def get_intrinsic_metrics(
         metrics_data = []
         for file in metrics_dir.glob("*.json"):
             filename = file.stem
-            parts = filename.replace("msde-S1-", "").replace("_intrinsic_metrics", "")
+            parts = filename.replace(f"msde-{data_lineage}-", "").replace(
+                "_intrinsic_metrics", ""
+            )
             language, model_raw = parts.split("_", 1)
             model = model_raw.replace("__", "/")
 
@@ -265,7 +269,9 @@ def _parse_eval_str(task_str: str) -> dict[str, str | int]:
     return {"task": task, "eval_lang": lang, "n_shots": int(n_shots)}
 
 
-def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
+def _parse_model_info(
+    dataset_id: str, data_lineage: str = "S1"
+) -> dict[str, str | bool]:
     # dataset_id: 'ljvmiranda921/details_msde-allenai_Olmo-3-1025-7B-lora-4bit-msde-S1-es_Llama-3_1-8B-Instruct' -> 'allenai_Olmo-3-1025-7B-lora-4bit-msde-S1-es_Llama-3_1-8B-Instruct'
     prefix = "details_msde-"
     relevant_part = dataset_id.split(prefix, 1)[1] if prefix in dataset_id else dataset_id  # fmt: skip
@@ -273,7 +279,7 @@ def _parse_model_info(dataset_id: str) -> dict[str, str | bool]:
     # parts: ['allenai_Olmo-3-1025-7B-lora-4bit', 'es_Llama-3_1-8B-Instruct']
     # model_info_raw: 'allenai_Olmo-3-1025-7B-lora-4bit'
     # lang_and_teacher: 'es_Llama-3_1-8B-Instruct'
-    model_info_raw, lang_and_teacher = relevant_part.split("-msde-T1-")
+    model_info_raw, lang_and_teacher = relevant_part.split(f"-msde-{data_lineage}-")
     # Extract language and teacher model
     lang_teacher_parts = lang_and_teacher.split("_", 1)
     language = lang_teacher_parts[0]
