@@ -6,7 +6,7 @@ CHAT_TEMPLATE="gemma-3"
 TEACHER_MODEL_FULL="google/gemma-3-27b-it"
 INPUT_DATASET_FILTER="{\"model\": \"${TEACHER_MODEL_FULL}\"}"
 
-python -m scripts.finetune_unsloth \
+torchrun --nproc_per_node 2 -m scripts.finetune_unsloth \
     --input_dataset ${INPUT_DATASET_SYNTH} \
     --run_name ${RUN_NAME} \
     --base_model ${BASE_MODEL} \

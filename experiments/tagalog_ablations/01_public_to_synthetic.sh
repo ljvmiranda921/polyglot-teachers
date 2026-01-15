@@ -6,7 +6,7 @@ BASE_MODEL="google/gemma-3-4b-pt"
 CHAT_TEMPLATE="gemma-3"
 
 echo "Finetuning student model using this dataset: ${INPUT_DATASET_PUBLIC}"
-python -m scripts.finetune_unsloth \
+torchrun --nproc_per_node 2 -m scripts.finetune_unsloth \
     --input_dataset ${INPUT_DATASET_PUBLIC} \
     --run_name ${RUN_NAME} \
     --base_model ${BASE_MODEL} \
@@ -29,7 +29,7 @@ INPUT_DATASET_FILTER="{\"model\": \"${TEACHER_MODEL_FULL}\"}"
 echo "Finetuning student model using this dataset: ${INPUT_DATASET_SYNTH} and teacher: ${TEACHER_MODEL_FULL}"
 
 
-python -m scripts.finetune_unsloth \
+torchrun --nproc_per_node 2 -m scripts.finetune_unsloth \
     --input_dataset ${INPUT_DATASET_SYNTH} \
     --run_name ${RUN_NAME} \
     --base_model ${BASE_MODEL} \
