@@ -4,10 +4,11 @@ RUN_NAME="tgl_25k-Gemma3"
 BASE_MODEL="google/gemma-3-4b-pt"
 CHAT_TEMPLATE="gemma-3"
 TEACHER_MODEL_FULL="google/gemma-3-27b-it"
+INPUT_DATASET="ljvmiranda921/msde-S1-tl"
 INPUT_DATASET_FILTER="{\"model\": \"${TEACHER_MODEL_FULL}\"}"
 
 torchrun --nproc_per_node 2 -m scripts.finetune_unsloth \
-    --input_dataset ${INPUT_DATASET_SYNTH} \
+    --input_dataset ${INPUT_DATASET} \
     --run_name ${RUN_NAME} \
     --base_model ${BASE_MODEL} \
     --chat_template ${CHAT_TEMPLATE} \
