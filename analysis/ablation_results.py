@@ -149,6 +149,9 @@ def main():
     add_arc_annotation(
         ax, df, 0, 1, "Use synthetic\ndata", y_offset=10, text_y_offset=20
     )
+    add_arc_annotation(
+        ax, df, 1, 2, "T=Aya Expanse 32B", y_offset=10, text_y_offset=20
+    )
 
     ax.set_ylabel(r"\textsc{FilBench Score}", fontsize=FONT_SIZES.get("large"))
 
