@@ -28,6 +28,34 @@ def get_args():
     return parser.parse_args()
 
 
+def add_arc_annotation(
+    ax, df, start_idx, end_idx, annotation_text, y_offset=10, text_y_offset=20, rad=-0.5
+):
+    from matplotlib.patches import FancyArrowPatch
+
+    arc_arrow = FancyArrowPatch(
+        (start_idx, df["filbench_score"].iloc[start_idx] + y_offset),
+        (end_idx, df["filbench_score"].iloc[end_idx] + y_offset),
+        arrowstyle="->",
+        connectionstyle=f"arc3,rad={rad}",
+        color="black",
+        linewidth=1.5,
+        mutation_scale=20,
+    )
+    ax.add_patch(arc_arrow)
+
+    arc_mid_x = (start_idx + end_idx) / 2.0
+    arc_mid_y = df["filbench_score"].iloc[start_idx : end_idx + 1].max() + text_y_offset
+    ax.text(
+        arc_mid_x,
+        arc_mid_y,
+        annotation_text,
+        ha="center",
+        va="bottom",
+        fontdict={"size": FONT_SIZES.get("medium")},
+    )
+
+
 def main():
     args = get_args()
     logging.info(f"Loading ablation results from {args.input_dir}")
@@ -79,6 +107,7 @@ def main():
 
     ax.set_xticks(x_positions)
     ax.set_xticklabels([])
+    ax.tick_params(axis='x', length=0)
 
     # Let's just use Claude here... this is tricky to add using matplotlib
     ax.set_ylim([0, 90])
@@ -86,10 +115,11 @@ def main():
     gemma_4b_end = 5
     gemma_4b_mid = (gemma_4b_start + gemma_4b_end) / 2.0
 
+    num_dashes = 16
     ax.text(
         gemma_4b_mid,
         -0.02,
-        r"$\vert$------ Gemma 3 4B ------$\vert$",
+        r"$\vert$" + "-" * num_dashes + " Gemma 3 4B " + "-" * num_dashes + r"$\vert$",
         ha="center",
         va="top",
         transform=ax.get_xaxis_transform(),
@@ -116,28 +146,8 @@ def main():
         fontdict={"size": FONT_SIZES.get("medium")},
     )
 
-    from matplotlib.patches import FancyArrowPatch
-
-    arc_arrow = FancyArrowPatch(
-        (0, df["filbench_score"].iloc[0] + 10),
-        (1, df["filbench_score"].iloc[1] + 10),
-        arrowstyle="->",
-        connectionstyle="arc3,rad=-0.5",
-        color="black",
-        linewidth=1.5,
-        mutation_scale=20,
-    )
-    ax.add_patch(arc_arrow)
-
-    arc_mid_x = 0.5
-    arc_mid_y = df["filbench_score"].iloc[0:2].max() + 20
-    ax.text(
-        arc_mid_x,
-        arc_mid_y,
-        "Use synthetic\ndata",
-        ha="center",
-        va="bottom",
-        fontdict={"size": FONT_SIZES.get("medium")},
+    add_arc_annotation(
+        ax, df, 0, 1, "Use synthetic\ndata", y_offset=10, text_y_offset=20
     )
 
     ax.set_ylabel(r"\textsc{FilBench Score}", fontsize=FONT_SIZES.get("large"))
