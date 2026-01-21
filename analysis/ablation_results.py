@@ -81,6 +81,7 @@ def main():
     ax.set_xticklabels([])
 
     # Let's just use Claude here... this is tricky to add using matplotlib
+    ax.set_ylim([0, 90])
     gemma_4b_start = -1
     gemma_4b_end = 5
     gemma_4b_mid = (gemma_4b_start + gemma_4b_end) / 2.0
@@ -115,7 +116,31 @@ def main():
         fontdict={"size": FONT_SIZES.get("medium")},
     )
 
-    ax.set_ylabel("FILBench Score")
+    from matplotlib.patches import FancyArrowPatch
+
+    arc_arrow = FancyArrowPatch(
+        (0, df["filbench_score"].iloc[0] + 3),
+        (1, df["filbench_score"].iloc[1] + 3),
+        arrowstyle="->",
+        connectionstyle="arc3,rad=0.3",
+        color="black",
+        linewidth=1.5,
+        mutation_scale=20,
+    )
+    ax.add_patch(arc_arrow)
+
+    arc_mid_x = 0.5
+    arc_mid_y = df["filbench_score"].iloc[0:2].max() + 5
+    ax.text(
+        arc_mid_x,
+        arc_mid_y,
+        "Use synthetic data",
+        ha="center",
+        va="bottom",
+        fontdict={"size": FONT_SIZES.get("medium")},
+    )
+
+    ax.set_ylabel(r"\textsc{FilBench Score}", fontsize=FONT_SIZES.get("large"))
 
     ax.grid(axis="y", alpha=0.3, linestyle="--")
     ax.set_axisbelow(True)
