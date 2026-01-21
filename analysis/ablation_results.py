@@ -87,8 +87,8 @@ def main():
 
     ax.text(
         gemma_4b_mid,
-        -0.08,
-        r"|---- Gemma 3 4B ----|",
+        -0.02,
+        r"$\vert$------ Gemma 3 4B ------$\vert$",
         ha="center",
         va="top",
         transform=ax.get_xaxis_transform(),
