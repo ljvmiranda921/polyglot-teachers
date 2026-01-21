@@ -29,7 +29,15 @@ def get_args():
 
 
 def add_arc_annotation(
-    ax, df, start_idx, end_idx, annotation_text, y_offset=10, text_y_offset=20, rad=-0.5
+    ax,
+    df,
+    start_idx,
+    end_idx,
+    annotation_text,
+    y_offset=10,
+    text_y_offset=20,
+    text_x_offset=0,
+    rad=-0.5,
 ):
     from matplotlib.patches import FancyArrowPatch
 
@@ -44,7 +52,7 @@ def add_arc_annotation(
     )
     ax.add_patch(arc_arrow)
 
-    arc_mid_x = (start_idx + end_idx) / 2.0
+    arc_mid_x = ((start_idx + end_idx) / 2.0) + text_x_offset
     arc_mid_y = df["filbench_score"].iloc[start_idx : end_idx + 1].max() + text_y_offset
     ax.text(
         arc_mid_x,
@@ -112,41 +120,15 @@ def main():
 
     ax.set_ylim([0, 90])
 
-    ax.text(
-        0,
-        -0.02,
-        "None",
-        ha="center",
-        va="top",
-        transform=ax.get_xaxis_transform(),
-        fontdict={"size": FONT_SIZES.get("medium")},
-    )
-
-    ax.text(
-        1,
-        -0.02,
-        "GPT-4o",
-        ha="center",
-        va="top",
-        transform=ax.get_xaxis_transform(),
-        fontdict={"size": FONT_SIZES.get("medium")},
-    )
-
-    ax.text(
-        2,
-        -0.02,
-        "Aya Exp",
-        ha="center",
-        va="top",
-        transform=ax.get_xaxis_transform(),
-        fontdict={"size": FONT_SIZES.get("medium")},
-    )
-
+    # fmt: off
+    ax.text(0, -0.02, "None", ha="center", va="top", transform=ax.get_xaxis_transform(), fontdict={"size": FONT_SIZES.get("medium")})
+    ax.text(1, -0.02, "GPT-4o", ha="center", va="top", transform=ax.get_xaxis_transform(), fontdict={"size": FONT_SIZES.get("medium")})
+    ax.text(2, -0.02, "Aya Exp", ha="center", va="top", transform=ax.get_xaxis_transform(), fontdict={"size": FONT_SIZES.get("medium")})
     gemma_27b_start = 3
     gemma_27b_end = 6
     gemma_27b_mid = (gemma_27b_start + gemma_27b_end) / 2.0
     num_dashes = 8
-
+    # fmt: on
     ax.text(
         gemma_27b_mid,
         -0.02,
@@ -156,12 +138,13 @@ def main():
         transform=ax.get_xaxis_transform(),
         fontdict={"size": FONT_SIZES.get("medium")},
     )
-
     # fmt: off
     add_arc_annotation(ax, df, 0, 1, "Use synthetic\npipeline", y_offset=10, text_y_offset=20)
     add_arc_annotation(ax, df, 1, 2, "Better\nteacher", y_offset=10, text_y_offset=20)
     add_arc_annotation(ax, df, 2, 3, "Match\nfamily", y_offset=10, text_y_offset=20)
     add_arc_annotation(ax, df, 3, 4, "Scale data\n(10k→25k)", y_offset=10, text_y_offset=20)
+    add_arc_annotation(ax, df, 4, 5, "Scale size\n(4B→12B)", y_offset=10, text_y_offset=20, text_x_offset=0.10)
+    add_arc_annotation(ax, df, 5, 6, "Scale size\n(12B→27B)", y_offset=10, text_y_offset=20, text_x_offset=0.25)
     # fmt: on
 
     ax.set_xlabel("Teacher Model", fontsize=FONT_SIZES.get("large"), labelpad=25)
