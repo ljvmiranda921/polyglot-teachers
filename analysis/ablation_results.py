@@ -114,7 +114,7 @@ def main():
     ax.text(
         0,
         -0.02,
-        "Public",
+        "None",
         ha="center",
         va="top",
         transform=ax.get_xaxis_transform(),
