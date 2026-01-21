@@ -107,19 +107,14 @@ def main():
 
     ax.set_xticks(x_positions)
     ax.set_xticklabels([])
-    ax.tick_params(axis='x', length=0)
+    ax.tick_params(axis="x", length=0)
 
-    # Let's just use Claude here... this is tricky to add using matplotlib
     ax.set_ylim([0, 90])
-    gemma_4b_start = -1
-    gemma_4b_end = 5
-    gemma_4b_mid = (gemma_4b_start + gemma_4b_end) / 2.0
 
-    num_dashes = 16
     ax.text(
-        gemma_4b_mid,
+        0,
         -0.02,
-        r"$\vert$" + "-" * num_dashes + " Gemma 3 4B " + "-" * num_dashes + r"$\vert$",
+        "Public",
         ha="center",
         va="top",
         transform=ax.get_xaxis_transform(),
@@ -127,9 +122,9 @@ def main():
     )
 
     ax.text(
-        5,
+        1,
         -0.02,
-        "12B",
+        "GPT-4o",
         ha="center",
         va="top",
         transform=ax.get_xaxis_transform(),
@@ -137,9 +132,24 @@ def main():
     )
 
     ax.text(
-        6,
+        2,
         -0.02,
-        "27B",
+        "Aya Exp",
+        ha="center",
+        va="top",
+        transform=ax.get_xaxis_transform(),
+        fontdict={"size": FONT_SIZES.get("medium")},
+    )
+
+    gemma_27b_start = 3
+    gemma_27b_end = 6
+    gemma_27b_mid = (gemma_27b_start + gemma_27b_end) / 2.0
+    num_dashes = 8
+
+    ax.text(
+        gemma_27b_mid,
+        -0.02,
+        r"$\vert$" + "-" * num_dashes + " Gemma 3 27B " + "-" * num_dashes + r"$\vert$",
         ha="center",
         va="top",
         transform=ax.get_xaxis_transform(),
@@ -149,9 +159,7 @@ def main():
     add_arc_annotation(
         ax, df, 0, 1, "Use synthetic\ndata", y_offset=10, text_y_offset=20
     )
-    add_arc_annotation(
-        ax, df, 1, 2, "T=Aya Expanse 32B", y_offset=10, text_y_offset=20
-    )
+    add_arc_annotation(ax, df, 1, 2, "T=Aya Expanse 32B", y_offset=10, text_y_offset=20)
 
     ax.set_ylabel(r"\textsc{FilBench Score}", fontsize=FONT_SIZES.get("large"))
 
