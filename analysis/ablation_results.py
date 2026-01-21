@@ -160,6 +160,7 @@ def main():
     # fmt: off
     add_arc_annotation(ax, df, 0, 1, "Use synthetic\npipeline", y_offset=10, text_y_offset=20)
     add_arc_annotation(ax, df, 1, 2, "Better\nteacher", y_offset=10, text_y_offset=20)
+    add_arc_annotation(ax, df, 2, 3, "Match\nfamily", y_offset=10, text_y_offset=20)
     # fmt: on
 
     ax.set_xlabel("Teacher Model", fontsize=FONT_SIZES.get("large"), labelpad=25)
