@@ -119,10 +119,10 @@ def main():
     from matplotlib.patches import FancyArrowPatch
 
     arc_arrow = FancyArrowPatch(
-        (0, df["filbench_score"].iloc[0] + 3),
-        (1, df["filbench_score"].iloc[1] + 3),
+        (0, df["filbench_score"].iloc[0] + 10),
+        (1, df["filbench_score"].iloc[1] + 10),
         arrowstyle="->",
-        connectionstyle="arc3,rad=0.3",
+        connectionstyle="arc3,rad=-0.5",
         color="black",
         linewidth=1.5,
         mutation_scale=20,
@@ -130,11 +130,11 @@ def main():
     ax.add_patch(arc_arrow)
 
     arc_mid_x = 0.5
-    arc_mid_y = df["filbench_score"].iloc[0:2].max() + 5
+    arc_mid_y = df["filbench_score"].iloc[0:2].max() + 20
     ax.text(
         arc_mid_x,
         arc_mid_y,
-        "Use synthetic data",
+        "Use synthetic\ndata",
         ha="center",
         va="bottom",
         fontdict={"size": FONT_SIZES.get("medium")},
