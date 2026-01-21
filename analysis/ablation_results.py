@@ -139,12 +139,12 @@ def main():
         fontdict={"size": FONT_SIZES.get("medium")},
     )
     # fmt: off
-    add_arc_annotation(ax, df, 0, 1, "Use synthetic\npipeline", y_offset=10, text_y_offset=20)
-    add_arc_annotation(ax, df, 1, 2, "Better\nteacher", y_offset=10, text_y_offset=20)
-    add_arc_annotation(ax, df, 2, 3, "Match\nfamily", y_offset=10, text_y_offset=20)
-    add_arc_annotation(ax, df, 3, 4, "Scale data\n(10k→25k)", y_offset=10, text_y_offset=20)
-    add_arc_annotation(ax, df, 4, 5, "Scale size\n(4B→12B)", y_offset=10, text_y_offset=20, text_x_offset=0.10)
-    add_arc_annotation(ax, df, 5, 6, "Scale size\n(12B→27B)", y_offset=10, text_y_offset=20, text_x_offset=0.25)
+    add_arc_annotation(ax, df, 0, 1, "+Use synthetic\npipeline", y_offset=10, text_y_offset=20, text_x_offset=-0.10)
+    add_arc_annotation(ax, df, 1, 2, "+Better\nteacher", y_offset=10, text_y_offset=20)
+    add_arc_annotation(ax, df, 2, 3, "+Match\nfamily", y_offset=10, text_y_offset=20)
+    add_arc_annotation(ax, df, 3, 4, "+Scale data\n(10k→25k)", y_offset=10, text_y_offset=20)
+    add_arc_annotation(ax, df, 4, 5, "+Scale size\n(4B→12B)", y_offset=10, text_y_offset=20, text_x_offset=0.10)
+    add_arc_annotation(ax, df, 5, 6, "+Scale size\n(12B→27B)", y_offset=10, text_y_offset=20, text_x_offset=0.25)
     # fmt: on
 
     ax.set_xlabel("Teacher Model", fontsize=FONT_SIZES.get("large"), labelpad=25)
