@@ -95,6 +95,26 @@ def main():
         fontdict={"size": FONT_SIZES.get("medium")},
     )
 
+    ax.text(
+        5,
+        -0.02,
+        "12B",
+        ha="center",
+        va="top",
+        transform=ax.get_xaxis_transform(),
+        fontdict={"size": FONT_SIZES.get("medium")},
+    )
+
+    ax.text(
+        6,
+        -0.02,
+        "27B",
+        ha="center",
+        va="top",
+        transform=ax.get_xaxis_transform(),
+        fontdict={"size": FONT_SIZES.get("medium")},
+    )
+
     ax.set_ylabel("FILBench Score")
 
     ax.grid(axis="y", alpha=0.3, linestyle="--")
