@@ -1,0 +1,73 @@
+{
+    "config": {
+        "model_name": "ljvmiranda921/msde-sft-dev",
+        "model_dtype": null,
+        "model_size": null
+    },
+    "results": {
+        "belebele_ceb_mcf": {
+            "acc": 0.7711111111111111,
+            "acc_stderr": 0.014011705158884504
+        },
+        "cebuaner_ceb_mcf": {
+            "acc": 0.8419847328244274,
+            "acc_stderr": 0.01008165450012518
+        },
+        "readability_ceb_mcf": {
+            "acc": 0.35428571428571426,
+            "acc_stderr": 0.025602613748797867
+        },
+        "firecs_fil_mcf": {
+            "acc": 0.6141689373297002,
+            "acc_stderr": 0.00568229889615097
+        },
+        "include_tgl_mcf:culturology": {
+            "acc": 0.8423645320197044,
+            "acc_stderr": 0.025639014131172408
+        },
+        "include_tgl_mcf:driving_license": {
+            "acc": 0.7333333333333333,
+            "acc_stderr": 0.05140664006373735
+        },
+        "include_tgl_mcf:history": {
+            "acc": 0.7672413793103449,
+            "acc_stderr": 0.039406691683377015
+        },
+        "include_tgl_mcf:language": {
+            "acc": 0.660377358490566,
+            "acc_stderr": 0.04621678759968263
+        },
+        "include_tgl_mcf:_average": {
+            "acc": 0.7508291507884871,
+            "acc_stderr": 0.04066728336949235
+        },
+        "sib200_tgl_mcf": {
+            "acc": 0.7373737373737373,
+            "acc_stderr": 0.044452876769839444
+        },
+        "sib200_ceb_mcf": {
+            "acc": 0.696969696969697,
+            "acc_stderr": 0.046423399544431185
+        },
+        "tlunifiedner_tgl_mcf": {
+            "acc": 0.9126029132362254,
+            "acc_stderr": 0.007109448362094905
+        },
+        "universalner_ceb_mcf": {
+            "acc": 0.9387755102040817,
+            "acc_stderr": 0.03460372440370037
+        },
+        "universalner_tgl_mcf": {
+            "acc": 0.9285714285714286,
+            "acc_stderr": 0.034726602486028414
+        }
+    },
+    "versions": {},
+    "category_scores": {
+        "CLASSICAL_NLP": 45.00142346914661,
+        "READING_COMPREHENSION": 55.791989954756076,
+        "GENERATION": 56.761004392073055,
+        "CULTURAL_KNOWLEDGE": 54.530857517136546
+    },
+    "filbench_score": 53.02131883327807
+}
