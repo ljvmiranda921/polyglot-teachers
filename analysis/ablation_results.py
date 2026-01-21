@@ -52,7 +52,7 @@ def add_arc_annotation(
         annotation_text,
         ha="center",
         va="bottom",
-        fontdict={"size": FONT_SIZES.get("medium")},
+        fontdict={"size": FONT_SIZES.get("small")},
     )
 
 
@@ -156,11 +156,12 @@ def main():
         fontdict={"size": FONT_SIZES.get("medium")},
     )
 
-    add_arc_annotation(
-        ax, df, 0, 1, "Use synthetic\ndata", y_offset=10, text_y_offset=20
-    )
-    add_arc_annotation(ax, df, 1, 2, "T=Aya Expanse 32B", y_offset=10, text_y_offset=20)
+    # fmt: off
+    add_arc_annotation(ax, df, 0, 1, "Use synthetic\ndata", y_offset=10, text_y_offset=20)
+    add_arc_annotation(ax, df, 1, 2, "Better teacher", y_offset=10, text_y_offset=20)
+    # fmt: on
 
+    ax.set_xlabel("Teacher Model", fontsize=FONT_SIZES.get("large"), labelpad=25)
     ax.set_ylabel(r"\textsc{FilBench Score}", fontsize=FONT_SIZES.get("large"))
 
     ax.grid(axis="y", alpha=0.3, linestyle="--")
