@@ -1,1 +1,73 @@
-{"config": {"model_name": "ljvmiranda921/msde-sft-dev", "model_dtype": null, "model_size": null}, "results": {"belebele_ceb_mcf": {"acc": 0.72, "acc_stderr": 0.014974951276705693}, "cebuaner_ceb_mcf": {"acc": 0.8083969465648855, "acc_stderr": 0.010877866432009942}, "readability_ceb_mcf": {"acc": 0.4, "acc_stderr": 0.026223635962515795}, "firecs_fil_mcf": {"acc": 0.5982288828337875, "acc_stderr": 0.005722747720626614}, "include_tgl_mcf:culturology": {"acc": 0.8325123152709359, "acc_stderr": 0.026273086047535407}, "include_tgl_mcf:driving_license": {"acc": 0.6666666666666666, "acc_stderr": 0.05479966243511907}, "include_tgl_mcf:history": {"acc": 0.75, "acc_stderr": 0.04037864265436242}, "include_tgl_mcf:language": {"acc": 0.6981132075471698, "acc_stderr": 0.04480127092110672}, "include_tgl_mcf:_average": {"acc": 0.7368230473711931, "acc_stderr": 0.0415631655145309}, "sib200_tgl_mcf": {"acc": 0.7373737373737373, "acc_stderr": 0.04445287676983945}, "sib200_ceb_mcf": {"acc": 0.7171717171717171, "acc_stderr": 0.045494611170084964}, "tlunifiedner_tgl_mcf": {"acc": 0.9018366054464851, "acc_stderr": 0.007490058579070014}, "universalner_ceb_mcf": {"acc": 0.9591836734693877, "acc_stderr": 0.028559278271678014}, "universalner_tgl_mcf": {"acc": 0.9285714285714286, "acc_stderr": 0.034726602486028414}}, "versions": {}, "category_scores": {"CLASSICAL_NLP": 44.069457762817464, "READING_COMPREHENSION": 54.885939566814685, "GENERATION": 55.25052177295498, "CULTURAL_KNOWLEDGE": 51.51559808574955}, "filbench_score": 51.43037929708417}
+{
+    "config": {
+        "model_name": "ljvmiranda921/msde-sft-dev",
+        "model_dtype": null,
+        "model_size": null
+    },
+    "results": {
+        "belebele_ceb_mcf": {
+            "acc": 0.72,
+            "acc_stderr": 0.014974951276705693
+        },
+        "cebuaner_ceb_mcf": {
+            "acc": 0.8083969465648855,
+            "acc_stderr": 0.010877866432009942
+        },
+        "readability_ceb_mcf": {
+            "acc": 0.4,
+            "acc_stderr": 0.026223635962515795
+        },
+        "firecs_fil_mcf": {
+            "acc": 0.5982288828337875,
+            "acc_stderr": 0.005722747720626614
+        },
+        "include_tgl_mcf:culturology": {
+            "acc": 0.8325123152709359,
+            "acc_stderr": 0.026273086047535407
+        },
+        "include_tgl_mcf:driving_license": {
+            "acc": 0.6666666666666666,
+            "acc_stderr": 0.05479966243511907
+        },
+        "include_tgl_mcf:history": {
+            "acc": 0.75,
+            "acc_stderr": 0.04037864265436242
+        },
+        "include_tgl_mcf:language": {
+            "acc": 0.6981132075471698,
+            "acc_stderr": 0.04480127092110672
+        },
+        "include_tgl_mcf:_average": {
+            "acc": 0.7368230473711931,
+            "acc_stderr": 0.0415631655145309
+        },
+        "sib200_tgl_mcf": {
+            "acc": 0.7373737373737373,
+            "acc_stderr": 0.04445287676983945
+        },
+        "sib200_ceb_mcf": {
+            "acc": 0.7171717171717171,
+            "acc_stderr": 0.045494611170084964
+        },
+        "tlunifiedner_tgl_mcf": {
+            "acc": 0.9018366054464851,
+            "acc_stderr": 0.007490058579070014
+        },
+        "universalner_ceb_mcf": {
+            "acc": 0.9591836734693877,
+            "acc_stderr": 0.028559278271678014
+        },
+        "universalner_tgl_mcf": {
+            "acc": 0.9285714285714286,
+            "acc_stderr": 0.034726602486028414
+        }
+    },
+    "versions": {},
+    "category_scores": {
+        "CLASSICAL_NLP": 44.069457762817464,
+        "READING_COMPREHENSION": 54.885939566814685,
+        "GENERATION": 55.25052177295498,
+        "CULTURAL_KNOWLEDGE": 51.51559808574955
+    },
+    "filbench_score": 51.43037929708417
+}

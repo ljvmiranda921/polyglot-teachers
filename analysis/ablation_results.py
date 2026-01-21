@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from analysis.utils.plot_theme import COLORS, OUTPUT_DIR, PLOT_PARAMS
+from analysis.utils.plot_theme import COLORS, OUTPUT_DIR, PLOT_PARAMS, FONT_SIZES
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -48,15 +48,39 @@ def main():
     fig, ax = plt.subplots(figsize=args.figsize)
 
     x_positions = np.arange(len(df))
+    colors = [
+        COLORS["slate_2"] if i <= 1 else COLORS["cambridge_blue"]
+        for i in range(len(df))
+    ]
+    hatches = ["///" if i <= 1 else "" for i in range(len(df))]
+
     bars = ax.bar(
-        x_positions, df["filbench_score"], color=COLORS["cambridge_blue"], width=0.7
+        x_positions,
+        df["filbench_score"],
+        color=colors,
+        width=0.7,
+        edgecolor="black",
+        linewidth=1.5,
     )
 
+    for bar, hatch in zip(bars, hatches):
+        bar.set_hatch(hatch)
+
+    for bar, score in zip(bars, df["filbench_score"]):
+        height = bar.get_height()
+        ax.text(
+            bar.get_x() + bar.get_width() / 2.0,
+            height,
+            f"{score:.1f}",
+            ha="center",
+            va="bottom",
+            fontdict={"size": FONT_SIZES.get("medium")},
+        )
+
     ax.set_xticks(x_positions)
-    ax.set_xticklabels(df["experiment"], rotation=45, ha="right")
+    ax.set_xticklabels([])
 
     ax.set_ylabel("FILBench Score")
-    ax.set_xlabel("Experiment")
 
     ax.grid(axis="y", alpha=0.3, linestyle="--")
     ax.set_axisbelow(True)
