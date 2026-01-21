@@ -80,6 +80,21 @@ def main():
     ax.set_xticks(x_positions)
     ax.set_xticklabels([])
 
+    # Let's just use Claude here... this is tricky to add using matplotlib
+    gemma_4b_start = -1
+    gemma_4b_end = 5
+    gemma_4b_mid = (gemma_4b_start + gemma_4b_end) / 2.0
+
+    ax.text(
+        gemma_4b_mid,
+        -0.08,
+        r"|---- Gemma 3 4B ----|",
+        ha="center",
+        va="top",
+        transform=ax.get_xaxis_transform(),
+        fontdict={"size": FONT_SIZES.get("medium")},
+    )
+
     ax.set_ylabel("FILBench Score")
 
     ax.grid(axis="y", alpha=0.3, linestyle="--")
