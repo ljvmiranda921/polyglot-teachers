@@ -57,4 +57,4 @@ For information on running experiments on the cluster, see the [experiment docum
 ## Acknowledgements
 
 LJVM and AK acknowledge the support of the UKRI Frontier Grant EP/Y031350/1 ([EQUATE](https://gtr.ukri.org/projects?ref=EP%2FY031350%2F1)).
-This work was performed using joint resources provided by the [Cambridge Service for Data Driven Discovery (CSD3)](https://hpc.cam.ac.uk/high-performance-computing) EP/T022159/1 and the [Isambard AI National AI Research Resource (AIRR)](https://www.bristol.ac.uk/research/centres/bristol-supercomputing/#isambard-ai) ST/AIRR/I-A-I/1023.
+This work was performed using joint resources provided by the [Cambridge Service for Data Driven Discovery (CSD3)](https://hpc.cam.ac.uk/high-performance-computing) EP/T022159/1, the [Isambard AI National AI Research Resource (AIRR)](https://www.bristol.ac.uk/research/centres/bristol-supercomputing/#isambard-ai) ST/AIRR/I-A-I/1023, and the Microsoft Research Grant.
