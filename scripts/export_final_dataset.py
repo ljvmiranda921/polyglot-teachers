@@ -11,7 +11,7 @@ _handler = logging.StreamHandler(sys.stdout)
 _handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
 logger.addHandler(_handler)
 
-LANGUAGES = ["ar", "de", "id", "ja", "es", "cs"]
+LANGUAGES = ["ar", "de", "id", "ja", "es", "cs", "tl"]
 SOURCE_DATASET = "ljvmiranda921/msde-S1-{language}"
 TARGET_MODEL = "google/gemma-3-27b-it"
 COLUMNS_TO_KEEP = [
