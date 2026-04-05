@@ -5,6 +5,8 @@
 
 # Evaluating LMs for Multilingual Synthetic Data Generation 
 
+ [[Paper (Coming Soon)]()] [[HuggingFace Collection](https://huggingface.co/collections/ljvmiranda921/polyglot-teachers)]
+
 Supervised finetuning (SFT) has been a dominant approach in building multilingual language models (LMs).
 Central to its success is the availability of high-quality multilingual datasets.
 However, collecting this data from native-speakers demands substantial human effort and resources, creating a bottleneck in LM development.
