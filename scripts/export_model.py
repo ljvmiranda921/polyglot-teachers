@@ -15,7 +15,12 @@ from huggingface_hub import HfApi, snapshot_download
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 _handler = logging.StreamHandler(sys.stdout)
-_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
+_handler.setFormatter(
+    logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+)
 logger.addHandler(_handler)
 
 SOURCE_REPO = "ljvmiranda921/msde-sft-dev"
@@ -31,6 +36,12 @@ LANGUAGE_NAMES = {
     "tl": "Tagalog",
 }
 
+BASE_MODELS = {
+    "gemma-3-4b-pt": {"id": "google/gemma-3-4b-pt", "license": "gemma"},
+    "Olmo-3-1025-7B": {"id": "allenai/OLMo-3-1025-7B", "license": "apache-2.0"},
+    "Olmo-3-1125-32B": {"id": "allenai/OLMo-3-1125-32B", "license": "apache-2.0"},
+}
+
 
 def get_args():
     # fmt: off
@@ -43,11 +54,27 @@ def get_args():
     return parser.parse_args()
 
 
-def render_model_card(language: str) -> str:
-    """Render the template model card with the given language."""
+def detect_base_model(branch: str) -> dict:
+    """Detect the base model from the branch name."""
+    for key, info in BASE_MODELS.items():
+        if key in branch:
+            return info
+    raise ValueError(f"Could not detect base model from branch: {branch}")
+
+
+def render_model_card(language: str, output_repo: str, branch: str) -> str:
+    """Render the template model card with the given parameters."""
     template = TEMPLATE_PATH.read_text()
-    language_name = LANGUAGE_NAMES[language]
-    return template.format(language=language, language_name=language_name)
+    base_info = detect_base_model(branch)
+    model_name = output_repo.split("/")[-1]
+    return template.format(
+        language=language,
+        language_name=LANGUAGE_NAMES[language],
+        base_model=base_info["id"],
+        license=base_info["license"],
+        model_name=model_name,
+        output_repo=output_repo,
+    )
 
 
 def main():
@@ -67,7 +94,7 @@ def main():
 
         # Write model card
         readme_path = local_path / "README.md"
-        model_card = render_model_card(args.language)
+        model_card = render_model_card(args.language, args.output_repo, args.branch)
         readme_path.write_text(model_card)
         logger.info(f"Generated model card for language={args.language}")
 
@@ -79,7 +106,9 @@ def main():
             repo_id=args.output_repo,
             commit_message=f"Upload model from {SOURCE_REPO} branch {args.branch}",
         )
-        logger.info(f"Done! Model available at https://huggingface.co/{args.output_repo}")
+        logger.info(
+            f"Done! Model available at https://huggingface.co/{args.output_repo}"
+        )
 
 
 if __name__ == "__main__":
