@@ -1,11 +1,3 @@
-"""Create the final polyglot-teachers-sft dataset by combining all languages,
-filtered to only include the gemma-3-27b model.
-
-Uses streaming to avoid loading entire datasets into memory at once.
-Each language is processed one at a time and written as a parquet shard,
-then all shards are uploaded together.
-"""
-
 import argparse
 import logging
 import sys
@@ -23,14 +15,27 @@ logging.basicConfig(
 LANGUAGES = ["ar", "de", "id", "ja", "es", "cs"]
 SOURCE_DATASET = "ljvmiranda921/msde-S1-{language}"
 TARGET_MODEL = "google/gemma-3-27b-it"
-COLUMNS_TO_KEEP = ["id", "source", "language", "strategy", "source_id", "synth_prompt", "model", "prompt", "response", "messages"]
+COLUMNS_TO_KEEP = [
+    "id",
+    "source",
+    "language",
+    "strategy",
+    "source_id",
+    "synth_prompt",
+    "model",
+    "prompt",
+    "response",
+    "messages",
+]
 
 
 def get_args():
+    # fmt: off
     parser = argparse.ArgumentParser(description="Create the final polyglot-teachers-sft dataset.")
     parser.add_argument("--output_dataset", type=str, default="ljvmiranda921/polyglot-teachers-sft", help="HuggingFace dataset path to save to.")
     parser.add_argument("--cache_dir", type=str, default="data/final_dataset_cache", help="Local cache directory for intermediate parquet shards.")
     parser.add_argument("--languages", nargs="+", type=str, default=LANGUAGES, help="Languages to include.")
+    # fmt: on
     return parser.parse_args()
 
 
@@ -69,16 +74,16 @@ def main():
         shards.append(shard)
 
     final_ds = concatenate_datasets(shards)
-    logging.info(f"Final dataset: {len(final_ds)} rows across {len(args.languages)} languages")
+    logging.info(
+        f"Final dataset: {len(final_ds)} rows across {len(args.languages)} languages"
+    )
 
-    # Show language distribution
     from collections import Counter
 
     lang_counts = Counter(final_ds["language"])
     for lang, count in sorted(lang_counts.items()):
         logging.info(f"  {lang}: {count}")
 
-    # Push to hub
     logging.info(f"Pushing to {args.output_dataset}...")
     try:
         final_ds.push_to_hub(args.output_dataset, private=True)
