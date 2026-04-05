@@ -6,8 +6,8 @@ template, and uploads everything to the target repository.
 
 import argparse
 import logging
+import shutil
 import sys
-import tempfile
 from pathlib import Path
 
 from huggingface_hub import HfApi, snapshot_download
@@ -81,17 +81,20 @@ def main():
     args = get_args()
     api = HfApi()
 
-    # Download all files from the source branch
-    logger.info(f"Downloading {SOURCE_REPO} branch={args.branch}")
-    with tempfile.TemporaryDirectory() as tmpdir:
-        local_dir = snapshot_download(
-            SOURCE_REPO,
-            revision=args.branch,
-            local_dir=tmpdir,
-        )
-        local_path = Path(local_dir)
-        logger.info(f"Downloaded to {local_path}")
+    # Download all files from the source branch into a local cache dir
+    cache_dir = Path(__file__).parent.parent / ".cache" / "export_model"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    local_path = cache_dir / args.branch
 
+    logger.info(f"Downloading {SOURCE_REPO} branch={args.branch}")
+    snapshot_download(
+        SOURCE_REPO,
+        revision=args.branch,
+        local_dir=str(local_path),
+    )
+    logger.info(f"Downloaded to {local_path}")
+
+    try:
         # Write model card
         readme_path = local_path / "README.md"
         model_card = render_model_card(args.language, args.output_repo, args.branch)
@@ -106,9 +109,10 @@ def main():
             repo_id=args.output_repo,
             commit_message=f"Upload model from {SOURCE_REPO} branch {args.branch}",
         )
-        logger.info(
-            f"Done! Model available at https://huggingface.co/{args.output_repo}"
-        )
+        logger.info(f"Done! Model available at https://huggingface.co/{args.output_repo}")
+    finally:
+        logger.info(f"Cleaning up {local_path}")
+        shutil.rmtree(local_path)
 
 
 if __name__ == "__main__":
