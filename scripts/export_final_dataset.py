@@ -54,7 +54,11 @@ def process_language(language: str, cache_dir: Path) -> Dataset:
 
     rows = []
     for row in filtered:
-        rows.append({col: row[col] for col in COLUMNS_TO_KEEP if col in row})
+        entry = {col: row[col] for col in COLUMNS_TO_KEEP if col in row}
+        # Override language with the target language from the dataset name
+        # (e.g., translate-strategy rows may have language="en" but belong to msde-S1-ar)
+        entry["language"] = language
+        rows.append(entry)
 
     shard_ds = Dataset.from_list(rows)
     shard_ds.to_parquet(str(shard_path))
