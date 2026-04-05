@@ -25,6 +25,7 @@ logger.addHandler(_handler)
 
 SOURCE_REPO = "ljvmiranda921/msde-sft-dev"
 TEMPLATE_PATH = Path(__file__).parent.parent / "assets" / "TEMPLATE_MODEL_CARD.md"
+LOGO_PATH = Path(__file__).parent.parent / "assets" / "ltl_logo2.svg"
 
 LANGUAGE_NAMES = {
     "ar": "Arabic",
@@ -34,6 +35,16 @@ LANGUAGE_NAMES = {
     "id": "Indonesian",
     "ja": "Japanese",
     "tl": "Tagalog",
+}
+
+EXAMPLE_PROMPTS = {
+    "ar": "مرحبًا، كيف حالك؟",
+    "cs": "Ahoj, jak se máš?",
+    "de": "Hallo, wie geht es dir?",
+    "es": "Hola, ¿cómo estás?",
+    "id": "Halo, apa kabar?",
+    "ja": "こんにちは、お元気ですか？",
+    "tl": "Kamusta ka?",
 }
 
 BASE_MODELS = {
@@ -74,6 +85,7 @@ def render_model_card(language: str, output_repo: str, branch: str) -> str:
         license=base_info["license"],
         model_name=model_name,
         output_repo=output_repo,
+        example_prompt=EXAMPLE_PROMPTS[language],
     )
 
 
@@ -101,6 +113,9 @@ def main():
         readme_path.write_text(model_card)
         logger.info(f"Generated model card for language={args.language}")
 
+        # Copy logo for the model card
+        shutil.copy2(LOGO_PATH, local_path / "ltl_logo2.svg")
+
         # Create repo and upload
         api.create_repo(args.output_repo, exist_ok=True, private=args.private)
         logger.info(f"Uploading to {args.output_repo}...")
@@ -109,7 +124,9 @@ def main():
             repo_id=args.output_repo,
             commit_message=f"Upload model from {SOURCE_REPO} branch {args.branch}",
         )
-        logger.info(f"Done! Model available at https://huggingface.co/{args.output_repo}")
+        logger.info(
+            f"Done! Model available at https://huggingface.co/{args.output_repo}"
+        )
     finally:
         logger.info(f"Cleaning up {local_path}")
         shutil.rmtree(local_path)

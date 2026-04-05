@@ -27,7 +27,7 @@ model_id = "{output_repo}"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForCausalLM.from_pretrained(model_id)
 
-messages = [{{"role": "user", "content": "Hello, how are you?"}}]
+messages = [{{"role": "user", "content": "{example_prompt}"}}]
 inputs = tokenizer.apply_chat_template(messages, return_tensors="pt", add_generation_prompt=True)
 outputs = model.generate(inputs, max_new_tokens=256)
 print(tokenizer.decode(outputs[0], skip_special_tokens=True))
