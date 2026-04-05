@@ -49,8 +49,7 @@ tags:
 - sft
 ---
 
-<img src="https://raw.githubusercontent.com/ljvmiranda921/polyglot-teachers/main/assets/ltl_logo2.svg" height="90" align="right" />
-<img src="https://raw.githubusercontent.com/ljvmiranda921/polyglot-teachers/main/assets/cambridge_logo.png" height="80" align="right" />
+<img alt="Logo for LTL" src="ltl_logo2.svg" width="240px" style="margin-left:'auto' margin-right:'auto' display:'block'">
 
 # PolyglotTeachers-SFT-Synth
 
@@ -137,7 +136,7 @@ LJVM would also like to thank Songbo Hu, Chen Cecilia Liu, Millicent Ochieng, an
 ```bibtex
 @misc{miranda2025polyglotteachers,
   title={Polyglot Teachers: Evaluating Language Models for Multilingual Synthetic Data Generation},
-  author={Lester James V. Miranda and Ivan Vulic and Anna Korhonen},
+  author={Lester James V. Miranda and Ivan Vulić and Anna Korhonen},
   year={2025},
 }
 ```
