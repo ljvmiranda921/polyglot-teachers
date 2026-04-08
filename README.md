@@ -1,5 +1,4 @@
-<img src="assets/ltl_logo2.svg" height="90" align="right" />
-<img src="assets/cambridge_logo.png" height="80" align="right" />
+<img src="assets/cambridge_logo.png" height="80" />&nbsp;&nbsp;&nbsp;<img src="assets/ltl_logo2.svg" height="90" />
 
 <!-- # Polyglot Teachers: Evaluating LLMs for Multilingual Synt. Data Generation  -->
 
