@@ -4,7 +4,7 @@
 
 # Evaluating LMs for Multilingual Synthetic Data Generation 
 
- [[Paper (Coming Soon)]()] [[HuggingFace Collection](https://huggingface.co/collections/ljvmiranda921/polyglot-teachers)]
+ [[Paper](https://arxiv.org/abs/2604.11290)] [[HuggingFace Collection](https://huggingface.co/collections/ljvmiranda921/polyglot-teachers)]
 
 Supervised finetuning (SFT) has been a dominant approach in building multilingual language models (LMs).
 Central to its success is the availability of high-quality multilingual datasets.
@@ -59,3 +59,17 @@ For information on running experiments on the cluster, see the [experiment docum
 
 LJVM and AK acknowledge the support of the UKRI Frontier Grant EP/Y031350/1 ([EQUATE](https://gtr.ukri.org/projects?ref=EP%2FY031350%2F1)).
 This work was performed using joint resources provided by the [Cambridge Service for Data Driven Discovery (CSD3)](https://hpc.cam.ac.uk/high-performance-computing) EP/T022159/1, the [Isambard AI National AI Research Resource (AIRR)](https://www.bristol.ac.uk/research/centres/bristol-supercomputing/#isambard-ai) ST/AIRR/I-A-I/1023, and the Microsoft Research Grant.
+
+## Citation
+
+```
+@misc{miranda2026polyglotteachersevaluatinglanguage,
+      title={Polyglot Teachers: Evaluating Language Models for Multilingual Synthetic Data Generation}, 
+      author={Lester James V. Miranda and Ivan Vulić and Anna Korhonen},
+      year={2026},
+      eprint={2604.11290},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2604.11290}, 
+}
+```
