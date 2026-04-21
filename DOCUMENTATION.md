@@ -55,7 +55,7 @@ In order to compute intrinsic metrics on the synthesized dataset, you can run th
 python -m scripts.get_intrinsic_metrics \
     --input_dataset <input_hf_dataset> \  # The HuggingFace ID of the dataset to compute intrinsic metrics on
     --metrics <metric1> <metric2> ... \  # The intrinsic metrics to compute (e.g., perplexity, distinct_ri, etc) You can also put all to compute all available metrics
-    --metric_params <metric_fn::{\"param1\": value1},metric_fn2::{\"param2\": value2}> \  # (Optional) Additional parameters for the metrics in JSON format
+    --metric_params <metric_fn::{\"param1\": value1}|metric_fn2::{\"param2\": value2}> \  # (Optional) Additional parameters for the metrics in JSON format. Metric blocks are separated by '|'.
     --output_path <output_json_path> \  # (Optional) Path to save the intrinsic metrics JSON file
 ```
 
@@ -112,3 +112,33 @@ lighteval vllm "model_name=<model_name>,tensor_parallel_size=2,gpu_memory_utiliz
 ```
 
 ## Step 5: Compute PG-Score
+
+The **PG-Score** is our main metric: the mean of a PGR (Performance Gain Recovered) from extrinsic benchmarks and a z-score over intrinsic metrics (distinct-RI, rubric score, and perplexity).
+It is computed by [scripts/get_scores.py](scripts/get_scores.py), which pulls pre-computed intrinsic metrics from a HuggingFace dataset and searches for student-model eval dumps (from Step 4) by a name prefix.
+
+```bash
+python -m scripts.get_scores \
+    --intrinsic <hf_intrinsic_metrics_dataset> \  # HF dataset holding per-(language, teacher) intrinsic metrics JSONs. Default: ljvmiranda921/mtep-intrinsic-metrics
+    --extrinsic <hf_search_prefix> \  # Search string used to list student eval datasets under the --hf_org (e.g., 'msde-allenai_Olmo-3-1025-7B')
+    --base_model_results <hf_dataset> \  # Lighteval results dataset for the base (pretrained) model — the lower anchor for PGR
+    --ref_model_results <hf_dataset> \  # Lighteval results dataset for the reference (instruct) model — the upper anchor for PGR
+    --data_lineage <tag> \  # Lineage tag embedded in dataset names for parsing (e.g., 'S1'). Default: S1
+    --output_file <output_jsonl> \  # Output JSONL filename written under data/mtep-cache/. Default: pg_scores.jsonl
+    --show_per_language  # (Optional) Print PG-Score broken down by target language instead of averaged across them
+```
+
+You can also pass `--intrinsic_kwargs` / `--extrinsic_kwargs` as JSON strings to forward extra options to the intrinsic/extrinsic loaders (e.g., `directory_path`, `local_path`, `use_cache`), and use `--add_metadata '{"key": "value"}'` to attach extra fields to every row of the output (useful when running multiple configurations and appending with `--append`).
+
+For example, to compute PG-Scores for all OLMo-3-1025-7B student runs distilled under lineage `S1`:
+
+```bash
+python -m scripts.get_scores \
+    --extrinsic "msde-allenai_Olmo-3-1025-7B" \
+    --base_model_results "ljvmiranda921/details_allenai__Olmo-3-1025-7B_private" \
+    --ref_model_results "ljvmiranda921/details_allenai__Olmo-3-7B-Instruct-SFT_private" \
+    --data_lineage S1 \
+    --output_file pg_scores_olmo3.jsonl \
+    --show_per_language
+```
+
+The script prints a grouped table (by teacher model, optionally by language) and writes the merged per-row results to `data/mtep-cache/<output_file>`.
