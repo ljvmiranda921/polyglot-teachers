@@ -1,8 +1,6 @@
-"""Delete all datasets matching the pattern ljvmiranda921/details_msde*.
+"""Cleanup datasets
 
-WARNING: This script is DESTRUCTIVE and IRREVERSIBLE. It will permanently
-delete datasets from HuggingFace Hub. Use --dry_run first to see what
-would be deleted.
+Ideally you won't need these since you have the aggregated values. Delete after review period.
 """
 
 import argparse
