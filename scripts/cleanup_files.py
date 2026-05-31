@@ -63,8 +63,8 @@ def main():
 
     # Double confirmation
     print(f"\n{'='*60}")
-    print(f"  WARNING: You are about to DELETE {len(matching)} datasets.")
-    print(f"  This action is IRREVERSIBLE.")
+    print(f"\tWARNING: You are about to DELETE {len(matching)} datasets.")
+    print(f"\tThis action is IRREVERSIBLE.")
     print(f"{'='*60}\n")
 
     if not confirm("Are you sure you want to delete these datasets?"):
