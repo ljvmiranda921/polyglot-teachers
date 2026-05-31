@@ -2,7 +2,7 @@
 
 <!-- # Polyglot Teachers: Evaluating LLMs for Multilingual Synt. Data Generation  -->
 
-# Evaluating LMs for Multilingual Synthetic Data Generation 
+# Polyglot Teachers: Evaluating Language Models for Multilingual Synthetic Data Generation 
 
  [[Paper](https://arxiv.org/abs/2604.11290)] [[HuggingFace Collection](https://huggingface.co/collections/ljvmiranda921/polyglot-teachers)]
 
