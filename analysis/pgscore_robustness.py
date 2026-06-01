@@ -102,6 +102,9 @@ def main():
         },
         ax=ax,
     )
+    cbar = heatmap.collections[0].colorbar
+    cbar.ax.xaxis.label.set_size(18)
+    cbar.ax.tick_params(labelsize=18)
 
     # Add significance legend
     ax.text(
