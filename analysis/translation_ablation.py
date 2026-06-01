@@ -70,7 +70,7 @@ def main():
     ax1.set_ylabel("Average PG-Score")
     ax1.set_ylim(0, 1.7)
     ax1.set_xticks(x)
-    ax1.set_xticklabels(display_labels, ha="center")
+    ax1.set_xticklabels(display_labels, ha="center", fontsize=20)
 
     width = 0.25
     offsets = [-width, 0, width]
@@ -97,7 +97,7 @@ def main():
 
     ax2.set_ylabel("PG-Score")
     ax2.set_xticks(x)
-    ax2.set_xticklabels(display_labels, ha="center")
+    ax2.set_xticklabels(display_labels, ha="center", fontsize=20)
     ax2.legend(loc="best", frameon=False)
 
     plt.tight_layout()

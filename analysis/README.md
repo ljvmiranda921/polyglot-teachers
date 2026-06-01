@@ -30,6 +30,3 @@ python -m analysis.base_model_effect --reference_result results/pg_scores_base_o
 # pca_loading_factors.pdf + pca_predicted_vs_actual_linear.pdf  (--models linear pins the committed filename)
 python -m analysis.principal_components --intrinsic_dir data/csd3 --benchmark_path results/pg_scores_base_olmo3.jsonl --models linear
 ```
-
-No figure: `model_scale.py` (`--input_path <pg_scores>.jsonl`), `stronger_maybe_better.py`
-(regression tables to stdout), `inspect_dataset.py` (dataset stats for a HF dataset ID).
