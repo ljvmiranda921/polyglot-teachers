@@ -15,7 +15,7 @@ from sklearn.linear_model import Lasso, LinearRegression, Ridge
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
-from utils.plot_theme import COLORS, OUTPUT_DIR, PLOT_PARAMS
+from analysis.utils.plot_theme import COLORS, OUTPUT_DIR, PLOT_PARAMS
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
