@@ -304,8 +304,16 @@ def plot_predicted_vs_actual(
         linewidth=2,
     )
 
-    ax.set_xlabel("Actual Benchmark Score")
-    ax.set_ylabel("Predicted Benchmark Score")
+    ax.set_xlabel("Actual Benchmark Score", fontsize=20)
+    ax.set_ylabel("Predicted Benchmark Score", fontsize=20)
+    ax.set_yticklabels(
+        ax.get_yticklabels(),
+        fontsize=18,
+    )
+    ax.set_xticklabels(
+        ax.get_xticklabels(),
+        fontsize=18,
+    )
     ax.grid(True, alpha=0.3, linestyle=":", linewidth=0.5)
     ax.legend(
         loc="upper center",
