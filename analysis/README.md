@@ -7,7 +7,7 @@ lives in [`utils/plot_theme.py`](utils/plot_theme.py); needs a LaTeX install wit
 
 ```bash
 # tgl_ablation_filbench_scores.pdf
-python -m analysis.ablation_results --input_dir results/tgl_ablations --figsize 8,4
+python -m analysis.ablation_results --input_dir results/tgl_ablations --figsize 9,4
 
 # translation_ablation.pdf
 python -m analysis.translation_ablation --input_path results/pg_scores_translate_abl.jsonl --figsize 8,12

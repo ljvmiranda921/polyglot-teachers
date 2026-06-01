@@ -148,7 +148,7 @@ def main():
     # fmt: on
 
     ax.set_xlabel("Teacher Model", fontsize=FONT_SIZES.get("large"), labelpad=25)
-    ax.set_ylabel(r"\textsc{FilBench Score}", fontsize=FONT_SIZES.get("large"))
+    ax.set_ylabel("FilBench Score", fontsize=FONT_SIZES.get("large"))
 
     ax.grid(axis="y", alpha=0.3, linestyle="--")
     ax.set_axisbelow(True)
