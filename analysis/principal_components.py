@@ -376,7 +376,17 @@ def plot_loading_factors_heatmap(pca, feature_names, n_components, output_path):
         ax=ax,
     )
 
-    ax.set_yticklabels(ax.get_yticklabels(), rotation=0, ha="right", va="center")
+    ax.set_yticklabels(
+        ax.get_yticklabels(),
+        rotation=0,
+        ha="right",
+        va="center",
+        fontsize=18,
+    )
+    ax.set_xticklabels(
+        ax.get_xticklabels(),
+        fontsize=20,
+    )
     plt.tight_layout()
     output_path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_path, format="pdf", bbox_inches="tight")
