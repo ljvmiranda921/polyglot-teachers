@@ -91,12 +91,20 @@ def main():
     )
 
     for i, (label, data) in enumerate(zip(tick_labels, box_data)):
-        ax.scatter([i] * len(data), data, alpha=0.3, s=40, color=COLORS.get("dark_blue"), zorder=3)
+        ax.scatter(
+            [i] * len(data),
+            data,
+            alpha=0.3,
+            s=40,
+            color=COLORS.get("dark_blue"),
+            zorder=3,
+        )
 
     ax.set_xticks(positions)
-    ax.set_xticklabels(tick_labels)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel("PG-Score")
+    ax.set_xticklabels(tick_labels, fontsize=18)
+    ax.set_yticklabels(ax.get_yticklabels(), fontsize=18)
+    ax.set_xlabel(xlabel, fontsize=18)
+    ax.set_ylabel("PG-Score", fontsize=18)
     ax.grid(True, axis="y", linestyle="--", alpha=0.3)
 
     df_corr = df_plot.groupby("target_lang", as_index=False).agg({args.property: "first", "pg_score": "mean"})  # fmt: skip
@@ -118,7 +126,7 @@ def main():
         transform=ax.transAxes,
         va="top",
         ha="left",
-        fontsize=FONT_SIZES.get("large"),
+        fontsize=18,
         bbox=dict(boxstyle="round,pad=0.5", facecolor="white", alpha=0.8, edgecolor="none"),  # fmt: skip
     )
 

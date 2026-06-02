@@ -55,7 +55,7 @@ def main():
         method_data = df[df["translate_method"] == method]
         avg_values.append(method_data["pg_score"].mean())
 
-    ax1.bar(x, avg_values, width, color=COLORS["warm_blue"], edgecolor="black")
+    ax1.bar(x, avg_values, width, color=COLORS["cambridge_blue"], edgecolor="black")
 
     for i, val in enumerate(avg_values):
         ax1.text(
@@ -70,12 +70,16 @@ def main():
     ax1.set_ylabel("Average PG-Score")
     ax1.set_ylim(0, 1.7)
     ax1.set_xticks(x)
-    ax1.set_xticklabels(display_labels, ha="center")
+    ax1.set_xticklabels(display_labels, ha="center", fontsize=20)
 
     width = 0.25
     offsets = [-width, 0, width]
-    colors_list = [COLORS["warm_blue"], COLORS["warm_crest"], COLORS["warm_green"]]
-    hatches_list = ["", "//", "\\\\"]
+    colors_list = [
+        COLORS["cambridge_blue"],
+        COLORS["light_crest"],
+        COLORS["light_cherry"],
+    ]
+    hatches_list = ["", "//", ".."]
 
     for i, lang in enumerate(langs):
         lang_data = df[df["target_lang"] == lang]
@@ -97,7 +101,7 @@ def main():
 
     ax2.set_ylabel("PG-Score")
     ax2.set_xticks(x)
-    ax2.set_xticklabels(display_labels, ha="center")
+    ax2.set_xticklabels(display_labels, ha="center", fontsize=20)
     ax2.legend(loc="best", frameon=False)
 
     plt.tight_layout()

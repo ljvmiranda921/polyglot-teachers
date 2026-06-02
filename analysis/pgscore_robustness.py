@@ -89,6 +89,7 @@ def main():
     heatmap = sns.heatmap(
         rankings_df,
         annot=annotations,
+        annot_kws={"fontsize": 16},
         fmt="",
         mask=mask,
         cmap=cmap,
@@ -101,6 +102,9 @@ def main():
         },
         ax=ax,
     )
+    cbar = heatmap.collections[0].colorbar
+    cbar.ax.xaxis.label.set_size(18)
+    cbar.ax.tick_params(labelsize=18)
 
     # Add significance legend
     ax.text(
@@ -110,6 +114,14 @@ def main():
         transform=ax.transAxes,
         fontsize=FONT_SIZES["medium"],
         verticalalignment="top",
+    )
+    ax.set_yticklabels(
+        ax.get_yticklabels(),
+        fontsize=18,
+    )
+    ax.set_xticklabels(
+        ax.get_xticklabels(),
+        fontsize=18,
     )
 
     plt.savefig(OUTPUT_DIR / "pgscore_robustness_heatmap.pdf", bbox_inches="tight")

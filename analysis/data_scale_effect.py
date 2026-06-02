@@ -86,8 +86,16 @@ def main():
             )
 
         ax.set_xscale("log")
-        ax.set_xlabel("Num. samples, log")
-        ax.set_ylabel("Avg. Multilingual Performance")
+        ax.set_xlabel("Num. samples, log", fontsize=18)
+        ax.set_ylabel("Avg. Multilingual Performance", fontsize=18)
+        ax.set_yticklabels(
+            ax.get_yticklabels(),
+            fontsize=18,
+        )
+        ax.set_xticklabels(
+            ax.get_xticklabels(),
+            fontsize=18,
+        )
         ax.grid(True, which="both", linestyle="--", alpha=0.3)
 
         # Add legend below the plot
@@ -96,7 +104,7 @@ def main():
             handles,
             labels,
             loc="lower center",
-            bbox_to_anchor=(0.5, -0.05),
+            bbox_to_anchor=(0.5, -0.10),
             ncol=3,
             frameon=False,
         )

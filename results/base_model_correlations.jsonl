@@ -1,0 +1,10 @@
+{"model_a": "OLMo 3 7B", "model_b": "OLMo 3 7B", "rho": 1.00, "significance": ""}
+{"model_a": "Gemma 3 4B", "model_b": "OLMo 3 7B", "rho": 0.87, "significance": "**"}
+{"model_a": "Gemma 3 4B", "model_b": "Gemma 3 4B", "rho": 1.00, "significance": ""}
+{"model_a": "Qwen 3 8B", "model_b": "OLMo 3 7B", "rho": 0.60, "significance": ""}
+{"model_a": "Qwen 3 8B", "model_b": "Gemma 3 4B", "rho": 0.65, "significance": ""}
+{"model_a": "Qwen 3 8B", "model_b": "Qwen 3 8B", "rho": 1.00, "significance": ""}
+{"model_a": "Llama 3 8B", "model_b": "OLMo 3 7B", "rho": 0.63, "significance": ""}
+{"model_a": "Llama 3 8B", "model_b": "Gemma 3 4B", "rho": 0.68, "significance": "*"}
+{"model_a": "Llama 3 8B", "model_b": "Qwen 3 8B", "rho": 0.57, "significance": ""}
+{"model_a": "Llama 3 8B", "model_b": "Llama 3 8B", "rho": 1.00, "significance": ""}

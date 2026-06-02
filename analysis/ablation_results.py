@@ -147,9 +147,16 @@ def main():
     add_arc_annotation(ax, df, 5, 6, "+Scale size\n(12B→27B)", y_offset=10, text_y_offset=20, text_x_offset=0.25)
     # fmt: on
 
-    ax.set_xlabel("Teacher Model", fontsize=FONT_SIZES.get("large"), labelpad=25)
-    ax.set_ylabel(r"\textsc{FilBench Score}", fontsize=FONT_SIZES.get("large"))
-
+    ax.set_xlabel("Teacher Model", fontsize=18, labelpad=25)
+    ax.set_ylabel("FilBench Score", fontsize=18)
+    ax.set_yticklabels(
+        ax.get_yticklabels(),
+        fontsize=18,
+    )
+    ax.set_xticklabels(
+        ax.get_xticklabels(),
+        fontsize=18,
+    )
     ax.grid(axis="y", alpha=0.3, linestyle="--")
     ax.set_axisbelow(True)
 

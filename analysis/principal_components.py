@@ -15,7 +15,7 @@ from sklearn.linear_model import Lasso, LinearRegression, Ridge
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
-from utils.plot_theme import COLORS, OUTPUT_DIR, PLOT_PARAMS
+from analysis.utils.plot_theme import COLORS, OUTPUT_DIR, PLOT_PARAMS
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -304,8 +304,16 @@ def plot_predicted_vs_actual(
         linewidth=2,
     )
 
-    ax.set_xlabel("Actual Benchmark Score")
-    ax.set_ylabel("Predicted Benchmark Score")
+    ax.set_xlabel("Actual Benchmark Score", fontsize=20)
+    ax.set_ylabel("Predicted Benchmark Score", fontsize=20)
+    ax.set_yticklabels(
+        ax.get_yticklabels(),
+        fontsize=18,
+    )
+    ax.set_xticklabels(
+        ax.get_xticklabels(),
+        fontsize=18,
+    )
     ax.grid(True, alpha=0.3, linestyle=":", linewidth=0.5)
     ax.legend(
         loc="upper center",
@@ -376,7 +384,17 @@ def plot_loading_factors_heatmap(pca, feature_names, n_components, output_path):
         ax=ax,
     )
 
-    ax.set_yticklabels(ax.get_yticklabels(), rotation=0, ha="right", va="center")
+    ax.set_yticklabels(
+        ax.get_yticklabels(),
+        rotation=0,
+        ha="right",
+        va="center",
+        fontsize=18,
+    )
+    ax.set_xticklabels(
+        ax.get_xticklabels(),
+        fontsize=20,
+    )
     plt.tight_layout()
     output_path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_path, format="pdf", bbox_inches="tight")
