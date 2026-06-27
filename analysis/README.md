@@ -1,9 +1,7 @@
 # Analysis & plots
 
 Reproduce every figure in [`plot_outputs/`](../plot_outputs). Run from the **repo
-root** as modules. Shared styling (Helvetica font via LaTeX, colors, output dir)
-lives in [`utils/plot_theme.py`](utils/plot_theme.py); needs a LaTeX install with the
-`helvet` and `sansmath` packages.
+root** as modules. 
 
 ```bash
 # tgl_ablation_filbench_scores.pdf
