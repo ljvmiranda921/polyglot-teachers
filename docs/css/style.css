@@ -50,6 +50,109 @@ section { scroll-margin-top: 1rem; }
 .site-header .top-links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.6rem 0 2.6rem; }
 .site-header .top-links .btn { border-bottom-width: 1.5px; }  /* keep .btn border on <a> hover */
 
+/* ---------- sidenotes ----------
+   Numbered aside for tangential remarks. Sits in the right margin on wide
+   viewports (Tufte-style); collapses to an indented note inside the column
+   otherwise. Use: <sup class="sidenote-marker">1</sup> then a
+   <span class="sidenote"> at the end of the same paragraph. */
+
+.sidenote-marker { font-family: var(--font-mono); font-size: 0.72rem; color: var(--blue); }
+.sidenote {
+  display: block;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: var(--muted);
+  margin: 0.6rem 0 0.25rem;
+  padding-left: 0.85rem;
+  border-left: 2px solid var(--rule);
+}
+.sidenote sup { font-family: var(--font-mono); font-size: 0.72rem; }
+@media (min-width: 1360px) {
+  .sidenote {
+    float: right;
+    clear: right;
+    width: 200px;
+    margin: 0 -240px 0.75rem 0;  /* push into the right page margin */
+    border-left: none;
+    padding-left: 0;
+  }
+}
+
+/* ---------- method cards (Generate / Translate / Respond) ----------
+   Three chat viewports that play in sequence; see js/methods.js. Bubble
+   colors follow chia's chat palette: seed inputs in panel gray on the left,
+   teacher outputs in cream on the right. */
+
+.method-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin: 1.75rem 0 1rem;
+}
+.method-card {
+  margin: 0;
+  border: 1.5px solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+}
+.method-card figcaption { padding: 0.85rem 1rem 0.7rem; border-bottom: 1px solid var(--rule); }
+.method-card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--blue);
+  margin: 0 0 0.2rem;
+  letter-spacing: 0;
+}
+.method-card figcaption .caption { margin: 0; }
+
+.method-chat {
+  display: flex;
+  flex-direction: column;
+  padding: 0.9rem 0.9rem 0.5rem;
+  min-height: 250px;
+}
+
+.chat-item { opacity: 0; transform: translateY(8px); transition: opacity 0.3s ease, transform 0.3s ease; margin-bottom: 0.55rem; }
+.chat-item.is-shown, .chat-item.is-typing { opacity: 1; transform: none; }
+
+.msg-label {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--muted);
+  margin-bottom: 0.15rem;
+}
+.from-teacher .msg-label { text-align: right; }
+
+.method-chat .msg { font-size: 0.8rem; margin-bottom: 0; }
+.msg.seed    { background: var(--panel); color: var(--ink); margin-right: auto; border-bottom-left-radius: 4px; }
+.msg.teacher { background: var(--cream); color: var(--blue); margin-left: auto;  border-bottom-right-radius: 4px; }
+
+/* Typing indicator: shown in place of a teacher bubble while "generating". */
+.msg.typing { display: none; gap: 4px; align-items: center; width: fit-content; padding: 0.6rem 0.7rem; }
+.chat-item.is-typing .msg:not(.typing) { display: none; }
+.chat-item.is-typing .msg.typing { display: flex; }
+.msg.typing span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--blue);
+  animation: method-typing 1s infinite;
+}
+.msg.typing span:nth-child(2) { animation-delay: 0.15s; }
+.msg.typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes method-typing {
+  0%, 60%, 100% { opacity: 0.35; transform: none; }
+  30%           { opacity: 1;    transform: translateY(-3px); }
+}
+
+.methods-caption { margin-bottom: 0; }
+
+@media (max-width: 820px) {
+  .method-cards { grid-template-columns: 1fr; }
+  .method-chat { min-height: 0; }
+}
+
 /* ---------- figures ---------- */
 
 .placeholder {

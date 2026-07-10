@@ -76,12 +76,80 @@
 
   <section id="framework">
     <h2>Our evaluation framework</h2>
-    <p>We study three synthetic data generation approaches commonly found in the literature.</p>
-    <div id="methods-figure">
-      <p class="placeholder">[ the three approaches load here ]</p>
+    <p>
+      We study three synthetic data generation approaches commonly found in the literature.<sup class="sidenote-marker">1</sup>
+      <span class="sidenote"><sup>1</sup> We conduct a brief review of synthetic data approaches in our <a href="https://arxiv.org/abs/2604.11290" target="_blank" rel="noopener noreferrer">paper</a> (Appendix A).</span>
+    </p>
+    <div class="method-cards" id="method-cards">
+      <figure class="method-card">
+        <figcaption>
+          <h3>Generate</h3>
+          <p class="caption">Create a brand-new pair from few-shot seed examples.</p>
+        </figcaption>
+        <div class="method-chat">
+          <div class="chat-item from-seed">
+            <span class="msg-label">seed example (ja)</span>
+            <div class="msg seed">Q: 空はなぜ青いの？<br>A: 光が散乱するからです。</div>
+          </div>
+          <div class="chat-item from-seed">
+            <span class="msg-label">seed example (ja)</span>
+            <div class="msg seed">Q: 雨はどうして降るの？<br>A: 雲の水滴が重くなるからです。</div>
+          </div>
+          <div class="chat-item from-teacher">
+            <span class="msg-label">teacher &middot; new pair (ja)</span>
+            <div class="msg teacher">Q: 虹はどうやってできるの？<br>A: 光が水滴の中で屈折してできます。</div>
+            <div class="msg teacher typing"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </figure>
+      <figure class="method-card">
+        <figcaption>
+          <h3>Translate</h3>
+          <p class="caption">Translate an English prompt, then respond in the target language.</p>
+        </figcaption>
+        <div class="method-chat">
+          <div class="chat-item from-seed">
+            <span class="msg-label">seed prompt (en)</span>
+            <div class="msg seed">How do I make pancakes?</div>
+          </div>
+          <div class="chat-item from-teacher">
+            <span class="msg-label">teacher &middot; translated prompt (de)</span>
+            <div class="msg teacher">Wie mache ich Pfannkuchen?</div>
+            <div class="msg teacher typing"><span></span><span></span><span></span></div>
+          </div>
+          <div class="chat-item from-teacher">
+            <span class="msg-label">teacher &middot; response (de)</span>
+            <div class="msg teacher">Mische Mehl, Eier und Milch, dann brate den Teig goldbraun in der Pfanne.</div>
+            <div class="msg teacher typing"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </figure>
+      <figure class="method-card">
+        <figcaption>
+          <h3>Respond</h3>
+          <p class="caption">Answer an existing prompt in the target language.</p>
+        </figcaption>
+        <div class="method-chat">
+          <div class="chat-item from-seed">
+            <span class="msg-label">seed prompt (id)</span>
+            <div class="msg seed">Apa makanan khas Bandung?</div>
+          </div>
+          <div class="chat-item from-teacher">
+            <span class="msg-label">teacher &middot; response (id)</span>
+            <div class="msg teacher">Beberapa makanan khas Bandung adalah batagor, siomay, dan surabi.</div>
+            <div class="msg teacher typing"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </figure>
     </div>
+    <p class="caption methods-caption">
+      <strong>Generate:</strong> sample prompt&ndash;response pairs from the seed dataset as few-shot examples and generate a new pair.&ensp;
+      <strong>Translate:</strong> forward-translate English prompts from the seed dataset to the target language, then generate the response.&ensp;
+      <strong>Respond:</strong> take a prompt from the seed dataset and generate the response.
+    </p>
   </section>
 
+  <script src="js/methods.js"></script>
 </main>
 </body>
 </html>
