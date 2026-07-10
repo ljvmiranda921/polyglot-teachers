@@ -15,14 +15,31 @@ section { scroll-margin-top: 1rem; }
   font-family: var(--font-heading);
   font-size: 1.35rem;
   font-weight: 400;
-  color: var(--ink);
+  color: var(--muted);
   margin: 0 0 1.25rem;
   text-wrap: balance;
 }
+.site-header .subtitle a { color: var(--muted); }
+.site-header .subtitle a:hover { border-bottom-color: var(--muted); }
+
+/* Lead statement under the subtitle: Univers Light with the key numbers
+   emphasised in brand blue. */
+.site-header .tagline {
+  font-size: 1.25rem;
+  line-height: 1.25;
+  font-weight: 300;
+  letter-spacing: -0.005em;
+  margin: 0 0 1.5rem;
+  text-wrap: pretty;
+}
+.site-header .tagline strong { color: var(--blue); }
 
 .site-header .authors { font-size: 1.05rem; margin: 0 0 0.5rem; }
 .site-header .authors > a { font-weight: 400; }
 .site-header .authors .aff { color: var(--muted); font-size: 0.95rem; }
+
+.site-header .top-links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.6rem 0 2.6rem; }
+.site-header .top-links .btn { border-bottom-width: 1.5px; }  /* keep .btn border on <a> hover */
 
 /* ---------- responsive ---------- */
 
