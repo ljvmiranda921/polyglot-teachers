@@ -137,7 +137,6 @@ if (figure) {
 
   if (reduceMotion) {
     Object.values(stepEl).forEach((el) => el.classList.add('is-on'));
-    stepEl.typing.classList.remove('is-on');
   } else {
     const on = (name, ms) => setTimeout(() => stepEl[name].classList.add('is-on'), ms);
 
@@ -147,20 +146,14 @@ if (figure) {
       on('arrow1', 850);
       on('teacher', 1450);
       on('arrow2', 2250);
-      on('chat', 2850);
-      on('typing', 3050);
-      setTimeout(() => stepEl.typing.classList.remove('is-on'), 3700);
-      on('bub1', 3720);
-      on('bub2', 4120);
-      on('bub3', 4520);
-      on('bub4', 4920);
-      on('arrow3', 5600);
-      on('sft', 6100);
-      on('base', 6650);
-      on('arrowbase', 7250);
-      on('arrow4', 7950);
-      on('student', 8550);
-      setTimeout(() => { coatStart = performance.now(); }, 9000);
+      on('chat', 2900);
+      on('arrow3', 3700);
+      on('sft', 4200);
+      on('base', 4750);
+      on('arrowbase', 5350);
+      on('arrow4', 6050);
+      on('student', 6650);
+      setTimeout(() => { coatStart = performance.now(); }, 7100);
     }
 
     let played = false;
