@@ -1,12 +1,12 @@
 /* The Polyglot Score pipeline figure: seed dataset → teacher model →
-   synthetic dataset → supervised finetuning → student model, played as a
-   staged story that loops. The teacher cube wears the brand-blue iridescent
-   finish; the base model is a smaller matte-ink cube that gets coated during
-   finetuning — but only partway toward the teacher's finish, since a student
-   is a cross between its matte base and its teacher. three.js comes from a
-   CDN as an ES module — no build step. Falls back to flat squares without
-   WebGL, and renders the finished state statically under
-   prefers-reduced-motion. */
+   synthetic dataset → supervised finetuning (which also takes a base model)
+   → student model, revealed as a staged story that plays once. Three cubes:
+   the teacher wears the brand-blue iridescent finish, the base model is a
+   smaller matte-ink cube, and the student (same size as the base) ends up a
+   cross between the two — the base coated partway in the teacher's finish.
+   three.js comes from a CDN as an ES module — no build step. Falls back to
+   flat squares without WebGL, and renders the finished state statically
+   under prefers-reduced-motion. */
 import * as THREE from 'https://esm.sh/three@0.168.0';
 import { RoundedBoxGeometry } from 'https://esm.sh/three@0.168.0/examples/jsm/geometries/RoundedBoxGeometry.js';
 
@@ -57,7 +57,9 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 
 let coatStart = Infinity;  // set by the timeline when finetuning begins
 
-function createCube(mount, isStudent) {
+// role: 'teacher' (blue finish), 'base' (stays matte), 'student' (matte,
+// then coats partway toward the teacher once coatStart is set).
+function createCube(mount, role) {
   if (!mount) return null;
   let renderer;
   try {
@@ -94,13 +96,13 @@ function createCube(mount, isStudent) {
     envMapIntensity: 1.25,
     clearcoatRoughness: 0.08,
   });
-  applyParams(material, isStudent ? MATTE : COATED);
+  applyParams(material, role === 'teacher' ? COATED : MATTE);
 
   const cube = new THREE.Mesh(new RoundedBoxGeometry(1.7, 1.7, 1.7, 5, 0.09), material);
   scene.add(cube);
 
   if (reduceMotion) {
-    if (isStudent) lerpParams(material, MATTE, COATED, STUDENT_K);
+    if (role === 'student') lerpParams(material, MATTE, COATED, STUDENT_K);
     cube.rotation.set(0.42, 0.65, 0);
     renderer.render(scene, camera);
     return null;
@@ -110,7 +112,7 @@ function createCube(mount, isStudent) {
     const t = tMs / 1000;
     cube.rotation.y = t * 0.45;
     cube.rotation.x = 0.42 + Math.sin(t * 0.6) * 0.05;
-    if (isStudent) {
+    if (role === 'student') {
       const k = Math.min(Math.max((performance.now() - coatStart) / COAT_MS, 0), 1);
       lerpParams(material, MATTE, COATED, smooth(k) * STUDENT_K);
     }
@@ -126,57 +128,52 @@ const figure = document.getElementById('pgscore-figure');
 if (figure) {
   const stepEl = {};
   figure.querySelectorAll('.pg-anim').forEach((el) => { stepEl[el.dataset.step] = el; });
-  const studentNode = stepEl.student;
 
   const cubes = [
-    createCube(document.getElementById('pg-cube-teacher'), false),
-    createCube(document.getElementById('pg-cube-student'), true),
+    createCube(document.getElementById('pg-cube-teacher'), 'teacher'),
+    createCube(document.getElementById('pg-cube-base'), 'base'),
+    createCube(document.getElementById('pg-cube-student'), 'student'),
   ].filter(Boolean);
 
   if (reduceMotion) {
     Object.values(stepEl).forEach((el) => el.classList.add('is-on'));
     stepEl.typing.classList.remove('is-on');
-    studentNode.classList.add('is-student');
   } else {
-    let timers = [];
-    const at = (ms, fn) => timers.push(setTimeout(fn, ms));
-    const on = (name, ms) => at(ms, () => stepEl[name].classList.add('is-on'));
+    const on = (name, ms) => setTimeout(() => stepEl[name].classList.add('is-on'), ms);
 
-    function resetAll() {
-      timers.forEach(clearTimeout);
-      timers = [];
-      Object.values(stepEl).forEach((el) => el.classList.remove('is-on'));
-      studentNode.classList.remove('is-student');
-      coatStart = Infinity;
-    }
-
-    function runCycle() {
+    // Plays once; the finished pipeline stays on screen.
+    function runStory() {
       on('seed', 200);
       on('arrow1', 850);
       on('teacher', 1450);
       on('arrow2', 2250);
       on('chat', 2850);
       on('typing', 3050);
-      at(3700, () => stepEl.typing.classList.remove('is-on'));
+      setTimeout(() => stepEl.typing.classList.remove('is-on'), 3700);
       on('bub1', 3720);
       on('bub2', 4120);
       on('bub3', 4520);
       on('bub4', 4920);
       on('arrow3', 5600);
-      on('student', 6300);
-      at(7300, () => { coatStart = performance.now(); });
-      at(8300, () => studentNode.classList.add('is-student'));
-      at(12800, () => { resetAll(); runCycle(); });
+      on('sft', 6100);
+      on('base', 6650);
+      on('arrowbase', 7250);
+      on('arrow4', 7950);
+      on('student', 8550);
+      setTimeout(() => { coatStart = performance.now(); }, 9000);
     }
 
+    let played = false;
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           cubes.forEach((c) => c.start());
-          runCycle();
+          if (!played) {
+            played = true;
+            runStory();
+          }
         } else {
           cubes.forEach((c) => c.stop());
-          resetAll();
         }
       });
     }, { threshold: 0.15 });

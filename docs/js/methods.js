@@ -1,8 +1,7 @@
 /* Plays the three method cards (Generate / Translate / Respond) as chat
-   conversations, card by card, then loops after a hold. Seed bubbles pop in;
-   teacher bubbles show a typing indicator first. Starts when the cards scroll
-   into view, resets when they leave, and honors prefers-reduced-motion by
-   rendering the final state statically. */
+   conversations, card by card, once. Seed bubbles pop in; teacher bubbles
+   show a typing indicator first. Starts when the cards scroll into view and
+   honors prefers-reduced-motion by rendering the final state statically. */
 (function () {
   var root = document.getElementById('method-cards');
   if (!root) return;
@@ -26,43 +25,32 @@
 
   var STEP_MS = 500;    // pause after a bubble lands
   var TYPING_MS = 750;  // how long the teacher "types"
-  var HOLD_MS = 4500;   // hold the finished state before looping
-
-  var timer = null;
-  var running = false;
 
   function play() {
     reset();
     var i = 0;
     (function next() {
-      if (i >= items.length) {
-        timer = setTimeout(play, HOLD_MS);
-        return;
-      }
+      if (i >= items.length) return;  // played once, stay on the final state
       var el = items[i++];
       if (el.classList.contains('from-teacher')) {
         el.classList.add('is-typing');
-        timer = setTimeout(function () {
+        setTimeout(function () {
           el.classList.remove('is-typing');
           el.classList.add('is-shown');
-          timer = setTimeout(next, STEP_MS);
+          setTimeout(next, STEP_MS);
         }, TYPING_MS);
       } else {
         el.classList.add('is-shown');
-        timer = setTimeout(next, STEP_MS);
+        setTimeout(next, STEP_MS);
       }
     })();
   }
 
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
-      if (entry.isIntersecting && !running) {
-        running = true;
+      if (entry.isIntersecting) {
+        io.disconnect();
         play();
-      } else if (!entry.isIntersecting && running) {
-        running = false;
-        clearTimeout(timer);
-        reset();
       }
     });
   }, { threshold: 0.3 });

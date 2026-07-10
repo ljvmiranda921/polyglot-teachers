@@ -170,6 +170,7 @@
         </div>
         <div class="pg-node pg-anim" data-step="chat">
           <div class="pg-vis">
+            <div class="pg-chat-stack">
             <div class="pg-chat">
               <div class="msg teacher typing pg-anim" data-step="typing"><span></span><span></span><span></span></div>
               <div class="msg seed pg-anim" data-step="bub1"><span class="bar" style="width: 78%"></span><span class="bar" style="width: 52%"></span></div>
@@ -177,21 +178,33 @@
               <div class="msg seed pg-anim" data-step="bub3"><span class="bar" style="width: 58%"></span></div>
               <div class="msg teacher pg-anim" data-step="bub4"><span class="bar" style="width: 86%"></span><span class="bar" style="width: 44%"></span></div>
             </div>
+            </div>
           </div>
           <span class="pg-node-label">Synthetic dataset</span>
         </div>
         <div class="pg-harrow pg-anim" data-step="arrow3">
-          <span class="pg-arrow-label">Supervised<br>Finetuning</span>
+          <span class="pg-arrow-label"></span>
+          <span class="shaft"></span>
+        </div>
+        <div class="pg-sft-col">
+          <div class="pg-vis">
+            <div class="pg-sft-box pg-anim" data-step="sft">Supervised<br>Finetuning</div>
+          </div>
+          <div class="pg-uparrow pg-anim" data-step="arrowbase"><span class="shaft"></span></div>
+          <div class="pg-node pg-anim" data-step="base">
+            <div class="pg-cube pg-cube-sm" id="pg-cube-base"></div>
+            <span class="pg-node-label">Base model</span>
+          </div>
+        </div>
+        <div class="pg-harrow pg-anim" data-step="arrow4">
+          <span class="pg-arrow-label"></span>
           <span class="shaft"></span>
         </div>
         <div class="pg-node pg-anim" data-step="student">
           <div class="pg-vis">
             <div class="pg-cube pg-cube-sm" id="pg-cube-student"></div>
           </div>
-          <span class="pg-node-label pg-label-swap">
-            <span class="label-base">Base model</span>
-            <span class="label-student">Student model</span>
-          </span>
+          <span class="pg-node-label">Student model</span>
         </div>
       </div>
     </div>
