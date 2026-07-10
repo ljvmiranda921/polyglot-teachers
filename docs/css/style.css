@@ -146,8 +146,6 @@ section { scroll-margin-top: 1rem; }
   30%           { opacity: 1;    transform: translateY(-3px); }
 }
 
-.methods-caption { margin-bottom: 0; }
-
 @media (max-width: 820px) {
   .method-cards { grid-template-columns: 1fr; }
   .method-chat { min-height: 0; }
