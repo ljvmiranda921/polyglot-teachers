@@ -143,14 +143,62 @@
       </figure>
     </div>
     <p>
+      <span class="para-label">Polyglot Score.</span>
       Given a teacher model, we then measure (1) the <strong>intrinsic</strong> quality of the generated data and (2) the <strong>extrinsic</strong> performance of a student model trained on that data across a diverse set of multilingual tasks.
     </p>
-    <div id="pgscore-figure">
-      <p class="placeholder">[ the Polyglot Score figure loads here ]</p>
+    <div id="pgscore-figure" class="pgscore">
+      <div class="pg-pipeline">
+        <div class="pg-node pg-anim" data-step="seed">
+          <div class="pg-vis">
+            <div class="pg-stack"><span class="sheet"></span><span class="sheet"></span><span class="sheet"></span></div>
+          </div>
+          <span class="pg-node-label">Seed dataset</span>
+        </div>
+        <div class="pg-harrow pg-anim" data-step="arrow1">
+          <span class="pg-arrow-label"></span>
+          <span class="shaft"></span>
+        </div>
+        <div class="pg-node pg-anim" data-step="teacher">
+          <div class="pg-vis">
+            <div class="pg-cube pg-cube-lg" id="pg-cube-teacher"></div>
+          </div>
+          <span class="pg-node-label">Teacher model</span>
+        </div>
+        <div class="pg-harrow pg-anim" data-step="arrow2">
+          <span class="pg-arrow-label">synthesize</span>
+          <span class="shaft"></span>
+        </div>
+        <div class="pg-node pg-anim" data-step="chat">
+          <div class="pg-vis">
+            <div class="pg-chat">
+              <div class="msg teacher typing pg-anim" data-step="typing"><span></span><span></span><span></span></div>
+              <div class="msg seed pg-anim" data-step="bub1"><span class="bar" style="width: 78%"></span><span class="bar" style="width: 52%"></span></div>
+              <div class="msg teacher pg-anim" data-step="bub2"><span class="bar" style="width: 82%"></span><span class="bar" style="width: 64%"></span></div>
+              <div class="msg seed pg-anim" data-step="bub3"><span class="bar" style="width: 58%"></span></div>
+              <div class="msg teacher pg-anim" data-step="bub4"><span class="bar" style="width: 86%"></span><span class="bar" style="width: 44%"></span></div>
+            </div>
+          </div>
+          <span class="pg-node-label">Synthetic dataset</span>
+        </div>
+        <div class="pg-harrow pg-anim" data-step="arrow3">
+          <span class="pg-arrow-label">Supervised<br>Finetuning</span>
+          <span class="shaft"></span>
+        </div>
+        <div class="pg-node pg-anim" data-step="student">
+          <div class="pg-vis">
+            <div class="pg-cube pg-cube-sm" id="pg-cube-student"></div>
+          </div>
+          <span class="pg-node-label pg-label-swap">
+            <span class="label-base">Base model</span>
+            <span class="label-student">Student model</span>
+          </span>
+        </div>
+      </div>
     </div>
   </section>
 
   <script src="js/methods.js"></script>
+  <script src="js/pgscore.js" type="module"></script>
 </main>
 </body>
 </html>
