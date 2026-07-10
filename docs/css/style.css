@@ -11,13 +11,22 @@ section { scroll-margin-top: 1rem; }
 .letterhead { display: flex; align-items: center; gap: 1.25rem; margin-bottom: 2rem; }
 .letterhead img { height: 44px; width: auto; }
 
+/* The title runs long, so size it down from chia's 3rem default and let
+   lines fill the full measure (`pretty`) instead of balancing into equal
+   short lines, which wraps far too early on a wide viewport. */
+.site-header h1 {
+  font-size: clamp(2rem, 1.2rem + 2.6vw, 2.65rem);
+  line-height: 1.08;
+  text-wrap: pretty;
+}
+
 .site-header .subtitle {
   font-family: var(--font-heading);
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 400;
   color: var(--muted);
   margin: 0 0 1.25rem;
-  text-wrap: balance;
+  text-wrap: pretty;
 }
 .site-header .subtitle a { color: var(--muted); }
 .site-header .subtitle a:hover { border-bottom-color: var(--muted); }
@@ -44,7 +53,6 @@ section { scroll-margin-top: 1rem; }
 /* ---------- responsive ---------- */
 
 @media (max-width: 640px) {
-  h1 { font-size: 2.25rem; }
   h2 { font-size: 1.4rem; }
-  .site-header .subtitle { font-size: 1.15rem; }
+  .site-header .subtitle { font-size: 1.1rem; }
 }
