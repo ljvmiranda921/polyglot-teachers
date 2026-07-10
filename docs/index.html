@@ -143,8 +143,8 @@
       </figure>
     </div>
     <p>
-      <span class="para-label">Polyglot Score.</span>
-      Given a teacher model, we then measure (1) the <strong>intrinsic</strong> quality of the generated data and (2) the <strong>extrinsic</strong> performance of a student model trained on that data across a diverse set of multilingual tasks.
+      <span class="para-label">Synthetic data pipeline.</span>
+      We then formalize the post-training synthetic data generation pipeline.
     </p>
     <div id="pgscore-figure" class="pgscore">
       <div class="pg-pipeline">
@@ -165,7 +165,14 @@
           <span class="pg-node-label">Teacher model</span>
         </div>
         <div class="pg-harrow pg-anim" data-step="arrow2">
-          <span class="pg-arrow-label boxed">Synthesize<span class="sub">Generate<br>Translate<br>Respond</span></span>
+          <span class="shaft"></span>
+        </div>
+        <div class="pg-op-col">
+          <div class="pg-vis">
+            <div class="pg-sft-box pg-anim" data-step="synth">Synthesize<span class="sub">Generate<br>Translate<br>Respond</span></div>
+          </div>
+        </div>
+        <div class="pg-harrow pg-anim" data-step="arrow2b">
           <span class="shaft"></span>
         </div>
         <div class="pg-node pg-anim" data-step="chat">
@@ -179,7 +186,7 @@
             </div>
             </div>
           </div>
-          <span class="pg-node-label">Synthetic dataset</span>
+          <span class="pg-node-label em">Synthetic dataset</span>
         </div>
         <div class="pg-harrow pg-anim" data-step="arrow3">
           <span class="pg-arrow-label"></span>
@@ -203,10 +210,18 @@
           <div class="pg-vis">
             <div class="pg-cube pg-cube-sm" id="pg-cube-student"></div>
           </div>
-          <span class="pg-node-label">Student model</span>
+          <span class="pg-node-label em">Student model</span>
         </div>
       </div>
+      <p class="caption pg-caption">
+        <strong>The synthetic data pipeline.</strong>
+        Given a seed dataset, a teacher model synthesizes prompt&ndash;response pairs to form a synthetic dataset. Supervised finetuning on a base model results in a student model that learns from the teacher-generated outputs.
+      </p>
     </div>
+    <p>
+      <span class="para-label">Polyglot Score.</span>
+      Given a teacher model, we then measure (1) the <strong>intrinsic</strong> quality of the generated data and (2) the <strong>extrinsic</strong> performance of a student model trained on that data across a diverse set of multilingual tasks.
+    </p>
   </section>
 
   <script src="js/methods.js"></script>

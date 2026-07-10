@@ -204,31 +204,44 @@ section { scroll-margin-top: 1rem; }
 
 /* ---- pipeline row: seed → teacher → synthetic dataset → student ---- */
 
-.pg-pipeline { display: flex; align-items: flex-start; gap: 0.4rem; }
+.pg-pipeline { display: flex; align-items: flex-start; gap: 0.25rem; }
+
+.pg-caption { margin: 1.5rem 0 0; }
+.pg-caption strong { color: var(--ink); }
 .pg-node { display: flex; flex-direction: column; align-items: center; }
 /* Every node's visual sits in a fixed-height box so arrow shafts (placed at
    half that height) line up with the visuals' centers, not their labels. */
 .pg-vis { height: 150px; display: flex; align-items: center; justify-content: center; }
 .pg-node-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.35rem; text-align: center; }
+/* the two nodes we measure — see the Polyglot Score paragraph */
+.pg-node-label.em { color: var(--blue); font-weight: 500; }
 
 /* staged reveal: everything starts hidden, the timeline adds .is-on */
 .pg-anim { opacity: 0; transform: translateY(6px); transition: opacity 0.45s ease, transform 0.45s ease; }
 .pg-anim.is-on { opacity: 1; transform: none; }
 
-/* Supervised Finetuning junction: takes the synthetic dataset (from the
-   left) and the base model (from below), outputs the student (to the right) */
-.pg-sft-col { display: flex; flex-direction: column; align-items: center; }
+/* Operation boxes (Synthesize, Supervised Finetuning): bordered nodes with
+   arrows in and out. The Synthesize box lists its three methods below. */
+.pg-op-col, .pg-sft-col { display: flex; flex-direction: column; align-items: center; }
 .pg-sft-box {
   font-family: var(--font-heading);
   font-weight: 600;
   font-size: 0.82rem;
   line-height: 1.2;
   text-align: center;
-  padding: 0.55rem 0.7rem;
+  padding: 0.5rem 0.55rem;
   color: var(--blue);
   background: var(--white);
   border: 1.5px solid var(--ink);
   box-shadow: var(--shadow-sm);
+}
+.pg-sft-box .sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--ink);
 }
 /* negative top margin pulls the arrow up to meet the SFT box, which sits
    centered in (and so doesn't fill) the fixed-height .pg-vis row */
@@ -249,50 +262,31 @@ section { scroll-margin-top: 1rem; }
   content: '';
   position: absolute;
   top: -2px;
-  left: -4px;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 9px solid var(--ink);
+  left: -3.5px;
+  border-left: 4.5px solid transparent;
+  border-right: 4.5px solid transparent;
+  border-bottom: 8px solid var(--ink);
+}
+.pg-uparrow .shaft::before {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
 }
 
 /* arrows: shaft draws left→right, arrowhead rides its tip */
 .pg-arrow-label { font-size: 0.72rem; color: var(--muted); text-align: center; line-height: 1.3; }
-.pg-harrow { position: relative; height: 150px; flex: 1 1 0; min-width: 58px; }
+.pg-harrow { position: relative; height: 150px; flex: 1 1 0; min-width: 40px; }
 .pg-harrow .pg-arrow-label {
   position: absolute;
   left: 0;
   right: 0;
   bottom: calc(50% + 9px);
-}
-/* boxed arrow label: same treatment as the Supervised Finetuning box,
-   sitting on top of the arrow's midpoint */
-.pg-arrow-label.boxed {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.78rem;
-  color: var(--blue);
-  background: var(--white);
-  border: 1.5px solid var(--ink);
-  box-shadow: var(--shadow-sm);
-  padding: 0.4rem 0.55rem;
-  line-height: 1.2;
-}
-.pg-arrow-label.boxed .sub {
-  display: block;
-  margin-top: 3px;
-  font-size: 0.68rem;
-  font-weight: 500;
-  line-height: 1.35;
-  color: var(--ink);
-}
-.pg-harrow .pg-arrow-label.boxed {
-  left: 50%;
-  right: auto;
-  bottom: auto;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: max-content;
-  max-width: 100%;
 }
 
 .pg-harrow .shaft {
@@ -307,37 +301,49 @@ section { scroll-margin-top: 1rem; }
   transition: transform 0.5s ease;
 }
 .pg-harrow.is-on .shaft { transform: scaleX(1); }
+/* triangular head at the tip, round dot at the origin */
 .pg-harrow .shaft::after {
   content: '';
   position: absolute;
   right: -2px;
-  top: -4px;
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
-  border-left: 9px solid var(--ink);
+  top: -3.5px;
+  border-top: 4.5px solid transparent;
+  border-bottom: 4.5px solid transparent;
+  border-left: 8px solid var(--ink);
+}
+.pg-harrow .shaft::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
 }
 
 /* cubes */
 .pg-cube canvas { display: block; }
-.pg-cube-lg { width: 150px; height: 150px; }
-.pg-cube-sm { width: 105px; height: 105px; }
+.pg-cube-lg { width: 118px; height: 118px; }
+.pg-cube-sm { width: 86px; height: 86px; }
 .pg-cube.is-fallback { background: var(--blue); border: 1.5px solid var(--ink); box-shadow: var(--shadow-md); }
-.pg-cube-lg.is-fallback { width: 100px; height: 100px; margin: 25px; }
-.pg-cube-sm.is-fallback { width: 72px;  height: 72px;  margin: 16px; }
+.pg-cube-lg.is-fallback { width: 82px; height: 82px; margin: 18px; }
+.pg-cube-sm.is-fallback { width: 60px; height: 60px; margin: 13px; }
 
 /* seed dataset: stack of sheets */
-.pg-stack { position: relative; width: 76px; height: 90px; }
-.pg-stack .sheet { position: absolute; width: 62px; height: 76px; background: var(--white); border: 1.5px solid var(--ink); }
-.pg-stack .sheet:nth-child(1) { left: 0;    top: 14px; }
-.pg-stack .sheet:nth-child(2) { left: 7px;  top: 7px; }
-.pg-stack .sheet:nth-child(3) { left: 14px; top: 0; box-shadow: var(--shadow-sm); }
+.pg-stack { position: relative; width: 66px; height: 80px; }
+.pg-stack .sheet { position: absolute; width: 54px; height: 68px; background: var(--white); border: 1.5px solid var(--ink); }
+.pg-stack .sheet:nth-child(1) { left: 0;    top: 12px; }
+.pg-stack .sheet:nth-child(2) { left: 6px;  top: 6px; }
+.pg-stack .sheet:nth-child(3) { left: 12px; top: 0; box-shadow: var(--shadow-sm); }
 .pg-stack .sheet:nth-child(3)::before {
   content: '';
   position: absolute;
-  left: 9px;
-  right: 9px;
-  top: 11px;
-  height: 34px;
+  left: 8px;
+  right: 8px;
+  top: 10px;
+  height: 30px;
   background: repeating-linear-gradient(to bottom, var(--muted) 0 2px, transparent 2px 9px);
   opacity: 0.55;
 }
@@ -349,7 +355,7 @@ section { scroll-margin-top: 1rem; }
 .pg-chat-stack::after {
   content: '';
   position: absolute;
-  width: 148px;
+  width: 118px;
   height: 136px;
   background: var(--white);
   border: 1.5px solid var(--ink);
@@ -359,7 +365,7 @@ section { scroll-margin-top: 1rem; }
 .pg-chat {
   position: relative;
   z-index: 1;
-  width: 148px;
+  width: 118px;
   height: 136px;
   padding: 9px;
   background: var(--white);
@@ -400,12 +406,17 @@ section { scroll-margin-top: 1rem; }
   .pg-harrow .shaft::after {
     right: auto;
     top: auto;
-    left: -4px;
+    left: -3.5px;
     bottom: -2px;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 9px solid var(--ink);
+    border-left: 4.5px solid transparent;
+    border-right: 4.5px solid transparent;
+    border-top: 8px solid var(--ink);
     border-bottom: 0;
+  }
+  .pg-harrow .shaft::before {
+    left: 50%;
+    top: -1px;
+    transform: translateX(-50%);
   }
   .pg-harrow .pg-arrow-label {
     left: calc(50% + 12px);
@@ -416,7 +427,6 @@ section { scroll-margin-top: 1rem; }
     text-align: left;
   }
   .pg-harrow .pg-arrow-label br { display: none; }
-  .pg-harrow .pg-arrow-label.boxed { left: calc(50% + 14px); transform: translateY(-50%); }
   .pg-uparrow { margin: 2px 0 6px; }  /* .pg-vis isn't fixed-height here */
 }
 

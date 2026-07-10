@@ -146,14 +146,16 @@ if (figure) {
       on('arrow1', 850);
       on('teacher', 1450);
       on('arrow2', 2250);
-      on('chat', 2900);
-      on('arrow3', 3700);
-      on('sft', 4200);
-      on('base', 4750);
-      on('arrowbase', 5350);
-      on('arrow4', 6050);
-      on('student', 6650);
-      setTimeout(() => { coatStart = performance.now(); }, 7100);
+      on('synth', 2750);
+      on('arrow2b', 3300);
+      on('chat', 3900);
+      on('arrow3', 4700);
+      on('sft', 5200);
+      on('base', 5750);
+      on('arrowbase', 6350);
+      on('arrow4', 7050);
+      on('student', 7650);
+      setTimeout(() => { coatStart = performance.now(); }, 8100);
     }
 
     let played = false;
