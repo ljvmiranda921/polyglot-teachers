@@ -1,0 +1,33 @@
+/* ============================================================================
+   Site-specific styles for "Polyglot Teachers".
+   Base typography, tokens, and components (.btn, .panel, .caption) come from
+   chia.css — this file only adds page-specific layout.
+   ============================================================================ */
+
+section { scroll-margin-top: 1rem; }
+
+/* ---------- header ---------- */
+
+.letterhead { display: flex; align-items: center; gap: 1.25rem; margin-bottom: 2rem; }
+.letterhead img { height: 44px; width: auto; }
+
+.site-header .subtitle {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+}
+
+.site-header .authors { font-size: 1.05rem; margin: 0 0 0.5rem; }
+.site-header .authors > a { font-weight: 400; }
+.site-header .authors .aff { color: var(--muted); font-size: 0.95rem; }
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 640px) {
+  h1 { font-size: 2.25rem; }
+  h2 { font-size: 1.4rem; }
+  .site-header .subtitle { font-size: 1.15rem; }
+}
