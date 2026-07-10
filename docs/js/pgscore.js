@@ -140,22 +140,28 @@ if (figure) {
   } else {
     const on = (name, ms) => setTimeout(() => stepEl[name].classList.add('is-on'), ms);
 
-    // Plays once; the finished pipeline stays on screen.
+    // Plays once, in four beats (ingredients → synthesis → training →
+    // payoff), with a small stagger inside each beat. The finished
+    // pipeline stays on screen; the coating sweep is the finale.
     function runStory() {
+      // beat 1: ingredients in
       on('seed', 200);
-      on('arrow1', 850);
-      on('teacher', 1450);
-      on('arrow2', 2250);
-      on('synth', 2750);
-      on('arrow2b', 3300);
-      on('chat', 3900);
-      on('arrow3', 4700);
-      on('sft', 5200);
-      on('base', 5750);
-      on('arrowbase', 6350);
-      on('arrow4', 7050);
-      on('student', 7650);
-      setTimeout(() => { coatStart = performance.now(); }, 8100);
+      on('arrow1', 350);
+      on('teacher', 500);
+      // beat 2: synthesis
+      on('arrow2', 1300);
+      on('synth', 1400);
+      on('arrow2b', 1550);
+      on('chat', 1700);
+      // beat 3: training
+      on('arrow3', 2500);
+      on('sft', 2600);
+      on('base', 2750);
+      on('arrowbase', 2900);
+      // beat 4: payoff
+      on('arrow4', 3700);
+      on('student', 3850);
+      setTimeout(() => { coatStart = performance.now(); }, 4400);
     }
 
     let played = false;
