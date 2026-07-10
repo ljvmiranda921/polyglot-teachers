@@ -225,11 +225,14 @@ section { scroll-margin-top: 1rem; }
   line-height: 1.2;
   text-align: center;
   padding: 0.55rem 0.7rem;
+  color: var(--blue);
   background: var(--white);
   border: 1.5px solid var(--ink);
   box-shadow: var(--shadow-sm);
 }
-.pg-uparrow { position: relative; width: 12px; height: 46px; margin: 2px 0 6px; }
+/* negative top margin pulls the arrow up to meet the SFT box, which sits
+   centered in (and so doesn't fill) the fixed-height .pg-vis row */
+.pg-uparrow { position: relative; width: 12px; height: 46px; margin: -40px 0 8px; }
 .pg-uparrow .shaft {
   position: absolute;
   left: calc(50% - 1px);
@@ -261,6 +264,37 @@ section { scroll-margin-top: 1rem; }
   right: 0;
   bottom: calc(50% + 9px);
 }
+/* boxed arrow label: same treatment as the Supervised Finetuning box,
+   sitting on top of the arrow's midpoint */
+.pg-arrow-label.boxed {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: var(--blue);
+  background: var(--white);
+  border: 1.5px solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  padding: 0.4rem 0.55rem;
+  line-height: 1.2;
+}
+.pg-arrow-label.boxed .sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.pg-harrow .pg-arrow-label.boxed {
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: max-content;
+  max-width: 100%;
+}
+
 .pg-harrow .shaft {
   position: absolute;
   left: 2px;
@@ -346,15 +380,6 @@ section { scroll-margin-top: 1rem; }
 .pg-chat .msg.teacher { background: var(--cream); color: var(--blue);  margin-left: auto;  border-bottom-right-radius: 3px; }
 .pg-chat .bar { display: block; height: 4px; border-radius: 2px; background: currentColor; opacity: 0.5; }
 .pg-chat .bar + .bar { margin-top: 4px; }
-.pg-chat .msg.typing { display: none; gap: 4px; align-items: center; padding: 7px 9px; }
-.pg-chat .msg.typing.is-on { display: flex; }
-.pg-chat .msg.typing span {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--blue);
-  animation: method-typing 1s infinite;
-}
-.pg-chat .msg.typing span:nth-child(2) { animation-delay: 0.15s; }
-.pg-chat .msg.typing span:nth-child(3) { animation-delay: 0.3s; }
 
 @media (max-width: 820px) {
   /* stack vertically; arrows rotate to point down */
@@ -391,6 +416,8 @@ section { scroll-margin-top: 1rem; }
     text-align: left;
   }
   .pg-harrow .pg-arrow-label br { display: none; }
+  .pg-harrow .pg-arrow-label.boxed { left: calc(50% + 14px); transform: translateY(-50%); }
+  .pg-uparrow { margin: 2px 0 6px; }  /* .pg-vis isn't fixed-height here */
 }
 
 /* ---------- figures ---------- */
