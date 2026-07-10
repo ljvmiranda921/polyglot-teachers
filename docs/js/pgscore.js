@@ -11,7 +11,7 @@ import * as THREE from 'https://esm.sh/three@0.168.0';
 import { RoundedBoxGeometry } from 'https://esm.sh/three@0.168.0/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 const MATTE  = { color: 0x1a1a1a, metalness: 0.0,  roughness: 0.92, iridescence: 0, clearcoat: 0 };
-const COATED = { color: 0x254eff, metalness: 0.85, roughness: 0.18, iridescence: 1, clearcoat: 1 };
+const COATED = { color: 0x4d70ff, metalness: 0.85, roughness: 0.18, iridescence: 1, clearcoat: 1 };
 const STUDENT_K = 0.62;   // how far the student gets from matte toward the teacher
 const COAT_MS = 1800;     // duration of the coating sweep
 

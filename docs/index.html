@@ -142,6 +142,7 @@
         </div>
       </figure>
     </div>
+    <p class="scroll-hint caption">swipe to see all three methods &rarr;</p>
     <p>
       The output is a set of question-answer pairs in the target language, quite similar to the conversations we have when talking to an AI assistant. These pairs are commonly used for supervised finetuning, which involves training a student model to mimic the teacher's outputs.
     </p>
@@ -165,7 +166,7 @@
           <div class="pg-vis">
             <div class="pg-cube pg-cube-lg" id="pg-cube-teacher"></div>
           </div>
-          <span class="pg-node-label">Teacher model</span>
+          <span class="pg-node-label em">Teacher model</span>
         </div>
         <div class="pg-harrow pg-anim" data-step="arrow2">
           <span class="shaft"></span>
@@ -216,6 +217,7 @@
           <span class="pg-node-label em">Student model</span>
         </div>
       </div>
+      <p class="scroll-hint caption">swipe to see the full pipeline &rarr;</p>
       <p class="caption pg-caption">
         <strong>The synthetic data pipeline.</strong>
         Given a seed dataset, a teacher model synthesizes prompt&ndash;response pairs to form a synthetic dataset. Supervised finetuning on a base model results in a student model that learns from the teacher-generated outputs.
