@@ -50,6 +50,16 @@ section { scroll-margin-top: 1rem; }
 .site-header .top-links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.6rem 0 2.6rem; }
 .site-header .top-links .btn { border-bottom-width: 1.5px; }  /* keep .btn border on <a> hover */
 
+/* ---------- figures ---------- */
+
+.placeholder {
+  color: var(--muted);
+  text-align: center;
+  padding: 2rem 0;
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
 /* ---------- responsive ---------- */
 
 @media (max-width: 640px) {
