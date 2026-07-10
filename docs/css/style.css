@@ -165,7 +165,7 @@ section { scroll-margin-top: 1rem; }
    (teacher cube → synthetic data → student cube) at the bottom. The cubes
    are three.js canvases driven by js/pgscore.js; arrows are pure CSS. */
 
-.pgscore { margin: 2.25rem 0 1rem; }
+.pgscore { position: relative; margin: 2.25rem 0 1rem; }
 
 .pg-equation {
   display: flex;
@@ -208,6 +208,18 @@ section { scroll-margin-top: 1rem; }
 
 .pg-caption { margin: 1.5rem 0 0; }
 .pg-caption strong { color: var(--ink); }
+/* On desktop the base-model cube hangs below the pipeline, leaving an empty
+   pocket at the bottom-left of the figure — tuck the caption in there,
+   bottom-aligned with the base model. */
+@media (min-width: 821px) {
+  .pg-caption {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    max-width: 67%;
+    margin: 0;
+  }
+}
 .pg-node { display: flex; flex-direction: column; align-items: center; }
 /* Every node's visual sits in a fixed-height box so arrow shafts (placed at
    half that height) line up with the visuals' centers, not their labels. */
