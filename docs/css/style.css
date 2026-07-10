@@ -526,6 +526,21 @@ a.cite:hover { border-bottom: none; text-decoration-style: solid; }
   font-size: 0.9rem;
 }
 
+/* ---------- citation ---------- */
+
+.bibtex-wrap { position: relative; }
+.bibtex {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  overflow-x: auto;
+  white-space: pre;
+  margin: 0;
+  line-height: 1.5;
+  padding-right: 5.5rem;   /* room for the copy button */
+}
+.copy-btn { position: absolute; top: 0.75rem; right: 0.75rem; }
+.copy-btn.is-copied { background: var(--blue); color: var(--white); }
+
 /* ---------- responsive ---------- */
 
 @media (max-width: 640px) {

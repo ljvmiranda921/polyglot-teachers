@@ -304,23 +304,78 @@
     </p>
 
     <h3>Which teacher model is good?</h3>
+    <!-- §3.1, tables/sota_evals.tex: diverging bar chart of PG-Score with language chips (Avg/ar/cs/de/es/id/ja);
+         full table in a <details>. Takeaway: Gemma 3 27B and Aya Expanse 32B are the most effective teachers. -->
     <div class="figure-mount">
-      <p class="placeholder">[ results load here ]</p>
+      <p class="placeholder">[ in progress ]</p>
     </div>
 
-    <!-- Upcoming subsections (from the paper):
-      - Which qualities of the dataset predict downstream performance? (§4.2: PCA, 93.3% variance, R²=0.664)
-      - What's a heuristic for choosing a teacher model? (§3.2: match teacher-student model families, +20.5% PG-Score)
-      - Do stronger models make better teachers? (§4.1: neither scale nor benchmark performance predicts PG-Score)
-      - Which data generation method should I use? (§3.3: Generate for high-resource, Respond/Translate for less-resourced)
-      - How much synthetic data do you need? (Appendix, data scale: gains diminish beyond 10k examples per language;
-        1k/5k/10k/25k/50k sweep with Gemma 3 27B on ar/de/id)
-      Separate section after Findings:
-      - "Our recipe in practice: Tagalog case study" (held-out language; each recipe component gives observable
-        gains on FilBench; 25k instances still improving there, and 4B→12B student scaling)
-    -->
+    <h3>Do stronger models make better teachers?</h3>
+    <!-- §4.1: scatter of log(param size) vs PG-Score colored by family, near-flat regression line
+         (ghost "expected" line first); small chia table of β/SE/p. Takeaway: neither scale nor
+         benchmark performance significantly predicts PG-Score. -->
+    <div class="figure-mount">
+      <p class="placeholder">[ in progress ]</p>
+    </div>
+
+    <h3>Which qualities of the dataset predict downstream performance?</h3>
+    <!-- §4.2: PC1-PC4 chips (42.2/22.1/16.5/12.6%, cumulative 93.3%) with plain-language descriptions;
+         predicted-vs-actual scatter, R²=0.664. Takeaway: intrinsic metrics alone can screen teachers. -->
+    <div class="figure-mount">
+      <p class="placeholder">[ in progress ]</p>
+    </div>
+
+    <h3>What&rsquo;s a heuristic for choosing a teacher model?</h3>
+    <!-- §3.2: student-base chips (OLMo 3 / Gemma 3 / Qwen 3 / Llama 3) showing top-3 teacher cubes,
+         matching families share the finish; 10x4 table with top-3 highlights. Takeaway: family-matched
+         pairs gain at least +20.5% PG-Score. -->
+    <div class="figure-mount">
+      <p class="placeholder">[ in progress ]</p>
+    </div>
+
+    <h3>Which data generation method should I use?</h3>
+    <!-- §3.3, tables/data_generation_method.tex: language x method grid, winner highlighted per language.
+         Takeaway: Generate for high-resource (de), Respond/Translate for less-resourced (ar, id). -->
+    <div class="figure-mount">
+      <p class="placeholder">[ in progress ]</p>
+    </div>
+
+    <h3>How much synthetic data do you need?</h3>
+    <!-- Appendix data scale: line chart 1k/5k/10k/25k/50k (Gemma 3 27B on ar/de/id), diminishing
+         returns beyond 10k; mark the 10k sweet spot. -->
+    <div class="figure-mount">
+      <p class="placeholder">[ in progress ]</p>
+    </div>
   </section>
 
+  <section id="case-study">
+    <h2>Our recipe in practice: Tagalog case study</h2>
+    <!-- Appendix Tagalog case study: apply the recipe to a held-out language; each recommendation
+         (top teacher, family matching, generation method, data scale 25k, student 4B→12B) yields
+         observable gains on FilBench. -->
+    <div class="figure-mount">
+      <p class="placeholder">[ in progress ]</p>
+    </div>
+  </section>
+
+  <section id="citation">
+    <h2>Citation</h2>
+    <div class="bibtex-wrap">
+      <pre class="panel bibtex"><code id="bibtex-code">@misc{miranda2026polyglotteachersevaluatinglanguage,
+  title={{P}olyglot {T}eachers: {E}valuating {L}anguage {M}odels for {M}ultilingual {S}ynthetic {D}ata {G}eneration},
+  author={Lester James V. Miranda and Ivan Vuli\'{c} and Anna Korhonen},
+  year={2026},
+  eprint={2604.11290},
+  archivePrefix={arXiv},
+  primaryClass={cs.CL},
+  url={https://arxiv.org/abs/2604.11290},
+}
+</code></pre>
+      <button type="button" class="btn copy-btn" data-copy-target="#bibtex-code" aria-label="Copy citation to clipboard">Copy</button>
+    </div>
+  </section>
+
+  <script src="js/main.js"></script>
   <script src="js/methods.js"></script>
   <script src="js/metrics.js"></script>
   <script src="js/pgscore.js" type="module"></script>
