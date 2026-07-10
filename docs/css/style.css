@@ -6,6 +6,19 @@
 
 section { scroll-margin-top: 1rem; }
 
+/* Subheadings, following the edge-nlp reference: Univers Light in ink,
+   leading 110%, tracking -5 (-0.005em). Scoped headings (e.g. .method-card
+   h3) override this with the display face. */
+h3 {
+  font-family: var(--font-body);
+  font-size: 1.35rem;
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  margin: 2.2rem 0 0.6rem;
+}
+
 /* ---------- header ---------- */
 
 .letterhead { display: flex; align-items: center; gap: 1.25rem; margin-bottom: 2rem; }

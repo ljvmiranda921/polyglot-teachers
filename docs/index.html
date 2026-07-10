@@ -291,6 +291,27 @@
     </div>
   </section>
 
+  <section id="findings">
+    <h2>Findings</h2>
+    <p>
+      We test <strong>10 teacher models</strong> on <strong>6 typologically diverse languages</strong> (Arabic, Czech, German, Spanish, Indonesian, and Japanese), chosen for their variation in resource availability, script, and language family.
+      In total, we generate <strong>over 1.4M SFT instances</strong> and train <strong>240 student models</strong>.
+    </p>
+
+    <h3>Which teacher model is good?</h3>
+    <div class="figure-mount">
+      <p class="placeholder">[ results load here ]</p>
+    </div>
+
+    <!-- Upcoming subsections (from the paper):
+      - Which qualities of the dataset predict downstream performance? (§4.2: PCA, 93.3% variance, R²=0.664)
+      - What's a heuristic for choosing a teacher model? (§3.2: match teacher-student model families, +20.5% PG-Score)
+      - Do stronger models make better teachers? (§4.1: neither scale nor benchmark performance predicts PG-Score)
+      - Which data generation method should I use? (§3.3: Generate for high-resource, Respond/Translate for less-resourced)
+      - Does the recipe transfer? (Appendix: held-out Tagalog case study)
+    -->
+  </section>
+
   <script src="js/methods.js"></script>
   <script src="js/metrics.js"></script>
   <script src="js/pgscore.js" type="module"></script>
