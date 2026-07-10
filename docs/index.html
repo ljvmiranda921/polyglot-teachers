@@ -68,6 +68,10 @@
       High-quality training data is often scarce for less-resourced languages, and collecting it from native speakers demands substantial human effort, creating a bottleneck for language-specific model development.
       To alleviate this challenge, <strong>synthetic data generation</strong> has gained traction as a promising solution: a typically larger <em>teacher model</em> generates training examples, which are then used to finetune a smaller <em>student model</em> to replicate the knowledge of the teacher.
     </p>
+    <p>
+      In this work, we study an important design decision in the synthetic data pipeline: <strong>the choice of the teacher model</strong>.
+      Teacher model selection is often ad hoc, typically defaulting to the largest available option, even though such models may have significant capability gaps in non-English languages.
+    </p>
   </section>
 
 </main>
