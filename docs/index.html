@@ -308,7 +308,11 @@
       - What's a heuristic for choosing a teacher model? (§3.2: match teacher-student model families, +20.5% PG-Score)
       - Do stronger models make better teachers? (§4.1: neither scale nor benchmark performance predicts PG-Score)
       - Which data generation method should I use? (§3.3: Generate for high-resource, Respond/Translate for less-resourced)
-      - Does the recipe transfer? (Appendix: held-out Tagalog case study)
+      - How much synthetic data do you need? (Appendix, data scale: gains diminish beyond 10k examples per language;
+        1k/5k/10k/25k/50k sweep with Gemma 3 27B on ar/de/id)
+      Separate section after Findings:
+      - "Our recipe in practice: Tagalog case study" (held-out language; each recipe component gives observable
+        gains on FilBench; 25k instances still improving there, and 4B→12B student scaling)
     -->
   </section>
 
