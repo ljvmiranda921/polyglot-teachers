@@ -58,7 +58,8 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 let coatStart = Infinity;  // set by the timeline when finetuning begins
 
 // role: 'teacher' (blue finish), 'base' (stays matte), 'student' (matte,
-// then coats partway toward the teacher once coatStart is set).
+// then coats partway toward the teacher once coatStart is set), or
+// 'studentFinal' (already coated partway; used outside the figure).
 function createCube(mount, role) {
   if (!mount) return null;
   let renderer;
@@ -97,6 +98,7 @@ function createCube(mount, role) {
     clearcoatRoughness: 0.08,
   });
   applyParams(material, role === 'teacher' ? COATED : MATTE);
+  if (role === 'studentFinal') lerpParams(material, MATTE, COATED, STUDENT_K);
 
   const cube = new THREE.Mesh(new RoundedBoxGeometry(1.7, 1.7, 1.7, 5, 0.09), material);
   scene.add(cube);
@@ -134,6 +136,11 @@ if (figure) {
     createCube(document.getElementById('pg-cube-base'), 'base'),
     createCube(document.getElementById('pg-cube-student'), 'student'),
   ].filter(Boolean);
+
+  // Standalone student cube next to the extrinsic metrics box; already
+  // coated, spins on its own (not tied to the figure's observer or story).
+  const metricCube = createCube(document.getElementById('metric-cube-student'), 'studentFinal');
+  if (metricCube) metricCube.start();
 
   if (reduceMotion) {
     Object.values(stepEl).forEach((el) => el.classList.add('is-on'));
