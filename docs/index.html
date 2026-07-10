@@ -143,6 +143,9 @@
       </figure>
     </div>
     <p>
+      The output is a set of question-answer pairs in the target language, quite similar to the conversations we have when talking to an AI assistant. These pairs are commonly used for supervised finetuning, which involves training a student model to mimic the teacher's outputs.
+    </p>
+    <p>
       <span class="para-label">Synthetic data pipeline.</span>
       We then formalize the post-training synthetic data generation pipeline.
     </p>
@@ -221,6 +224,8 @@
     <p>
       <span class="para-label">Polyglot Score.</span>
       Given a teacher model, we then measure (1) the <strong>intrinsic</strong> quality of the synthetic dataset and (2) the <strong>extrinsic</strong> performance of a student model trained on that data across a diverse set of multilingual tasks.
+      Our evaluation framework is holistic, as it considers these two output artifacts. 
+      We find this to be important as synthetic datasets enter the data commons (which are reused later on), and student models are deployed in real-world applications.
     </p>
   </section>
 
