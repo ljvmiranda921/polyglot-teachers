@@ -124,4 +124,48 @@
 
     Plotly.newPlot(strengthMount, [expected, actual, ...dots], strengthLayout, CONFIG);
   }
+
+  /* ---- Finding: which intrinsic metrics load on each PC? ----
+     Loadings copied from the paper's pca_loading_factors figure. */
+
+  const pcaMount = document.getElementById('chart-pca-loadings');
+  if (pcaMount) {
+    const features = ['Distinct Prompts', 'Distinct Responses', 'Perplexity', 'Rubric Score', 'Prompt Length', 'Response Length'];
+    const pcs = ['PC1', 'PC2', 'PC3', 'PC4', 'PC5', 'PC6'];
+    // rows = features, columns = PCs
+    const loadings = [
+      [0.073, 0.654, 0.008, 0.744, 0.012, -0.117],
+      [0.579, -0.098, -0.017, 0.111, -0.660, 0.456],
+      [-0.578, -0.037, 0.017, 0.211, 0.075, 0.784],
+      [0.514, -0.237, 0.354, 0.182, 0.678, 0.247],
+      [-0.079, 0.388, 0.838, -0.332, -0.171, 0.048],
+      [-0.234, -0.596, 0.415, 0.497, -0.265, -0.318],
+    ];
+    // diverging orange -> white -> blue, centered at 0
+    const scale = [[0, '#C96A2E'], [0.5, '#f4f2ee'], [1, '#254eff']];
+    const annotations = [];
+    features.forEach((f, r) => pcs.forEach((p, c) => {
+      const v = loadings[r][c];
+      annotations.push({
+        x: p, y: f, text: v.toFixed(3), showarrow: false,
+        font: { size: 12, color: Math.abs(v) > 0.55 ? '#fff' : INK },
+      });
+    }));
+
+    Plotly.newPlot(pcaMount, [{
+      type: 'heatmap', x: pcs, y: features, z: loadings,
+      colorscale: scale, zmid: 0, zmin: -0.85, zmax: 0.85,
+      xgap: 3, ygap: 3,
+      colorbar: { title: { text: 'loading', side: 'right', font: { size: 11 } }, thickness: 12, len: 0.9 },
+      hovertemplate: '%{y} on %{x}<br>loading: %{z:.3f}<extra></extra>',
+    }], {
+      margin: { l: 116, r: 16, t: 8, b: 30 },
+      height: 340,
+      font: FONT,
+      paper_bgcolor: '#fff', plot_bgcolor: '#fff',
+      xaxis: { side: 'bottom', tickfont: { size: 12 } },
+      yaxis: { autorange: 'reversed', tickfont: { size: 11.5 } },
+      annotations,
+    }, CONFIG);
+  }
 })();
