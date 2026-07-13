@@ -221,10 +221,10 @@
       xgap: 3, ygap: 3, showscale: false, hoverongaps: false,
       hovertemplate: '%{y} vs %{x}<br>ρ = %{z:.2f}<extra></extra>',
     }], {
-      margin: { l: 88, r: 10, t: 70, b: 8 },
-      height: 330, font: FONT, paper_bgcolor: '#fff', plot_bgcolor: '#fff',
-      xaxis: { side: 'top', tickangle: -45, tickfont: { size: 11 } },
-      yaxis: { tickfont: { size: 11 } },
+      margin: { l: 90, r: 10, t: 60, b: 8 },
+      height: 300, font: FONT, paper_bgcolor: '#fff', plot_bgcolor: '#fff',
+      xaxis: { side: 'top', tickangle: -45, tickfont: { size: 11 }, constrain: 'domain' },
+      yaxis: { tickfont: { size: 11 }, scaleanchor: 'x', scaleratio: 1, constrain: 'domain' },
       annotations: annotations.concat([{ xref: 'paper', yref: 'paper', x: 0.98, y: 0.12, text: '** p&lt;0.01&nbsp;&nbsp;* p&lt;0.05', showarrow: false, align: 'right', font: { size: 10, color: MUTED } }]),
     }, CONFIG);
   }

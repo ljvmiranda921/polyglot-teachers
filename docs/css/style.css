@@ -631,6 +631,7 @@ h3:hover .hanchor, .hanchor:focus { opacity: 1; }
 
 /* text on the left, figure on the right (stacks on narrow screens) */
 .finding-split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.75rem; align-items: center; margin: 1.25rem 0; }
+.finding-split .chart-mount { min-height: 0; }
 .finding-split .split-fig { margin: 0; }
 .finding-split .split-fig figcaption { margin-top: 0.5rem; }
 @media (max-width: 720px) {
