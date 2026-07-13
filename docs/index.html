@@ -304,11 +304,53 @@
     </p>
 
     <h3>Which teacher model is good?</h3>
-    <!-- §3.1, tables/sota_evals.tex: diverging bar chart of PG-Score with language chips (Avg/ar/cs/de/es/id/ja);
-         full table in a <details>. Takeaway: Gemma 3 27B and Aya Expanse 32B are the most effective teachers. -->
-    <div class="figure-mount">
-      <p class="placeholder">[ in progress ]</p>
+    <p>
+      <span class="section-label">Setup</span>We select 10 state-of-the-art models that vary in scale, architecture, and training data, then evaluate them as teachers by generating 10.5k prompt&ndash;response pairs for each teacher&ndash;language pair and finetuning an OLMo 3 7B student on each.
+    </p>
+    <div class="chart-chips" id="chart-teachers-chips">
+      <button type="button" class="btn chart-chip is-active" data-key="Average">Average</button>
+      <button type="button" class="btn chart-chip" data-key="ar">Arabic</button>
+      <button type="button" class="btn chart-chip" data-key="cs">Czech</button>
+      <button type="button" class="btn chart-chip" data-key="de">German</button>
+      <button type="button" class="btn chart-chip" data-key="es">Spanish</button>
+      <button type="button" class="btn chart-chip" data-key="id">Indonesian</button>
+      <button type="button" class="btn chart-chip" data-key="ja">Japanese</button>
     </div>
+    <div class="chart-mount" id="chart-teachers"></div>
+    <p class="caption">
+      <strong>PG-Score of each teacher model.</strong> Higher is better; 0 marks an average teacher (PG-Score is z-score normalized). The top three teachers for the selected language are shown in blue. Use the chips to switch languages.
+    </p>
+    <p>
+      <span class="section-label">Results</span>Gemma 3 27B (0.726) and Aya Expanse 32B (0.706) emerge as the most effective teachers, both outperforming larger models like Llama 3.1 70B (0.140). Smaller models can teach well too: Gemma 3 12B and 4B rank in the top five, while the Gemma 3 family dominates overall and the Llama 3.1 family underperforms. Teacher effectiveness also varies by language: German and Spanish score highly across the board, while Arabic is hard for most teachers.
+    </p>
+    <p class="callout">Model scale alone does not determine teacher effectiveness.</p>
+
+    <details class="data-details">
+      <summary>See the full table</summary>
+      <div class="table-scroll">
+        <table class="chia">
+          <caption><strong>Top models with the highest PG-Score (average across six languages).</strong> We evaluate teacher models with varying size and model family on 6 typologically diverse languages. For each language, the best model is in <strong>bold</strong> and the second-best is <u>underlined</u>.</caption>
+          <thead>
+            <tr>
+              <th style="text-align:left">Teacher Model</th>
+              <th>Average</th><th>ar</th><th>cs</th><th>de</th><th>es</th><th>id</th><th>ja</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="text-align:left">Gemma 3 27B Inst.</td><td class="is-highlight"><strong>0.726</strong></td><td><strong>0.145</strong></td><td><strong>0.360</strong></td><td>1.655</td><td><strong>1.358</strong></td><td>0.214</td><td><u>0.626</u></td></tr>
+            <tr><td style="text-align:left">Aya Expanse 32B</td><td class="is-highlight"><u>0.706</u></td><td><u>-0.058</u></td><td>0.222</td><td>1.468</td><td>1.129</td><td><strong>1.153</strong></td><td>0.320</td></tr>
+            <tr><td style="text-align:left">Gemma 3 12B Inst.</td><td class="is-highlight">0.595</td><td>-0.464</td><td>0.327</td><td><u>1.756</u></td><td><u>1.228</u></td><td>0.151</td><td>0.573</td></tr>
+            <tr><td style="text-align:left">Command A</td><td class="is-highlight">0.546</td><td>-1.360</td><td>0.114</td><td>1.673</td><td>1.102</td><td><u>1.063</u></td><td><strong>0.683</strong></td></tr>
+            <tr><td style="text-align:left">Gemma 3 4B Inst.</td><td class="is-highlight">0.469</td><td>-0.488</td><td><u>0.330</u></td><td>1.644</td><td>0.929</td><td>-0.105</td><td>0.504</td></tr>
+            <tr><td style="text-align:left">GPT 4o mini</td><td class="is-highlight">0.461</td><td>-1.117</td><td>0.015</td><td><strong>1.766</strong></td><td>0.908</td><td>1.003</td><td>0.189</td></tr>
+            <tr><td style="text-align:left">IBM Granite 4.0</td><td class="is-highlight">0.312</td><td>-0.072</td><td>-0.031</td><td>1.000</td><td>0.734</td><td>-0.079</td><td>0.321</td></tr>
+            <tr><td style="text-align:left">IBM Granite Micro</td><td class="is-highlight">0.304</td><td>-0.282</td><td>0.290</td><td>1.102</td><td>0.783</td><td>-0.329</td><td>0.264</td></tr>
+            <tr><td style="text-align:left">Llama 3.1 70B Inst.</td><td class="is-highlight">0.140</td><td>-0.964</td><td>0.109</td><td>1.195</td><td>0.688</td><td>0.182</td><td>-0.373</td></tr>
+            <tr><td style="text-align:left">Llama 3.1 8B Inst.</td><td class="is-highlight">-0.356</td><td>-1.693</td><td>-0.974</td><td>0.891</td><td>0.182</td><td>0.322</td><td>-0.863</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
 
     <h3>Do stronger models make better teachers?</h3>
     <!-- §4.1: scatter of log(param size) vs PG-Score colored by family, near-flat regression line
@@ -375,6 +417,8 @@
     </div>
   </section>
 
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+  <script src="js/charts.js" defer></script>
   <script src="js/main.js"></script>
   <script src="js/methods.js"></script>
   <script src="js/metrics.js"></script>

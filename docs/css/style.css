@@ -527,6 +527,39 @@ a.cite:hover { border-bottom: none; text-decoration-style: solid; }
   font-size: 0.9rem;
 }
 
+/* ---------- findings charts ---------- */
+
+.chart-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.25rem 0 1rem; }
+.btn.chart-chip { font-size: 0.8rem; padding: 0.3rem 0.65rem; }
+.chart-mount { width: 100%; min-height: 380px; }
+
+/* Collapsible full-table block: a thin rule above and below the summary,
+   inspired by owickstrom.github.io/the-proportional-web. */
+.data-details { margin: 1.5rem 0; }
+.data-details > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.data-details > summary::-webkit-details-marker { display: none; }
+.data-details > summary::after { content: '+'; font-size: 1.1rem; line-height: 1; }
+.data-details[open] > summary::after { content: '\2013'; }  /* en dash */
+.data-details[open] > summary { border-bottom: none; }
+.data-details .table-scroll { margin-top: 1rem; }
+
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+/* highlight a single column (chia ships tr.is-highlight; this is cell-level) */
+table.chia td.is-highlight { color: var(--blue); font-weight: 500; }
+
 /* ---------- citation ---------- */
 
 .bibtex-wrap { position: relative; }
