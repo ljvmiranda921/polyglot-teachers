@@ -276,7 +276,7 @@
       color: [GREY, GREY, BLUE, BLUE, BLUE, BLUE, BLUE],
     };
     const STEP = [
-      { title: 'Baseline: publicly available data', prose: 'We start with a Gemma 3 4B student finetuned on 10k Tagalog prompt-response pairs sampled from public datasets, a non-synthetic baseline (10K-Public).' },
+      { title: 'Baseline: publicly available data', prose: 'We start with a Gemma 3 4B student finetuned on 10k Tagalog prompt-response pairs sampled from public datasets, a non-synthetic, public-data baseline.' },
       { title: 'Use a synthetic pipeline', prose: 'Swapping public data for 10k instances synthesized by an off-the-shelf GPT-4o-mini teacher barely changes performance (about 0.5pp), suggesting there is no significant advantage to a synthetic pipeline if the teacher model is not optimal.' },
       { title: 'Use a better teacher', prose: 'We swap GPT-4o-mini for Aya Expanse 32B, a teacher with a higher PG-Score (0.706 vs. 0.461). The slight improvement suggests that PG-Score is generalizable to an unseen language.' },
       { title: 'Match teacher &amp; student families', prose: 'We use a Gemma 3 27B teacher to match the Gemma 3 4B student family. This yields a substantial improvement, demonstrating that family alignment is a reliable heuristic for teacher selection.' },
