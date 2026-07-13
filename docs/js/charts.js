@@ -169,7 +169,7 @@
     // paper marker colors, keyed by language
     const LANG = { Arabic: '#7fd8c9', Czech: '#fd8254', German: '#cdb4e8', Spanish: '#29337a', Indonesian: '#ffb81c', Japanese: '#545e73' };
     const pts = [{"x":0.3411,"y":0.4041,"l":"Arabic"},{"x":0.3572,"y":0.4364,"l":"Arabic"},{"x":0.3518,"y":0.437,"l":"Arabic"},{"x":0.3174,"y":0.4092,"l":"Arabic"},{"x":0.3459,"y":0.4105,"l":"Arabic"},{"x":0.3515,"y":0.3783,"l":"Arabic"},{"x":0.3405,"y":0.4146,"l":"Arabic"},{"x":0.3279,"y":0.4121,"l":"Arabic"},{"x":0.3087,"y":0.3421,"l":"Arabic"},{"x":0.3592,"y":0.4245,"l":"Czech"},{"x":0.362,"y":0.4192,"l":"Czech"},{"x":0.3629,"y":0.4281,"l":"Czech"},{"x":0.3621,"y":0.4279,"l":"Czech"},{"x":0.3563,"y":0.4253,"l":"Czech"},{"x":0.3564,"y":0.4093,"l":"Czech"},{"x":0.3538,"y":0.3968,"l":"Czech"},{"x":0.3525,"y":0.3968,"l":"Czech"},{"x":0.361,"y":0.4268,"l":"Czech"},{"x":0.3276,"y":0.3003,"l":"Czech"},{"x":0.3798,"y":0.4397,"l":"German"},{"x":0.3849,"y":0.4444,"l":"German"},{"x":0.3769,"y":0.4311,"l":"German"},{"x":0.3997,"y":0.4602,"l":"German"},{"x":0.3971,"y":0.4596,"l":"German"},{"x":0.3968,"y":0.4641,"l":"German"},{"x":0.3825,"y":0.4563,"l":"German"},{"x":0.4,"y":0.4754,"l":"German"},{"x":0.3975,"y":0.4794,"l":"German"},{"x":0.3921,"y":0.4626,"l":"German"},{"x":0.3773,"y":0.4563,"l":"Spanish"},{"x":0.3832,"y":0.4621,"l":"Spanish"},{"x":0.3582,"y":0.4528,"l":"Spanish"},{"x":0.3825,"y":0.4626,"l":"Spanish"},{"x":0.3715,"y":0.4513,"l":"Spanish"},{"x":0.3779,"y":0.4573,"l":"Spanish"},{"x":0.374,"y":0.4541,"l":"Spanish"},{"x":0.3727,"y":0.443,"l":"Spanish"},{"x":0.3892,"y":0.4789,"l":"Spanish"},{"x":0.3858,"y":0.4647,"l":"Spanish"},{"x":0.3582,"y":0.4288,"l":"Indonesian"},{"x":0.3814,"y":0.4519,"l":"Indonesian"},{"x":0.3447,"y":0.4166,"l":"Indonesian"},{"x":0.359,"y":0.4115,"l":"Indonesian"},{"x":0.3619,"y":0.4139,"l":"Indonesian"},{"x":0.3574,"y":0.4105,"l":"Indonesian"},{"x":0.3838,"y":0.4435,"l":"Indonesian"},{"x":0.3798,"y":0.4349,"l":"Indonesian"},{"x":0.3513,"y":0.3678,"l":"Indonesian"},{"x":0.3506,"y":0.4114,"l":"Indonesian"},{"x":0.3603,"y":0.4404,"l":"Japanese"},{"x":0.3618,"y":0.4485,"l":"Japanese"},{"x":0.3714,"y":0.4539,"l":"Japanese"},{"x":0.3685,"y":0.4482,"l":"Japanese"},{"x":0.3699,"y":0.4425,"l":"Japanese"},{"x":0.3584,"y":0.4446,"l":"Japanese"},{"x":0.3618,"y":0.3993,"l":"Japanese"},{"x":0.3306,"y":0.3708,"l":"Japanese"},{"x":0.3667,"y":0.4441,"l":"Japanese"}];
-    const diag = { type: 'scatter', mode: 'lines', x: [0.30, 0.41], y: [0.30, 0.41], line: { color: MUTED, width: 1.5, dash: 'dash' }, hoverinfo: 'skip', showlegend: false };
+    const diag = { type: 'scatter', mode: 'lines', x: [0.295, 0.485], y: [0.295, 0.485], line: { color: MUTED, width: 1.5, dash: 'dash' }, hoverinfo: 'skip', showlegend: false };
     const traces = Object.keys(LANG).map((lang) => {
       const p = pts.filter((d) => d.l === lang);
       return { type: 'scatter', mode: 'markers', name: lang,
@@ -178,11 +178,11 @@
         hovertemplate: lang + '<br>actual: %{x:.3f}<br>predicted: %{y:.3f}<extra></extra>' };
     });
     Plotly.newPlot(pcaScatter, [diag, ...traces], {
-      margin: { l: 48, r: 10, t: 6, b: 40 }, height: 320, font: FONT,
+      margin: { l: 48, r: 10, t: 6, b: 40 }, height: 360, font: FONT,
       paper_bgcolor: '#fff', plot_bgcolor: '#fff',
       legend: { orientation: 'h', y: -0.2, font: { size: 11 } },
-      xaxis: { title: { text: 'Actual Benchmark Score', font: { size: 12 } }, gridcolor: '#eee', zeroline: false, range: [0.305, 0.405] },
-      yaxis: { title: { text: 'Predicted', font: { size: 12 } }, gridcolor: '#eee', zeroline: false, range: [0.29, 0.49] },
+      xaxis: { title: { text: 'Actual Benchmark Score', font: { size: 12 } }, gridcolor: '#eee', zeroline: false, range: [0.295, 0.485], constrain: 'domain' },
+      yaxis: { title: { text: 'Predicted', font: { size: 12 } }, gridcolor: '#eee', zeroline: false, range: [0.295, 0.485], scaleanchor: 'x', scaleratio: 1, constrain: 'domain' },
       annotations: [{ xref: 'paper', yref: 'paper', x: 0.97, y: 0.06, text: 'R<sup>2</sup> = 0.664<br>RMSE = 0.440', showarrow: false, align: 'right', bordercolor: INK, borderwidth: 1, borderpad: 4, bgcolor: '#fff', font: { size: 11 } }],
     }, CONFIG);
   }
