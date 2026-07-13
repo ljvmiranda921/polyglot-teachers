@@ -641,7 +641,7 @@ h3:hover .hanchor, .hanchor:focus { opacity: 1; }
 .finding-split .chart-mount { min-height: 0; }
 /* narrower text + wider figure: gives a tall chart room and makes the text
    wrap taller so the two columns come closer in height */
-.finding-split--fig { grid-template-columns: 0.8fr 1.2fr; align-items: center; }
+.finding-split--fig { grid-template-columns: 0.68fr 1.32fr; align-items: center; }
 .finding-split .split-fig { margin: 0; }
 .finding-split .split-fig figcaption { margin-top: 0.5rem; }
 @media (max-width: 720px) {
