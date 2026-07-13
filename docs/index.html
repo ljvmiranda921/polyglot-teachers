@@ -381,15 +381,15 @@
     <div class="chart-duo">
       <figure>
         <div class="chart-mount" id="chart-pca-loadings"></div>
-        <figcaption class="caption"><strong>How each intrinsic metric loads onto the principal components.</strong> Blue is a positive loading, orange negative. PC1 tracks diverse, fluent responses (high response distinctness and rubric score, low perplexity); PC2 and PC3 track prompt length and diversity.</figcaption>
+        <figcaption class="caption"><strong>Loading strength of intrinsic metrics on the principal components (PCs).</strong> PC1 suggests that good teachers produce diverse and high-quality responses, while PC2 focuses on prompt diversity and length. PC3 and PC4, together, indicates the importance of prompts on student performance.</figcaption>
       </figure>
       <figure>
         <div class="chart-mount" id="chart-pca-scatter"></div>
-        <figcaption class="caption"><strong>Predicted vs. actual downstream performance.</strong> Each point is a teacher&ndash;language pair; the linear model over the intrinsic-metric PCs recovers most of the variation (R&sup2; = 0.68). The dashed line is a perfect fit.</figcaption>
+        <figcaption class="caption"><strong>Fit of a linear regression model on the PCs of the intrinsic metrics to predict student performance.</strong> Intrinsic metrics, via their PCs, can predict extrinsic student performance (R&sup2; = 0.664 and RMSE = 0.440) on multilingual benchmarks.</figcaption>
       </figure>
     </div>
     <p>
-      <span class="section-label">Results</span>The first four components capture <strong>87.3%</strong> of the variance in the intrinsic metrics, and those components predict downstream performance with <strong>R&sup2; = 0.68</strong> from a simple linear model. In other words, the qualities of the generated data carry most of the signal about how well a student will learn.
+      <span class="section-label">Results</span>The first four components explain over <strong>93.3%</strong> of the variance in the intrinsic metrics, and those components predict student performance with <strong>R&sup2; = 0.664</strong> from a simple linear model. In other words, the qualities of the generated data carry most of the signal about how well a student will learn.
     </p>
     <p class="callout">You can screen teachers from the data they generate, without training a single student model.</p>
 
