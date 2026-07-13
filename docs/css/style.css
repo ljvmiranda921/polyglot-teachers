@@ -587,7 +587,8 @@ a.cite:hover { border-bottom: none; text-decoration-style: solid; }
 #findings { counter-reset: finding; }
 #findings h3 { counter-increment: finding; scroll-margin-top: 1rem; margin-top: 3.6rem; }
 #findings h3:first-of-type { margin-top: 2.2rem; }
-#findings h3::before { content: counter(finding) ". "; }
+/* findings section is item 2 in the TOC, so subsections read 2.1, 2.2, ... */
+#findings h3::before { content: "2." counter(finding) "\00a0\00a0"; }
 
 /* hover-revealed "#" anchor for linking to a subsection (added by main.js) */
 .hanchor {
