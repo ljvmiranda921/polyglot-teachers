@@ -79,6 +79,24 @@
     </p>
   </section>
 
+  <details class="data-details toc" open>
+    <summary>Contents</summary>
+    <nav aria-label="Table of contents">
+      <ol>
+        <li><a href="#framework">Our evaluation framework</a></li>
+        <li><a href="#findings">Findings</a>
+          <ol>
+            <li><a href="#f-teachers">Which teacher model excels in multilingual data generation?</a></li>
+            <li><a href="#f-qualities">Which qualities of the dataset predict downstream performance?</a></li>
+            <li><a href="#f-heuristics">What are some heuristics for choosing a teacher model?</a></li>
+          </ol>
+        </li>
+        <li><a href="#case-study">Our recipe in practice: Tagalog case study</a></li>
+        <li><a href="#citation">Citation</a></li>
+      </ol>
+    </nav>
+  </details>
+
   <section id="framework">
     <h2>Our evaluation framework</h2>
     <p>
@@ -309,7 +327,7 @@
       In total, we generate <strong>over 1.4M SFT instances</strong> and train <strong>240 student models</strong>.
     </p>
 
-    <h3>Which teacher model excels in multilingual data generation?</h3>
+    <h3 id="f-teachers">Which teacher model excels in multilingual data generation?</h3>
     <p>
       <span class="section-label">Setup</span>We select 10 state-of-the-art models that vary in scale, architecture, and training data, then evaluate them as teachers by generating 10.5k prompt&ndash;response pairs for each teacher&ndash;language pair and finetuning an OLMo 3 7B student on each.
     </p>
@@ -374,7 +392,7 @@
          (size vs PG-Score by family) remains available in charts.js (#chart-strength,
          guarded) if we later want it as its own subsection. -->
 
-    <h3>Which qualities of the dataset predict downstream performance?</h3>
+    <h3 id="f-qualities">Which qualities of the dataset predict downstream performance?</h3>
     <p>
       <span class="section-label">Setup</span>In order to identify which qualities of the generated data drive student performance, we run principal component analysis (PCA) on the six intrinsic data-quality metrics, then fit a linear model that uses the resulting principal components to predict downstream student performance.
     </p>
@@ -408,7 +426,7 @@
       </table>
     </div>
 
-    <h3>What are some heuristics for choosing a teacher model?</h3>
+    <h3 id="f-heuristics">What are some heuristics for choosing a teacher model?</h3>
     <p>
       In order to distill some heuristics for choosing a teacher model, we test different aspects such as <strong>model family</strong>, <strong>data generation method</strong>, and <strong>amount of SFT examples</strong>. We note that these observations are conditional on our setup&mdash;the tasks and languages we evaluate on&mdash;and may not hold in every setting.
     </p>
