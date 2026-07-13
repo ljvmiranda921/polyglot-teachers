@@ -307,8 +307,7 @@ a.cite:hover { border-bottom: none; text-decoration-style: solid; }
   vertical-align: 2px;
 }
 .metric-intrinsic .metric-tag { color: var(--blue); }
-.metric-extrinsic h4 { color: var(--orange); }
-.metric-extrinsic .metric-tag { color: var(--orange); }
+.metric-extrinsic .metric-tag { color: var(--blue); }
 
 .metrics-duo {
   display: grid;
@@ -329,8 +328,7 @@ a.cite:hover { border-bottom: none; text-decoration-style: solid; }
 }
 .btn.metric-btn:hover { transform: none; box-shadow: none; border-color: var(--ink); color: var(--ink); }
 .btn.metric-btn:active { transform: none; box-shadow: none; }
-.metric-intrinsic .btn.metric-btn.is-active { background: var(--blue);   border-color: var(--blue);   color: var(--white); }
-.metric-extrinsic .btn.metric-btn.is-active { background: var(--orange); border-color: var(--orange); color: var(--white); }
+.btn.metric-btn.is-active { background: var(--blue); border-color: var(--blue); color: var(--white); }
 /* min-height fits the longest item so the box doesn't resize per chip;
    taller here than a full-width box since text wraps to more lines at
    half width */

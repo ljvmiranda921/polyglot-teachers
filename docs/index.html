@@ -329,25 +329,25 @@
     </p>
 
     <h3 id="f-teachers">Which teacher model excels in multilingual data generation?</h3>
-    <p>
-      <span class="section-label">Setup</span>We select 10 state-of-the-art models that vary in scale, architecture, and training data, then evaluate them as teachers by generating 10.5k prompt&ndash;response pairs for each teacher&ndash;language pair and finetuning an OLMo 3 7B student on each.
-    </p>
-    <div class="chart-chips" id="chart-teachers-chips">
-      <button type="button" class="btn chart-chip is-active" data-key="Average">Average</button>
-      <button type="button" class="btn chart-chip" data-key="ar">Arabic</button>
-      <button type="button" class="btn chart-chip" data-key="cs">Czech</button>
-      <button type="button" class="btn chart-chip" data-key="de">German</button>
-      <button type="button" class="btn chart-chip" data-key="es">Spanish</button>
-      <button type="button" class="btn chart-chip" data-key="id">Indonesian</button>
-      <button type="button" class="btn chart-chip" data-key="ja">Japanese</button>
+    <div class="finding-split">
+      <div>
+        <p><span class="section-label">Setup</span>We select 10 state-of-the-art models that vary in scale, architecture, and training data, then evaluate them as teachers by generating 10.5k prompt&ndash;response pairs for each teacher&ndash;language pair and finetuning an OLMo 3 7B student on each.</p>
+        <p><span class="section-label">Results</span>Gemma 3 27B (0.726) and Aya Expanse 32B (0.706) emerge as the most effective teachers, both outperforming larger models like Llama 3.1 70B (0.140).<sup class="sidenote-marker">2</sup> Smaller models can teach well too: Gemma 3 12B and 4B rank in the top five, while the Gemma 3 family dominates overall and the Llama 3.1 family underperforms. Teacher effectiveness also varies by language: German and Spanish score highly across the board, while Arabic is hard for most teachers.</p>
+      </div>
+      <figure class="split-fig">
+        <div class="chart-chips" id="chart-teachers-chips">
+          <button type="button" class="btn chart-chip is-active" data-key="Average">Average</button>
+          <button type="button" class="btn chart-chip" data-key="ar">Arabic</button>
+          <button type="button" class="btn chart-chip" data-key="cs">Czech</button>
+          <button type="button" class="btn chart-chip" data-key="de">German</button>
+          <button type="button" class="btn chart-chip" data-key="es">Spanish</button>
+          <button type="button" class="btn chart-chip" data-key="id">Indonesian</button>
+          <button type="button" class="btn chart-chip" data-key="ja">Japanese</button>
+        </div>
+        <div class="chart-mount" id="chart-teachers"></div>
+        <figcaption class="caption"><strong>PG-Score of each teacher model.</strong> Higher is better; 0 marks an average teacher (PG-Score is z-score normalized). The top three teachers for the selected language are shown in blue. Use the chips to switch languages.</figcaption>
+      </figure>
     </div>
-    <div class="chart-mount" id="chart-teachers"></div>
-    <p class="caption">
-      <strong>PG-Score of each teacher model.</strong> Higher is better; 0 marks an average teacher (PG-Score is z-score normalized). The top three teachers for the selected language are shown in blue. Use the chips to switch languages.
-    </p>
-    <p>
-      <span class="section-label">Results</span>Gemma 3 27B (0.726) and Aya Expanse 32B (0.706) emerge as the most effective teachers, both outperforming larger models like Llama 3.1 70B (0.140).<sup class="sidenote-marker">2</sup> Smaller models can teach well too: Gemma 3 12B and 4B rank in the top five, while the Gemma 3 family dominates overall and the Llama 3.1 family underperforms. Teacher effectiveness also varies by language: German and Spanish score highly across the board, while Arabic is hard for most teachers.
-    </p>
     <div class="sidenote sidenote--stat">
       <p><sup>2</sup> <strong>Does &ldquo;strength&rdquo; explain this?</strong> We find no evidence that it does: a mixed-effects regression of PG-Score on a teacher&rsquo;s parameter size and average multilingual benchmark performance leaves both predictors non-significant.</p>
       <table class="chia reg-table reg-table--mini">
