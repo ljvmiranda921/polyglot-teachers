@@ -6,6 +6,10 @@
 
 section { scroll-margin-top: 1rem; }
 
+/* chia sets `text-wrap: balance` on headings, which makes long h2s wrap into
+   balanced (early-breaking) lines; fill the measure instead. */
+h2 { text-wrap: pretty; }
+
 /* Subheadings, following the edge-nlp reference: Univers Light in ink,
    leading 110%, tracking -5 (-0.005em). Scoped headings (e.g. .method-card
    h3) override this with the display face. */
