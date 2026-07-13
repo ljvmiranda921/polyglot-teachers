@@ -674,6 +674,13 @@ h3:hover .hanchor, .hanchor:focus { opacity: 1; }
 /* highlight a single column (chia ships tr.is-highlight; this is cell-level) */
 table.chia td.is-highlight { color: var(--blue); font-weight: 500; }
 
+/* rank highlights: three shades of chia blue for 1st / 2nd / 3rd best */
+.hl-1 { background: rgba(37, 78, 255, 0.26); }
+.hl-2 { background: rgba(37, 78, 255, 0.14); }
+.hl-3 { background: rgba(37, 78, 255, 0.06); }
+/* swatches in the caption legend */
+.hl-key { padding: 0.02rem 0.3rem; border-radius: 2px; color: var(--ink); }
+
 /* ---------- citation ---------- */
 
 .bibtex-wrap { position: relative; }

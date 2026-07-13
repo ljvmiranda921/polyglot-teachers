@@ -431,19 +431,19 @@
       <summary>See the scores across base models</summary>
       <div class="table-scroll">
         <table class="chia">
-          <caption><strong>Average PG-Score of each teacher across four student base models.</strong> The best teacher for each base model is in <strong>bold</strong>.</caption>
+          <caption><strong>Average PG-Score of each teacher across four student base models.</strong> For each base model, the <span class="hl-key hl-1">best</span>, <span class="hl-key hl-2">second</span>, and <span class="hl-key hl-3">third</span> best teachers are highlighted.</caption>
           <thead>
             <tr><th style="text-align:left">Teacher Model</th><th>OLMo 3 7B</th><th>Gemma 3 4B</th><th>Qwen 3 8B</th><th>Llama 3 8B</th></tr>
           </thead>
           <tbody>
-            <tr><td style="text-align:left">GPT 4o mini</td><td>0.551</td><td><strong>1.022</strong></td><td>1.005</td><td>0.621</td></tr>
+            <tr><td style="text-align:left">GPT 4o mini</td><td class="hl-3">0.551</td><td class="hl-1"><strong>1.022</strong></td><td>1.005</td><td>0.621</td></tr>
             <tr><td style="text-align:left">Llama 3.1 70B Inst.</td><td>0.138</td><td>0.338</td><td>1.039</td><td>0.497</td></tr>
             <tr><td style="text-align:left">Llama 3.1 8B Inst.</td><td>-0.160</td><td>-0.133</td><td>0.365</td><td>0.048</td></tr>
             <tr><td style="text-align:left">Command A</td><td>0.459</td><td>0.725</td><td>0.974</td><td>0.737</td></tr>
-            <tr><td style="text-align:left">Aya Expanse 32B</td><td><strong>0.854</strong></td><td>0.762</td><td>1.183</td><td>0.793</td></tr>
-            <tr><td style="text-align:left">Gemma 3 27B Inst.</td><td>0.672</td><td>0.810</td><td>1.301</td><td>0.800</td></tr>
-            <tr><td style="text-align:left">Gemma 3 12B Inst.</td><td>0.481</td><td>0.666</td><td><strong>1.393</strong></td><td>0.804</td></tr>
-            <tr><td style="text-align:left">Gemma 3 4B Inst.</td><td>0.350</td><td>0.712</td><td>0.545</td><td><strong>1.062</strong></td></tr>
+            <tr><td style="text-align:left">Aya Expanse 32B</td><td class="hl-1"><strong>0.854</strong></td><td class="hl-3">0.762</td><td class="hl-3">1.183</td><td>0.793</td></tr>
+            <tr><td style="text-align:left">Gemma 3 27B Inst.</td><td class="hl-2">0.672</td><td class="hl-2">0.810</td><td class="hl-2">1.301</td><td class="hl-3">0.800</td></tr>
+            <tr><td style="text-align:left">Gemma 3 12B Inst.</td><td>0.481</td><td>0.666</td><td class="hl-1"><strong>1.393</strong></td><td class="hl-2">0.804</td></tr>
+            <tr><td style="text-align:left">Gemma 3 4B Inst.</td><td>0.350</td><td>0.712</td><td>0.545</td><td class="hl-1"><strong>1.062</strong></td></tr>
             <tr><td style="text-align:left">IBM Granite 4.0</td><td>0.283</td><td>0.278</td><td>0.831</td><td>-0.001</td></tr>
             <tr><td style="text-align:left">IBM Granite Micro</td><td>0.164</td><td>0.455</td><td>1.079</td><td>0.396</td></tr>
           </tbody>
