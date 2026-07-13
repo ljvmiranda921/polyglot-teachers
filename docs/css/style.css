@@ -6,6 +6,21 @@
 
 section { scroll-margin-top: 1rem; }
 
+/* justify the body prose (not captions, callouts, labels), with hyphenation
+   so justification doesn't open up big inter-word gaps */
+#background p,
+#framework > p,
+#findings > p,
+#findings .subpart-lead,
+.finding-split > div > p,
+#discussion > p,
+#discussion .recipe-list li {
+  text-align: justify;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  hyphenate-limit-chars: 6 3 3;
+}
+
 /* chia sets `text-wrap: balance` on headings, which makes long h2s wrap into
    balanced (early-breaking) lines; fill the measure instead. */
 h2 { text-wrap: pretty; }

@@ -388,11 +388,6 @@
       </div>
     </details>
 
-    <!-- The "Do stronger models make better teachers?" analysis (paper section 4.1)
-         now lives as the footnote in the Results above. A fuller scatter version
-         (size vs PG-Score by family) remains available in charts.js (#chart-strength,
-         guarded) if we later want it as its own subsection. -->
-
     <h3 id="f-qualities">Which qualities of the dataset predict downstream performance?</h3>
     <p>
       <span class="section-label">Setup</span>In order to identify which qualities of the generated data drive student performance, we run principal component analysis (PCA) on the six intrinsic data-quality metrics, then fit a linear model that uses the resulting principal components to predict downstream student performance.
@@ -525,9 +520,6 @@
 
   <section id="case-study">
     <h2>Our recipe in practice: Tagalog case study</h2>
-    <!-- Appendix Tagalog case study: apply the recipe to a held-out language; each recommendation
-         (top teacher, family matching, generation method, data scale 25k, student 4B→12B) yields
-         observable gains on FilBench. -->
     <div class="figure-mount">
       <p class="placeholder">[ in progress ]</p>
     </div>
