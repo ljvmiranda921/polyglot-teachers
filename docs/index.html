@@ -408,24 +408,28 @@
       </table>
     </div>
 
-    <h3>What&rsquo;s a heuristic for choosing a teacher model?</h3>
-    <!-- §3.2: student-base chips (OLMo 3 / Gemma 3 / Qwen 3 / Llama 3) showing top-3 teacher cubes,
-         matching families share the finish; 10x4 table with top-3 highlights. Takeaway: family-matched
-         pairs gain at least +20.5% PG-Score. -->
+    <h3>What are reliable heuristics for choosing a teacher model?</h3>
+    <p>
+      In order to distill reliable heuristics for choosing a teacher model, we test different aspects such as <strong>model family</strong>, <strong>data generation method</strong>, and <strong>amount of SFT examples</strong>.
+    </p>
+
+    <p><span class="para-label">Model family.</span></p>
+    <!-- §3.2: generalization_base_models.pdf (table of PG-Score across OLMo 3 / Llama 3 / Gemma 3 / Qwen 3
+         bases + Spearman rank-correlation heatmap). Takeaway: match teacher-student model families (+20.5%). -->
     <div class="figure-mount">
       <p class="placeholder">[ in progress ]</p>
     </div>
 
-    <h3>Which data generation method should I use?</h3>
+    <p><span class="para-label">Data generation method.</span></p>
     <!-- §3.3, tables/data_generation_method.tex: language x method grid, winner highlighted per language.
          Takeaway: Generate for high-resource (de), Respond/Translate for less-resourced (ar, id). -->
     <div class="figure-mount">
       <p class="placeholder">[ in progress ]</p>
     </div>
 
-    <h3>How much synthetic data do you need?</h3>
-    <!-- Appendix data scale: line chart 1k/5k/10k/25k/50k (Gemma 3 27B on ar/de/id), diminishing
-         returns beyond 10k; mark the 10k sweet spot. -->
+    <p><span class="para-label">Amount of SFT examples.</span></p>
+    <!-- Appendix data scale: data_scale_effect.pdf, line 1k/5k/10k/25k/50k (Gemma 3 27B on ar/de/id),
+         diminishing returns beyond 10k; mark the 10k sweet spot. -->
     <div class="figure-mount">
       <p class="placeholder">[ in progress ]</p>
     </div>
