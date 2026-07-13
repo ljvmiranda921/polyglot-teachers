@@ -215,8 +215,9 @@ a.cite:hover { border-bottom: none; text-decoration-style: solid; }
   .method-card { flex: 0 0 80%; scroll-snap-align: center; }
 }
 
-/* "swipe →" affordance under horizontally scrollable blocks, mobile only */
+/* "Swipe ▸" affordance under horizontally scrollable blocks, mobile only */
 .scroll-hint { display: none; }
+.scroll-tri { color: var(--blue); font-style: normal; }
 @media (max-width: 820px) {
   .scroll-hint { display: block; font-style: italic; margin: 0 0 2rem; }
 }
