@@ -675,6 +675,11 @@ h3:hover .hanchor, .hanchor:focus { opacity: 1; }
 .data-details[open] > summary { border-bottom: none; }
 .data-details .table-scroll { margin-top: 1rem; }
 
+/* recipe bullet list in the Discussion (parallel to the Tagalog interventions) */
+.recipe-list { margin: 1rem 0 1.25rem; padding-left: 1.2rem; }
+.recipe-list li { margin: 0.7rem 0; }
+.recipe-list strong { color: var(--blue); }
+
 /* collapsible table of contents */
 .toc { margin: 2rem 0; }
 .toc nav ol { list-style: none; margin: 1rem 0 0.35rem; padding-left: 0; counter-reset: toc; }

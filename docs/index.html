@@ -91,6 +91,7 @@
             <li><a href="#f-heuristics">What are some heuristics for choosing a teacher model?</a></li>
           </ol>
         </li>
+        <li><a href="#discussion">Discussion: Towards a recipe for multilingual synthetic data generation</a></li>
         <li><a href="#case-study">Our recipe in practice: Tagalog case study</a></li>
         <li><a href="#citation">Citation</a></li>
       </ol>
@@ -504,6 +505,22 @@
         <figcaption class="caption"><strong>Effect of synthetic data scale on student model performance.</strong> Performance improves with more synthetic data, but gains diminish beyond 10k examples.</figcaption>
       </figure>
     </div>
+  </section>
+
+  <section id="discussion">
+    <h2>Discussion: Towards a recipe for multilingual synthetic data generation</h2>
+    <p>
+      Our results provide actionable insights for selecting and effectively using teacher models in multilingual synthetic data generation. We distill them into a recipe of four decisions:
+    </p>
+    <ul class="recipe-list">
+      <li><strong>Teacher model.</strong> Model scale does not significantly predict teacher effectiveness. What matters instead is the quality of the generated data: prompt diversity, response fluency, and length collectively capture over 93% of the variance in intrinsic data quality and predict student performance, offering practitioners a cheaper alternative to full student training runs for screening teacher candidates.</li>
+      <li><strong>Data generation method.</strong> There are language-dependent considerations for data generation. For high-resource languages like German, where seed data quality is high, the <em>Generate</em> method performs best. For less-resourced languages like Arabic and Indonesian, methods that leverage existing prompts (<em>Respond</em>) or transfer from English (<em>Translate</em>) can yield substantial gains over a uniform mix of methods. For truly low-resource languages, we recommend combining synthetic data generation with targeted data collection.</li>
+      <li><strong>Synthetic data scale.</strong> Around 10k synthetic examples per language is sufficient to achieve strong student performance, and generating more mostly adds cost &mdash; though saturation points may depend on task diversity.</li>
+      <li><strong>Student base model.</strong> When the optimal teacher is unknown, matching model families offers a reliable heuristic for teacher selection. Gemma teachers paired with Gemma students, and Llama teachers with Llama students, outperform a mismatched baseline by at least 20%.</li>
+    </ul>
+    <p>
+      Next, we put this recipe into practice on a held-out language, applying the same four decisions.
+    </p>
   </section>
 
   <section id="case-study">
