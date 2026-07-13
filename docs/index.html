@@ -413,21 +413,30 @@
       In order to distill reliable heuristics for choosing a teacher model, we test different aspects such as <strong>model family</strong>, <strong>data generation method</strong>, and <strong>amount of SFT examples</strong>.
     </p>
 
-    <p><span class="para-label">Model family.</span></p>
+    <p>
+      <span class="para-label">Model family.</span>
+      Each teacher belongs to a model family (Gemma, Llama, Aya, and so on), and models within a family tend to share tokenization schemes and pretraining data. We test whether this shared lineage makes a family a useful signal for pairing a teacher with a student.
+    </p>
     <!-- §3.2: generalization_base_models.pdf (table of PG-Score across OLMo 3 / Llama 3 / Gemma 3 / Qwen 3
          bases + Spearman rank-correlation heatmap). Takeaway: match teacher-student model families (+20.5%). -->
     <div class="figure-mount">
       <p class="placeholder">[ in progress ]</p>
     </div>
 
-    <p><span class="para-label">Data generation method.</span></p>
+    <p>
+      <span class="para-label">Data generation method.</span>
+      The three methods make different assumptions: <em>Generate</em> depends on the quality of the few-shot seed examples, <em>Translate</em> transfers from widely-available English prompts, and <em>Respond</em> reuses existing prompts in the target language. These assumptions may favor different languages depending on how much data they already have.
+    </p>
     <!-- §3.3, tables/data_generation_method.tex: language x method grid, winner highlighted per language.
          Takeaway: Generate for high-resource (de), Respond/Translate for less-resourced (ar, id). -->
     <div class="figure-mount">
       <p class="placeholder">[ in progress ]</p>
     </div>
 
-    <p><span class="para-label">Amount of SFT examples.</span></p>
+    <p>
+      <span class="para-label">Amount of SFT examples.</span>
+      Generating synthetic data is not free, so we ask how many SFT examples are actually needed to reach stable student performance before the gains level off.
+    </p>
     <!-- Appendix data scale: data_scale_effect.pdf, line 1k/5k/10k/25k/50k (Gemma 3 27B on ar/de/id),
          diminishing returns beyond 10k; mark the 10k sweet spot. -->
     <div class="figure-mount">
