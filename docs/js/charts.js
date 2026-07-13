@@ -39,12 +39,12 @@
     });
 
     const layout = {
-      margin: { l: 132, r: 20, t: 8, b: 34 },
-      height: 380,
+      margin: { l: 128, r: 16, t: 6, b: 32 },
+      height: 344,
       font: FONT,
       paper_bgcolor: '#fff',
       plot_bgcolor: '#fff',
-      bargap: 0.32,
+      bargap: 0.3,
       xaxis: {
         zeroline: true, zerolinecolor: INK, zerolinewidth: 1.5,
         gridcolor: '#eee', range: [-2, 2], title: { text: 'PG-Score', font: { size: 12 } },

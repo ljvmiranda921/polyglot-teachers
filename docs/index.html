@@ -329,7 +329,7 @@
     </p>
 
     <h3 id="f-teachers">Which teacher model excels in multilingual data generation?</h3>
-    <div class="finding-split">
+    <div class="finding-split finding-split--fig">
       <div>
         <p><span class="section-label">Setup</span>We select 10 state-of-the-art models that vary in scale, architecture, and training data, then evaluate them as teachers by generating 10.5k prompt&ndash;response pairs for each teacher&ndash;language pair and finetuning an OLMo 3 7B student on each.</p>
         <p><span class="section-label">Results</span>Gemma 3 27B (0.726) and Aya Expanse 32B (0.706) emerge as the most effective teachers, both outperforming larger models like Llama 3.1 70B (0.140).<sup class="sidenote-marker">2</sup> Smaller models can teach well too: Gemma 3 12B and 4B rank in the top five, while the Gemma 3 family dominates overall and the Llama 3.1 family underperforms. Teacher effectiveness also varies by language: German and Spanish score highly across the board, while Arabic is hard for most teachers.</p>
