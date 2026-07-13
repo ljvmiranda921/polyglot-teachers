@@ -235,22 +235,23 @@
   const scaleMount = document.getElementById('chart-data-scale');
   if (scaleMount) {
     const x = [1000, 5000, 10000, 25000, 50000];
+    // one color, distinguished by marker shape + line dash
     const SERIES = {
-      German: { color: '#00bdb6', y: [0.496, 0.553, 0.639, 0.642, 0.643] },
-      Arabic: { color: '#e39a5f', y: [0.441, 0.541, 0.617, 0.615, 0.628] },
-      Indonesian: { color: '#a368df', y: [0.451, 0.484, 0.557, 0.581, 0.597] },
+      German: { symbol: 'square', dash: 'solid', y: [0.496, 0.553, 0.639, 0.642, 0.643] },
+      Arabic: { symbol: 'circle', dash: 'dash', y: [0.441, 0.541, 0.617, 0.615, 0.628] },
+      Indonesian: { symbol: 'triangle-up', dash: 'dashdot', y: [0.451, 0.484, 0.557, 0.581, 0.597] },
     };
     const traces = Object.keys(SERIES).map((lang) => ({
       type: 'scatter', mode: 'lines+markers', name: lang,
       x, y: SERIES[lang].y,
-      line: { color: SERIES[lang].color, width: 2 },
-      marker: { size: 8, color: SERIES[lang].color, line: { color: INK, width: 1 } },
+      line: { color: BLUE, width: 2, dash: SERIES[lang].dash },
+      marker: { symbol: SERIES[lang].symbol, size: 9, color: BLUE, line: { color: INK, width: 1 } },
       hovertemplate: lang + '<br>%{x} samples<br>perf: %{y:.3f}<extra></extra>',
     }));
 
     Plotly.newPlot(scaleMount, traces, {
-      margin: { l: 46, r: 12, t: 8, b: 42 },
-      height: 320, font: FONT, paper_bgcolor: '#fff', plot_bgcolor: '#fff',
+      margin: { l: 46, r: 12, t: 8, b: 40 },
+      height: 268, font: FONT, paper_bgcolor: '#fff', plot_bgcolor: '#fff',
       legend: { orientation: 'h', y: -0.22, font: { size: 11 } },
       xaxis: {
         type: 'log', gridcolor: '#eee',
