@@ -54,12 +54,22 @@
 
     Plotly.newPlot(mount, [trace('Average')], layout, CONFIG);
 
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     document.querySelectorAll('#chart-teachers-chips .chart-chip').forEach((chip) => {
       chip.addEventListener('click', () => {
         document.querySelectorAll('#chart-teachers-chips .chart-chip')
           .forEach((c) => c.classList.toggle('is-active', c === chip));
         const key = chip.dataset.key;
-        Plotly.react(mount, [trace(key)], layout, CONFIG);
+        if (reduceMotion) {
+          Plotly.react(mount, [trace(key)], layout, CONFIG);
+          return;
+        }
+        // Tween the bar lengths (and recolor) instead of snapping.
+        Plotly.animate(mount, { data: [trace(key)] }, {
+          transition: { duration: 500, easing: 'cubic-in-out' },
+          frame: { duration: 500, redraw: false },
+        });
       });
     });
   }
