@@ -179,9 +179,9 @@
         hovertemplate: lang + '<br>actual: %{x:.3f}<br>predicted: %{y:.3f}<extra></extra>' };
     });
     Plotly.newPlot(pcaScatter, [diag, ...traces], {
-      margin: { l: 48, r: 10, t: 6, b: 40 }, height: 360, font: FONT,
+      margin: { l: 48, r: 10, t: 6, b: 88 }, height: 380, font: FONT,
       paper_bgcolor: '#fff', plot_bgcolor: '#fff',
-      legend: { orientation: 'h', y: -0.2, font: { size: 11 } },
+      legend: { orientation: 'h', y: -0.2, yanchor: 'top', xanchor: 'center', x: 0.5, font: { size: 11 } },
       xaxis: { title: { text: 'Actual Benchmark Score', font: { size: 12 } }, gridcolor: '#eee', zeroline: false, range: [0.295, 0.405], tickvals: [0.30, 0.35, 0.40], constrain: 'domain' },
       yaxis: { title: { text: 'Predicted Benchmark Score', font: { size: 12 } }, gridcolor: '#eee', zeroline: false, range: [0.295, 0.505], tickvals: [0.30, 0.35, 0.40, 0.45, 0.50] },
       annotations: [{ xref: 'paper', yref: 'paper', x: 0.97, y: 0.06, text: 'R<sup>2</sup> = 0.664<br>RMSE = 0.440', showarrow: false, align: 'right', bordercolor: INK, borderwidth: 1, borderpad: 4, bgcolor: '#fff', font: { size: 11 } }],

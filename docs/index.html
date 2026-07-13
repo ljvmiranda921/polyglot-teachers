@@ -84,7 +84,7 @@
     <nav aria-label="Table of contents">
       <ol>
         <li><a href="#framework">Our evaluation framework</a></li>
-        <li><a href="#findings">Findings</a>
+        <li><a href="#findings">Experiments &amp; Findings</a>
           <ol>
             <li><a href="#f-teachers">Which teacher model excels in multilingual data generation?</a></li>
             <li><a href="#f-qualities">Which qualities of the dataset predict downstream performance?</a></li>
@@ -322,7 +322,7 @@
   </section>
 
   <section id="findings">
-    <h2>Findings</h2>
+    <h2>Experiments &amp; Findings</h2>
     <p>
       We test <strong>10 teacher models</strong> on <strong>6 typologically diverse languages</strong> (Arabic, Czech, German, Spanish, Indonesian, and Japanese), chosen for their variation in resource availability, script, and language family.
       In total, we generate <strong>over 1.4M SFT instances</strong> and train <strong>240 student models</strong>.
@@ -431,7 +431,7 @@
       <span class="para-label">Model family.</span>
       Each teacher belongs to a model family (Gemma, Llama, Aya, and so on), and models within a family tend to share tokenization schemes and pretraining data. We test whether this shared lineage makes a family a useful signal for pairing a teacher with a student.
     </p>
-    <div class="finding-split finding-split--fig">
+    <div class="finding-split">
       <div>
         <p><span class="section-label">Setup</span>Instead of finetuning the student from OLMo 3 7B, we repeat the evaluation with three other base models (Llama 3.1 8B, Gemma 3 4B, and Qwen 3 8B) and recompute PG-Score on German, Indonesian, and Arabic.</p>
         <p><span class="section-label">Results</span>The best teachers stay consistent across base models: Gemma 3 27B and Aya Expanse 32B remain in the top three regardless of the student. Teacher rankings correlate moderately to strongly across bases (Spearman &rho; = 0.57 to 0.87), and family-matched teacher&ndash;student pairs (e.g., a Gemma teacher with a Gemma student) achieve at least +20.5% higher PG-Score than a mismatched baseline.</p>
