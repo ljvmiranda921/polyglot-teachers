@@ -571,6 +571,24 @@ a.cite:hover { border-bottom: none; text-decoration-style: solid; }
 
 /* ---------- findings charts ---------- */
 
+/* auto-number the findings subsections (1. , 2. , ...) */
+#findings { counter-reset: finding; }
+#findings h3 { counter-increment: finding; scroll-margin-top: 1rem; }
+#findings h3::before { content: counter(finding) ". "; }
+
+/* hover-revealed "#" anchor for linking to a subsection (added by main.js) */
+.hanchor {
+  margin-left: 0.4rem;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+h3:hover .hanchor, .hanchor:focus { opacity: 1; }
+
+.reg-table { width: auto; max-width: 480px; margin: 1.25rem 0; }
+
 .chart-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.25rem 0 1rem; }
 /* Flat ink-bordered chips; only the selected one pops with the retro shadow
    (Average is selected by default). */

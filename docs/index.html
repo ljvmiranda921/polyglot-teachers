@@ -358,13 +358,26 @@
       </div>
     </details>
 
-    <h3>Do stronger models make better teachers?</h3>
-    <!-- §4.1: scatter of log(param size) vs PG-Score colored by family, near-flat regression line
-         (ghost "expected" line first); small chia table of β/SE/p. Takeaway: neither scale nor
-         benchmark performance significantly predicts PG-Score. -->
-    <div class="figure-mount">
-      <p class="placeholder">[ in progress ]</p>
-    </div>
+    <!-- PARKED: "Do stronger models make better teachers?" (paper section 4.1).
+         May instead become a small aside/footnote inside "Which teacher model
+         is good?". The chart code stays in charts.js, guarded on #chart-strength
+         so it no-ops while this markup is commented out.
+
+      <h3>Do stronger models make better teachers?</h3>
+      <p><span class="section-label">Setup</span>To test whether the usual proxies for a "strong" model predict teaching ability, we fit a mixed-effects model regressing PG-Score on (a) parameter size and (b) average multilingual benchmark performance across our three tasks.</p>
+      <div class="chart-mount" id="chart-strength"></div>
+      <p class="caption"><strong>Teacher scale vs. PG-Score.</strong> Each point is a teacher, colored by model family (GPT 4o mini is excluded, as its size is undisclosed). If bigger models simply made better teachers, the points would follow the dotted line; instead the fit is nearly flat.</p>
+      <p><span class="section-label">Results</span>Neither predictor is significant (p over 0.05): a tenfold increase in parameters buys almost no PG-Score, and benchmark performance fares no better. Llama 3.1 70B, the largest open model tested, lands in the bottom half, while 4B to 32B models top the rankings.</p>
+      <table class="chia reg-table">
+        <caption><strong>Mixed-effects regression of PG-Score on model strength.</strong> Neither predictor reaches significance, so neither alone ensures teacher effectiveness.</caption>
+        <thead><tr><th style="text-align:left">Predictor</th><th>beta</th><th>SE</th><th>p</th></tr></thead>
+        <tbody>
+          <tr><td style="text-align:left">log(Parameter size)</td><td>0.053</td><td>0.080</td><td>0.507</td></tr>
+          <tr><td style="text-align:left">Avg. multilingual performance</td><td>1.387</td><td>2.204</td><td>0.529</td></tr>
+        </tbody>
+      </table>
+      <p class="callout">Neither model size nor benchmark performance predicts teacher effectiveness.</p>
+    -->
 
     <h3>Which qualities of the dataset predict downstream performance?</h3>
     <!-- §4.2: PC1-PC4 chips (42.2/22.1/16.5/12.6%, cumulative 93.3%) with plain-language descriptions;

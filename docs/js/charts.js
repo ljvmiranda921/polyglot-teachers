@@ -73,4 +73,55 @@
       });
     });
   }
+
+  /* ---- Finding 2: does model scale predict PG-Score? ---- */
+
+  const strengthMount = document.getElementById('chart-strength');
+  if (strengthMount) {
+    const FAMILY = {
+      Google: { color: '#254eff', x: [27, 12, 4], y: [0.726, 0.595, 0.469], names: ['Gemma 3 27B', 'Gemma 3 12B', 'Gemma 3 4B'] },
+      Cohere: { color: '#C96A2E', x: [32, 104], y: [0.706, 0.546], names: ['Aya Expanse 32B', 'Command A'] },
+      IBM: { color: '#4DB78C', x: [3, 0.4], y: [0.312, 0.304], names: ['IBM Granite 4.0', 'IBM Granite Micro'] },
+      Meta: { color: '#A368DF', x: [70, 8], y: [0.14, -0.356], names: ['Llama 3.1 70B', 'Llama 3.1 8B'] },
+    };
+
+    const dots = Object.keys(FAMILY).map((fam) => ({
+      type: 'scatter', mode: 'markers', name: fam,
+      x: FAMILY[fam].x, y: FAMILY[fam].y, text: FAMILY[fam].names,
+      marker: { size: 13, color: FAMILY[fam].color, line: { color: INK, width: 1 } },
+      hovertemplate: '%{text}<br>%{x}B params<br>PG-Score: %{y:.3f}<extra></extra>',
+    }));
+
+    // the flat reality (OLS fit of the points above) vs. the steep line you'd
+    // expect if bigger simply meant better
+    const actual = {
+      type: 'scatter', mode: 'lines', name: 'actual fit',
+      x: [0.32, 131], y: [0.222, 0.493],
+      line: { color: INK, width: 2 }, hoverinfo: 'skip',
+    };
+    const expected = {
+      type: 'scatter', mode: 'lines', name: 'if scale mattered',
+      x: [0.32, 131], y: [0.0, 1.0],
+      line: { color: MUTED, width: 2, dash: 'dot' }, hoverinfo: 'skip',
+    };
+
+    const strengthLayout = {
+      margin: { l: 48, r: 16, t: 8, b: 46 },
+      height: 400,
+      font: FONT,
+      paper_bgcolor: '#fff', plot_bgcolor: '#fff',
+      legend: { orientation: 'h', y: -0.18, font: { size: 12 } },
+      xaxis: {
+        type: 'log', gridcolor: '#eee',
+        tickvals: [1, 10, 100], ticktext: ['1B', '10B', '100B'],
+        title: { text: 'Parameter size (log scale)', font: { size: 12 } },
+      },
+      yaxis: {
+        zeroline: true, zerolinecolor: INK, zerolinewidth: 1.5, gridcolor: '#eee',
+        title: { text: 'PG-Score', font: { size: 12 } },
+      },
+    };
+
+    Plotly.newPlot(strengthMount, [expected, actual, ...dots], strengthLayout, CONFIG);
+  }
 })();

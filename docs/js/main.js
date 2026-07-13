@@ -1,5 +1,20 @@
 /* Small page-wide behaviors. */
 document.addEventListener('DOMContentLoaded', () => {
+  // Give each findings subsection a slug id and a hover-revealed "#" anchor
+  // so it can be linked to directly.
+  document.querySelectorAll('#findings h3').forEach((h) => {
+    if (!h.id) {
+      h.id = h.textContent.trim().toLowerCase()
+        .replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+    }
+    const a = document.createElement('a');
+    a.className = 'hanchor';
+    a.href = '#' + h.id;
+    a.textContent = '#';
+    a.setAttribute('aria-label', 'Link to this section');
+    h.appendChild(a);
+  });
+
   // Copy-to-clipboard buttons. A button with data-copy-target="#id" copies
   // the target element's textContent and briefly shows a confirmation label.
   document.querySelectorAll('.copy-btn[data-copy-target]').forEach((btn) => {
