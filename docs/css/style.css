@@ -620,6 +620,15 @@ h3:hover .hanchor, .hanchor:focus { opacity: 1; }
 .btn.chart-chip.is-active:hover { background: var(--blue); }
 .chart-mount { width: 100%; min-height: 380px; }
 
+/* two charts side by side (heatmap + scatter), stacking on narrow screens */
+.chart-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.25rem 0; }
+.chart-duo figure { margin: 0; }
+.chart-duo .chart-mount { min-height: 320px; }
+.chart-duo figcaption { margin-top: 0.5rem; }
+@media (max-width: 720px) {
+  .chart-duo { grid-template-columns: 1fr; }
+}
+
 /* Collapsible full-table block: a thin rule above and below the summary,
    inspired by owickstrom.github.io/the-proportional-web. */
 .data-details { margin: 1.5rem 0; }

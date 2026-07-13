@@ -376,35 +376,21 @@
 
     <h3>Which qualities of the dataset predict downstream performance?</h3>
     <p>
-      <span class="section-label">Setup</span>We run principal component analysis (PCA) on the six intrinsic data-quality metrics, then fit a linear model that uses the resulting components to predict student benchmark performance.<sup class="sidenote-marker">3</sup>
+      <span class="section-label">Setup</span>In order to identify which qualities of the generated data drive student performance, we run principal component analysis (PCA) on the six intrinsic data-quality metrics, then fit a linear model that uses the resulting principal components to predict downstream student performance.
     </p>
-    <div class="sidenote sidenote--stat">
-      <p><sup>3</sup> The first four components already capture <strong>93.3%</strong> of the variance in the intrinsic metrics.</p>
-      <table class="chia reg-table reg-table--mini">
-        <thead>
-          <tr><th style="text-align:left">PC</th><th>Var.</th><th>Cumul.</th></tr>
-        </thead>
-        <tbody>
-          <tr><td style="text-align:left">PC1</td><td>42.2%</td><td>42.2%</td></tr>
-          <tr><td style="text-align:left">PC2</td><td>22.1%</td><td>64.3%</td></tr>
-          <tr><td style="text-align:left">PC3</td><td>16.5%</td><td>80.8%</td></tr>
-          <tr class="is-highlight"><td style="text-align:left">PC4</td><td>12.6%</td><td>93.3%</td></tr>
-          <tr><td style="text-align:left">PC5</td><td>3.5%</td><td>96.8%</td></tr>
-          <tr><td style="text-align:left">PC6</td><td>3.2%</td><td>100%</td></tr>
-        </tbody>
-      </table>
+    <div class="chart-duo">
+      <figure>
+        <div class="chart-mount" id="chart-pca-loadings"></div>
+        <figcaption class="caption"><strong>How each intrinsic metric loads onto the principal components.</strong> Blue is a positive loading, orange negative. PC1 tracks diverse, fluent responses (high response distinctness and rubric score, low perplexity); PC2 and PC3 track prompt length and diversity.</figcaption>
+      </figure>
+      <figure>
+        <div class="chart-mount" id="chart-pca-scatter"></div>
+        <figcaption class="caption"><strong>Predicted vs. actual downstream performance.</strong> Each point is a teacher&ndash;language pair; the linear model over the intrinsic-metric PCs recovers most of the variation (R&sup2; = 0.68). The dashed line is a perfect fit.</figcaption>
+      </figure>
     </div>
-    <div class="chart-mount" id="chart-pca-loadings"></div>
-    <p class="caption">
-      <strong>How each intrinsic metric loads onto the principal components.</strong> Blue is a positive loading, orange negative. PC1 tracks diverse, fluent responses (high response distinctness and rubric score, low perplexity); PC2 and PC3 track prompt diversity and length.
-    </p>
     <p>
-      <span class="section-label">Results</span>Those components predict student performance with <strong>R&sup2; = 0.664</strong> from a simple linear model, so the qualities of the generated data carry most of the signal about how well a student will learn.
+      <span class="section-label">Results</span>The first four components capture <strong>87.3%</strong> of the variance in the intrinsic metrics, and those components predict downstream performance with <strong>R&sup2; = 0.68</strong> from a simple linear model. In other words, the qualities of the generated data carry most of the signal about how well a student will learn.
     </p>
-    <figure class="fig-img">
-      <img src="assets/pca_predicted_vs_actual.png" alt="Scatter of predicted vs. actual student benchmark score; points cluster along the diagonal, R-squared 0.664." loading="lazy">
-      <figcaption class="caption"><strong>Predicted vs. actual student benchmark score.</strong> Each point is a teacher&ndash;language pair; the linear model over the intrinsic-metric PCs recovers most of the variation in downstream performance (R&sup2; = 0.664, RMSE = 0.440).</figcaption>
-    </figure>
     <p class="callout">You can screen teachers from the data they generate, without training a single student model.</p>
 
     <h3>What&rsquo;s a heuristic for choosing a teacher model?</h3>

@@ -125,47 +125,62 @@
     Plotly.newPlot(strengthMount, [expected, actual, ...dots], strengthLayout, CONFIG);
   }
 
-  /* ---- Finding: which intrinsic metrics load on each PC? ----
-     Loadings copied from the paper's pca_loading_factors figure. */
+  /* ---- Finding: which intrinsic metrics predict downstream performance? ----
+     Reproduced by running analysis.principal_components on the committed
+     data/csd3 + pg_scores_base_olmo3.jsonl (results_key=pg_score). */
 
   const pcaMount = document.getElementById('chart-pca-loadings');
   if (pcaMount) {
     const features = ['Distinct Prompts', 'Distinct Responses', 'Perplexity', 'Rubric Score', 'Prompt Length', 'Response Length'];
     const pcs = ['PC1', 'PC2', 'PC3', 'PC4', 'PC5', 'PC6'];
-    // rows = features, columns = PCs
     const loadings = [
-      [0.073, 0.654, 0.008, 0.744, 0.012, -0.117],
-      [0.579, -0.098, -0.017, 0.111, -0.660, 0.456],
-      [-0.578, -0.037, 0.017, 0.211, 0.075, 0.784],
-      [0.514, -0.237, 0.354, 0.182, 0.678, 0.247],
-      [-0.079, 0.388, 0.838, -0.332, -0.171, 0.048],
-      [-0.234, -0.596, 0.415, 0.497, -0.265, -0.318],
+      [-0.351, -0.018, -0.408, 0.688, 0.461, -0.159],
+      [0.334, -0.482, 0.294, 0.555, -0.429, -0.280],
+      [-0.361, 0.027, 0.773, 0.217, 0.229, 0.416],
+      [0.566, 0.305, -0.192, 0.346, -0.017, 0.656],
+      [-0.254, 0.738, 0.074, 0.230, -0.525, -0.237],
+      [0.501, 0.358, 0.329, -0.004, 0.525, -0.487],
     ];
-    // diverging orange -> white -> blue, centered at 0
     const scale = [[0, '#C96A2E'], [0.5, '#f4f2ee'], [1, '#254eff']];
     const annotations = [];
     features.forEach((f, r) => pcs.forEach((p, c) => {
       const v = loadings[r][c];
-      annotations.push({
-        x: p, y: f, text: v.toFixed(3), showarrow: false,
-        font: { size: 12, color: Math.abs(v) > 0.55 ? '#fff' : INK },
-      });
+      annotations.push({ x: p, y: f, text: v.toFixed(2), showarrow: false,
+        font: { size: 10, color: Math.abs(v) > 0.5 ? '#fff' : INK } });
     }));
 
     Plotly.newPlot(pcaMount, [{
       type: 'heatmap', x: pcs, y: features, z: loadings,
-      colorscale: scale, zmid: 0, zmin: -0.85, zmax: 0.85,
-      xgap: 3, ygap: 3,
-      colorbar: { title: { text: 'loading', side: 'right', font: { size: 11 } }, thickness: 12, len: 0.9 },
+      colorscale: scale, zmid: 0, zmin: -0.8, zmax: 0.8, xgap: 2, ygap: 2,
+      showscale: false,
       hovertemplate: '%{y} on %{x}<br>loading: %{z:.3f}<extra></extra>',
     }], {
-      margin: { l: 116, r: 16, t: 8, b: 30 },
-      height: 340,
-      font: FONT,
-      paper_bgcolor: '#fff', plot_bgcolor: '#fff',
-      xaxis: { side: 'bottom', tickfont: { size: 12 } },
-      yaxis: { autorange: 'reversed', tickfont: { size: 11.5 } },
+      margin: { l: 92, r: 8, t: 6, b: 26 },
+      height: 320, font: FONT, paper_bgcolor: '#fff', plot_bgcolor: '#fff',
+      xaxis: { side: 'bottom', tickfont: { size: 11 } },
+      yaxis: { autorange: 'reversed', tickfont: { size: 10.5 } },
       annotations,
+    }, CONFIG);
+  }
+
+  const pcaScatter = document.getElementById('chart-pca-scatter');
+  if (pcaScatter) {
+    const LANG = { de: ['German', '#254eff'], es: ['Spanish', '#A368DF'], id: ['Indonesian', '#C96A2E'], cs: ['Czech', '#4DB78C'], ja: ['Japanese', '#7B93B8'] };
+    const pts = [{"x":0.264,"y":0.586,"l":"ja"},{"x":1.0,"y":0.656,"l":"de"},{"x":0.908,"y":0.969,"l":"es"},{"x":1.129,"y":1.035,"l":"es"},{"x":0.182,"y":0.507,"l":"id"},{"x":1.195,"y":0.701,"l":"de"},{"x":0.182,"y":0.575,"l":"es"},{"x":-0.329,"y":0.26,"l":"id"},{"x":0.214,"y":0.165,"l":"id"},{"x":0.322,"y":0.146,"l":"id"},{"x":0.151,"y":0.096,"l":"id"},{"x":1.153,"y":0.784,"l":"id"},{"x":1.102,"y":1.172,"l":"es"},{"x":1.003,"y":0.99,"l":"id"},{"x":-0.079,"y":-0.525,"l":"id"},{"x":1.102,"y":0.968,"l":"de"},{"x":0.688,"y":0.762,"l":"es"},{"x":0.929,"y":0.841,"l":"es"},{"x":0.109,"y":0.403,"l":"cs"},{"x":0.114,"y":0.358,"l":"cs"},{"x":0.015,"y":0.075,"l":"cs"},{"x":-0.105,"y":0.211,"l":"id"},{"x":0.783,"y":0.947,"l":"es"},{"x":0.321,"y":-0.073,"l":"ja"},{"x":0.734,"y":0.654,"l":"es"},{"x":-0.031,"y":0.046,"l":"cs"},{"x":1.468,"y":1.029,"l":"de"},{"x":0.29,"y":0.475,"l":"cs"}];
+    const diag = { type: 'scatter', mode: 'lines', x: [-0.6, 1.6], y: [-0.6, 1.6], line: { color: MUTED, width: 1.5, dash: 'dash' }, hoverinfo: 'skip', showlegend: false };
+    const traces = Object.keys(LANG).map((code) => {
+      const p = pts.filter((d) => d.l === code);
+      return { type: 'scatter', mode: 'markers', name: LANG[code][0],
+        x: p.map((d) => d.x), y: p.map((d) => d.y),
+        marker: { size: 9, color: LANG[code][1], line: { color: INK, width: 1 } },
+        hovertemplate: LANG[code][0] + '<br>actual: %{x:.2f}<br>predicted: %{y:.2f}<extra></extra>' };
+    });
+    Plotly.newPlot(pcaScatter, [diag, ...traces], {
+      margin: { l: 44, r: 8, t: 6, b: 40 }, height: 320, font: FONT,
+      paper_bgcolor: '#fff', plot_bgcolor: '#fff',
+      legend: { orientation: 'h', y: -0.2, font: { size: 11 } },
+      xaxis: { title: { text: 'Actual', font: { size: 12 } }, gridcolor: '#eee', zeroline: false },
+      yaxis: { title: { text: 'Predicted', font: { size: 12 } }, gridcolor: '#eee', zeroline: false, scaleanchor: 'x', scaleratio: 1 },
     }, CONFIG);
   }
 })();
