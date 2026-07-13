@@ -424,11 +424,11 @@
     <div class="chart-duo">
       <figure>
         <div class="chart-mount" id="chart-pca-loadings"></div>
-        <figcaption class="caption"><strong>Figure 3. Loading strength of intrinsic metrics on the principal components (PCs).</strong> PC1 suggests that good teachers produce diverse and high-quality responses, while PC2 focuses on prompt diversity and length. PC3 and PC4, together, indicates the importance of prompts on student performance.</figcaption>
+        <figcaption class="caption"><strong>Figure 3. Loading strength of intrinsic metrics on the principal components (PCs).</strong> PC1 suggests that good teachers produce diverse and high-quality responses, while PC2 focuses on prompt diversity and length. PC3 and PC4, together, indicates the importance of prompts.</figcaption>
       </figure>
       <figure>
         <div class="chart-mount" id="chart-pca-scatter"></div>
-        <figcaption class="caption"><strong>Figure 4. Fit of a linear regression model on the PCs of the intrinsic metrics to predict student performance.</strong> Intrinsic metrics, via their PCs, can predict extrinsic student performance (R&sup2; = 0.664 and RMSE = 0.440) on multilingual benchmarks.</figcaption>
+        <figcaption class="caption"><strong>Figure 4. Fit of a linear regression model on the PCs of the intrinsic metrics to predict student performance.</strong> Intrinsic metrics, via their PCs, can predict extrinsic student performance on multilingual benchmarks.</figcaption>
       </figure>
     </div>
     <p>
@@ -501,7 +501,7 @@
     <p><span class="section-label">Setup</span>For each method in isolation, we generate 10k samples per teacher&ndash;language pair, finetune an OLMo 3 7B student, and compute PG-Score. We test three teachers spanning high to low PG-Score (Gemma 3 27B, Aya Expanse 32B, Llama 3.1 70B) across German, Indonesian, and Arabic.</p>
     <div class="table-scroll">
       <table class="chia">
-        <caption><strong>Table 3. PG-Score across the three data generation methods.</strong> For each teacher and language, the best method is <span class="hl-key hl-1">highlighted</span>.</caption>
+        <caption><strong>Table 3. PG-Score across the three data generation methods.</strong> We <span class="hl-key hl-1">highlight</span> the best method for each teacher and language.</caption>
         <thead>
           <tr><th rowspan="2" style="text-align:left">Teacher Model</th><th colspan="3">Arabic (ar)</th><th colspan="3">German (de)</th><th colspan="3">Indonesian (id)</th></tr>
           <tr><th>Gen.</th><th>Tr.</th><th>Resp.</th><th>Gen.</th><th>Tr.</th><th>Resp.</th><th>Gen.</th><th>Tr.</th><th>Resp.</th></tr>
