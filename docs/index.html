@@ -231,47 +231,55 @@
     <p>
       To evaluate a synthetic data recipe, we measure two things: (1) the <strong>intrinsic</strong> quality of the synthetic dataset itself, and (2) the <strong>extrinsic</strong> performance of a student model trained on that data across a diverse set of multilingual tasks.
       We find it important to consider both, since synthetic datasets enter the data commons and get reused, while student models are deployed in real-world applications.
+      To do so, we introduce the <span class="brand">Polyglot Score</span> (PG-Score), which combines both aspects into a single number:
     </p>
-
-    <div class="metric-row">
-      <div class="metric-icon">
-        <div class="pg-chat-stack">
-          <div class="pg-chat">
-            <div class="msg seed"><span class="bar" style="width: 78%"></span><span class="bar" style="width: 52%"></span></div>
-            <div class="msg teacher"><span class="bar" style="width: 82%"></span><span class="bar" style="width: 64%"></span></div>
-            <div class="msg seed"><span class="bar" style="width: 58%"></span></div>
-            <div class="msg teacher"><span class="bar" style="width: 86%"></span><span class="bar" style="width: 44%"></span></div>
-          </div>
-        </div>
-        <span class="pg-node-label em">Synthetic dataset</span>
-      </div>
+    <div class="pg-equation" role="img" aria-label="Polyglot Score equals Multilingual Data Quality plus Student Model Performance">
+      <span class="pg-badge">Polyglot Score</span>
+      <span class="pg-op">=</span>
+      <span class="pg-term">
+        <span class="pg-term-icon">
+          <span class="mini-stack" aria-hidden="true">
+            <span class="mini-sheet"></span>
+            <span class="mini-chat">
+              <span class="mini-bubble seed"></span>
+              <span class="mini-bubble teacher"></span>
+              <span class="mini-bubble seed short"></span>
+            </span>
+          </span>
+        </span>
+        <span class="pg-term-text">Multilingual<br>Data Quality</span>
+      </span>
+      <span class="pg-op">+</span>
+      <span class="pg-term">
+        <span class="pg-term-icon">
+          <span class="pg-cube pg-cube-xs" id="metric-cube-student"></span>
+        </span>
+        <span class="pg-term-text">Student Model<br>Performance</span>
+      </span>
+    </div>
+    <div class="metrics-duo">
       <div class="pg-panel panel metric-box metric-intrinsic">
         <h4><span class="metric-tag">Intrinsic</span> Multilingual Data Quality</h4>
         <div class="metric-choices">
-          <button type="button" class="btn metric-btn is-active" data-metric="diversity">Diversity</button>
-          <button type="button" class="btn metric-btn" data-metric="perplexity">Perplexity</button>
-          <button type="button" class="btn metric-btn" data-metric="reward">Reward score</button>
-        </div>
-        <div class="metric-detail-item is-active" data-metric="diversity">
-          <p>A corpus-level statistic that measures how varied the generated prompts and responses are.</p>
-          <p class="how"><strong>Computation:</strong> cosine distance of the prompt and response embeddings, embedded with Llama-Embed-Nemotron-8B <a class="cite" href="https://arxiv.org/abs/2511.07025" target="_blank" rel="noopener noreferrer">(Babakhin et al., 2025)</a>, the top-performing model on the MMTEB leaderboard.</p>
-        </div>
-        <div class="metric-detail-item" data-metric="perplexity">
-          <p>Measures the fluency and naturalness of the generated text: lower perplexity indicates more coherent and linguistically natural responses.</p>
-          <p class="how"><strong>Computation:</strong> the perplexity of a base model on the response, conditioned on the prompt.</p>
-        </div>
-        <div class="metric-detail-item" data-metric="reward">
-          <p>Scores the quality of each prompt&ndash;response pair based on rubrics relating to fluency, naturalness, and instruction-following.</p>
-          <p class="how"><strong>Computation:</strong> the verbalized score (1&ndash;5) of M-Prometheus 14B <a class="cite" href="https://openreview.net/forum?id=Atyk8lnIQQ" target="_blank" rel="noopener noreferrer">(Pombal et al., 2025)</a> prompted as a multilingual LLM judge, chosen for its high performance on human-aligned evaluation benchmarks.</p>
+            <button type="button" class="btn metric-btn is-active" data-metric="diversity">Diversity</button>
+            <button type="button" class="btn metric-btn" data-metric="perplexity">Perplexity</button>
+            <button type="button" class="btn metric-btn" data-metric="reward">Reward score</button>
+          </div>
+          <div class="metric-detail-item is-active" data-metric="diversity">
+            <p>A corpus-level statistic that measures how varied the generated prompts and responses are.</p>
+            <p class="how"><strong>Computation:</strong> cosine distance of the prompt and response embeddings, embedded with Llama-Embed-Nemotron-8B <a class="cite" href="https://arxiv.org/abs/2511.07025" target="_blank" rel="noopener noreferrer">(Babakhin et al., 2025)</a>, the top-performing model on the MMTEB leaderboard.</p>
+          </div>
+          <div class="metric-detail-item" data-metric="perplexity">
+            <p>Measures the fluency and naturalness of the generated text: lower perplexity indicates more coherent and linguistically natural responses.</p>
+            <p class="how"><strong>Computation:</strong> the perplexity of a base model on the response, conditioned on the prompt.</p>
+          </div>
+          <div class="metric-detail-item" data-metric="reward">
+            <p>Scores the quality of each prompt&ndash;response pair based on rubrics relating to fluency, naturalness, and instruction-following.</p>
+            <p class="how"><strong>Computation:</strong> the verbalized score (1&ndash;5) of M-Prometheus 14B <a class="cite" href="https://openreview.net/forum?id=Atyk8lnIQQ" target="_blank" rel="noopener noreferrer">(Pombal et al., 2025)</a> prompted as a multilingual LLM judge, chosen for its high performance on human-aligned evaluation benchmarks.</p>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="metric-row">
-      <div class="metric-icon">
-        <div class="pg-cube pg-cube-sm" id="metric-cube-student"></div>
-        <span class="pg-node-label em">Student model</span>
-      </div>
       <div class="pg-panel panel metric-box metric-extrinsic">
         <h4><span class="metric-tag">Extrinsic</span> Student Model Performance</h4>
         <div class="metric-choices">
@@ -280,7 +288,7 @@
           <button type="button" class="btn metric-btn" data-metric="math">M-GSM</button>
         </div>
         <div class="metric-detail-item is-active" data-metric="culture">
-          <p>Tests cultural and factual knowledge in the target language <a class="cite" href="https://arxiv.org/abs/2412.03304" target="_blank" rel="noopener noreferrer">(Singh et al., 2025)</a>: 400 multiple-choice questions per language&mdash;half culturally sensitive, half culturally agnostic&mdash;localized from English by native speakers.</p>
+          <p>Tests cultural and factual knowledge in the target language <a class="cite" href="https://arxiv.org/abs/2412.03304" target="_blank" rel="noopener noreferrer">(Singh et al., 2025)</a>: 400 multiple-choice questions per language (half culturally sensitive, half culturally agnostic) localized from English by native speakers.</p>
           <p class="how"><strong>Evaluation:</strong> zero-shot multiple-choice formulation, reporting accuracy.</p>
         </div>
         <div class="metric-detail-item" data-metric="chat">
@@ -293,21 +301,6 @@
         </div>
       </div>
     </div>
-
-    <p>
-      <span class="para-label">Polyglot Score.</span>
-      So that a teacher can be ranked at a glance, we devise the <span class="brand">Polyglot Score</span> (PG-Score), which combines both measurements into a single number:
-    </p>
-    <div class="pg-equation" role="img" aria-label="Polyglot Score equals Multilingual Data Quality plus Student Model Performance">
-      <span class="pg-badge">Polyglot Score</span>
-      <span class="pg-op">=</span>
-      <span class="pg-term">Multilingual<br>Data Quality</span>
-      <span class="pg-op">+</span>
-      <span class="pg-term">Student Model<br>Performance</span>
-    </div>
-    <p class="caption pg-equation-note">
-      Both terms are z-score normalized before summing, so <strong>0 marks an average teacher</strong> and higher means better data quality and stronger students.
-    </p>
   </section>
 
   <section id="findings">
