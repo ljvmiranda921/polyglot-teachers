@@ -187,4 +187,45 @@
       annotations: [{ xref: 'paper', yref: 'paper', x: 0.97, y: 0.06, text: 'R<sup>2</sup> = 0.664<br>RMSE = 0.440', showarrow: false, align: 'right', bordercolor: INK, borderwidth: 1, borderpad: 4, bgcolor: '#fff', font: { size: 11 } }],
     }, CONFIG);
   }
+
+  /* ---- Heuristic: model family. Spearman rank-correlation of teacher
+     rankings across student base models (values from the paper figure). ---- */
+
+  const famMount = document.getElementById('chart-family-corr');
+  if (famMount) {
+    const bases = ['OLMo 3 7B', 'Gemma 3 4B', 'Qwen 3 8B', 'Llama 3 8B'];
+    const N = null;
+    // rows = y (OLMo bottom -> Llama top), cols = x; upper triangle blank
+    const z = [
+      [1.00, N, N, N],
+      [0.87, 1.00, N, N],
+      [0.60, 0.65, 1.00, N],
+      [0.63, 0.68, 0.57, 1.00],
+    ];
+    const labels = [
+      ['1.00', '', '', ''],
+      ['0.87**', '1.00', '', ''],
+      ['0.60', '0.65', '1.00', ''],
+      ['0.63', '0.68*', '0.57', '1.00'],
+    ];
+    const annotations = [];
+    z.forEach((row, r) => row.forEach((v, c) => {
+      if (v === null) return;
+      annotations.push({ x: bases[c], y: bases[r], text: labels[r][c], showarrow: false,
+        font: { size: 12, color: v > 0.8 ? '#fff' : INK } });
+    }));
+
+    Plotly.newPlot(famMount, [{
+      type: 'heatmap', x: bases, y: bases, z,
+      colorscale: [[0, '#eef1ff'], [1, '#254eff']], zmin: 0.5, zmax: 1.0,
+      xgap: 3, ygap: 3, showscale: false, hoverongaps: false,
+      hovertemplate: '%{y} vs %{x}<br>ρ = %{z:.2f}<extra></extra>',
+    }], {
+      margin: { l: 88, r: 10, t: 70, b: 8 },
+      height: 330, font: FONT, paper_bgcolor: '#fff', plot_bgcolor: '#fff',
+      xaxis: { side: 'top', tickangle: -45, tickfont: { size: 11 } },
+      yaxis: { tickfont: { size: 11 } },
+      annotations: annotations.concat([{ xref: 'paper', yref: 'paper', x: 0.98, y: 0.12, text: '** p&lt;0.01&nbsp;&nbsp;* p&lt;0.05', showarrow: false, align: 'right', font: { size: 10, color: MUTED } }]),
+    }, CONFIG);
+  }
 })();
