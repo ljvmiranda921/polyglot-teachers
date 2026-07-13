@@ -93,6 +93,7 @@
         </li>
         <li><a href="#discussion">Discussion: Towards a recipe for multilingual synthetic data generation</a></li>
         <li><a href="#case-study">Our recipe in practice: Tagalog case study</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
         <li><a href="#citation">Citation</a></li>
       </ol>
     </nav>
@@ -523,12 +524,11 @@
     <p>
       <span class="section-label">Setup</span>To put the recipe to the test, we apply it to a held-out language that was not part of our evaluation: <strong>Tagalog</strong>, a mid-resource language and the standardized form of Filipino, the national language of the Philippines.
     </p>
-    <p>
-      <span class="para-label">Data.</span> We collect Filipino seed data from publicly available SFT datasets such as WildChat and the Aya Collection, and include English data from T&uuml;lu 3 for the <em>Translate</em> method.
-    </p>
-    <p>
-      <span class="para-label">Evaluation.</span> We evaluate on <a href="https://hf.co/spaces/filbench/filbench-leaderboard" target="_blank" rel="noopener noreferrer">FilBench</a> <a class="cite" href="https://aclanthology.org/2025.emnlp-main.127/" target="_blank" rel="noopener noreferrer">(Miranda et al., 2025)</a>, a Filipino-centric benchmark spanning classical NLP, cultural knowledge, reading comprehension, and generation. We compare our recipe against two baselines: <strong>10K-Public</strong> (10k Tagalog pairs sampled from public data, a non-synthetic approach) and <strong>10K-GPT-4oM</strong> (10k instances synthesized by an off-the-shelf GPT-4o-mini teacher, chosen ad hoc for its perceived strength).
-    </p>
+    <ul class="setup-list">
+      <li><strong>Data:</strong> We collect Filipino seed data from publicly available SFT datasets such as WildChat and the Aya Collection, and include English data from T&uuml;lu 3 for the <em>Translate</em> method.</li>
+      <li><strong>Evaluation:</strong> We evaluate on <a href="https://hf.co/spaces/filbench/filbench-leaderboard" target="_blank" rel="noopener noreferrer">FilBench</a> <a class="cite" href="https://aclanthology.org/2025.emnlp-main.127/" target="_blank" rel="noopener noreferrer">(Miranda et al., 2025)</a>, a Filipino-centric benchmark spanning classical NLP, cultural knowledge, reading comprehension, and generation.</li>
+      <li><strong>Baselines:</strong> We compare our recipe against <strong>10K-Public</strong> (10k Tagalog pairs sampled from public data, a non-synthetic approach) and <strong>10K-GPT-4oM</strong> (10k instances synthesized by an off-the-shelf GPT-4o-mini teacher, chosen ad hoc for its perceived strength).</li>
+    </ul>
 
     <p>
       <span class="section-label">Experiment</span>We perform a series of synthetic data interventions using the recipe and recommendations we learned, adding each one on top of the last. Step through them to watch the FilBench score climb.
@@ -549,6 +549,13 @@
     </div>
     <p class="caption">
       <strong>Student model performance on a held-out language, Tagalog, across several synthetic data interventions.</strong> Given a held-out language (Tagalog) and an evaluation benchmark (FilBench), we apply data interventions based on our recommendations on creating a multilingual synthetic data recipe. The interventions are additive.
+    </p>
+  </section>
+
+  <section id="conclusion">
+    <h2>Conclusion</h2>
+    <p>
+      We conduct a comprehensive evaluation of state-of-the-art LMs as multilingual teachers for synthetic data generation by assessing both intrinsic data quality and extrinsic student model performance. We find several properties that contribute to teacher effectiveness outside of model size or benchmark performance, such as prompt&ndash;response diversity, fluency, and language representation. Finally, we outline practical recommendations for creating a multilingual synthetic data generation recipe. We hope our findings guide future work on developing inclusive language technologies through high-quality synthetic data.
     </p>
   </section>
 

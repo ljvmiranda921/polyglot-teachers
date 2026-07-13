@@ -697,6 +697,10 @@ h3:hover .hanchor, .hanchor:focus { opacity: 1; }
 .data-details[open] > summary { border-bottom: none; }
 .data-details .table-scroll { margin-top: 1rem; }
 
+/* setup bullet list (Data / Evaluation / Baselines) */
+.setup-list { margin: 0.5rem 0 1.25rem; padding-left: 1.2rem; }
+.setup-list li { margin: 0.5rem 0; }
+
 /* interactive ablation: chart + controls on the left, explanation on the right */
 .ablation { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 1.75rem; align-items: center; margin: 1.25rem 0 0.75rem; }
 .ablation-fig .chart-mount { min-height: 0; }
