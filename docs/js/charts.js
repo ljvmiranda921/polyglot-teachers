@@ -263,4 +263,63 @@
       annotations: [{ x: Math.log10(10000), y: 0.46, text: 'gains flatten', showarrow: false, xanchor: 'left', font: { size: 10, color: MUTED } }],
     }, CONFIG);
   }
+
+  /* ---- Tagalog case study: step-through ablation (values from the paper's
+     tgl_ablation_filbench_scores figure). Each Next reveals one more bar. ---- */
+
+  const ablMount = document.getElementById('chart-ablation');
+  if (ablMount) {
+    const GREY = '#c9c2b6', YMIN = 45;
+    const bars = {
+      x: ['Public', 'GPT-4o', 'Aya<br>Exp.', 'Match<br>family', '+25k<br>data', '12B<br>model', '27B<br>model'],
+      y: [47.2, 47.7, 48.2, 49.5, 49.7, 51.4, 53.0],
+      color: [GREY, GREY, BLUE, BLUE, BLUE, BLUE, BLUE],
+    };
+    const STEP = [
+      { title: 'Baseline: publicly available data', prose: 'We start with a Gemma 3 4B student finetuned on 10k Tagalog prompt-response pairs sampled from public datasets, a non-synthetic baseline (10K-Public).' },
+      { title: 'Use a synthetic pipeline', prose: 'Swapping public data for 10k instances synthesized by an off-the-shelf GPT-4o-mini teacher barely changes performance (about 0.5pp), suggesting there is no significant advantage to a synthetic pipeline if the teacher model is not optimal.' },
+      { title: 'Use a better teacher', prose: 'We swap GPT-4o-mini for Aya Expanse 32B, a teacher with a higher PG-Score (0.706 vs. 0.461). The slight improvement suggests that PG-Score is generalizable to an unseen language.' },
+      { title: 'Match teacher &amp; student families', prose: 'We use a Gemma 3 27B teacher to match the Gemma 3 4B student family. This yields a substantial improvement, demonstrating that family alignment is a reliable heuristic for teacher selection.' },
+      { title: 'Scale the data (10k &rarr; 25k)', prose: 'Increasing synthetic instances from 10k to 25k gives a modest gain (+0.21pp), smaller than teacher selection or family matching. This is consistent with diminishing returns past 10k, though FilBench&rsquo;s diverse tasks suggest saturation is task-dependent.' },
+      { title: 'Scale the student (4B &rarr; 12B)', prose: 'Scaling the student model from 4B to 12B parameters raises performance further, showing that the recipe benefits from increased model capacity.' },
+      { title: 'Scale the student (12B &rarr; 27B)', prose: 'Scaling further to 27B continues the gains, yet our 25k-instance, SFT-only recipe stays data- and resource-efficient compared to heavier post-training pipelines.' },
+    ];
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let step = 0;
+    const yFor = (s) => bars.y.map((v, i) => (i <= s ? v : YMIN));
+    const textFor = (s) => bars.y.map((v, i) => (i <= s ? v.toFixed(1) : ''));
+    const trace = (s) => ({
+      type: 'bar', x: bars.x, y: yFor(s), text: textFor(s),
+      textposition: 'outside', textfont: { size: 12, color: INK }, cliponaxis: false,
+      marker: { color: bars.color, line: { color: INK, width: 1 } }, hoverinfo: 'skip',
+    });
+    const layout = {
+      margin: { l: 40, r: 10, t: 18, b: 40 }, height: 320, font: FONT,
+      paper_bgcolor: '#fff', plot_bgcolor: '#fff', bargap: 0.34,
+      xaxis: { tickfont: { size: 10.5 } },
+      yaxis: { range: [YMIN, 54], gridcolor: '#eee', title: { text: 'FilBench Score', font: { size: 12 } } },
+    };
+    Plotly.newPlot(ablMount, [trace(0)], layout, CONFIG);
+
+    const titleEl = document.getElementById('abl-title');
+    const proseEl = document.getElementById('abl-prose');
+    const stepEl = document.getElementById('abl-step');
+    const backBtn = document.getElementById('abl-back');
+    const nextBtn = document.getElementById('abl-next');
+
+    function render() {
+      const data = { data: [trace(step)] };
+      if (reduceMotion) Plotly.react(ablMount, data.data, layout, CONFIG);
+      else Plotly.animate(ablMount, data, { transition: { duration: 450, easing: 'cubic-out' }, frame: { duration: 450, redraw: false } });
+      titleEl.innerHTML = STEP[step].title;
+      proseEl.innerHTML = STEP[step].prose;
+      stepEl.textContent = step === 0 ? 'Baseline' : 'Intervention ' + step + ' of 6';
+      backBtn.disabled = step === 0;
+      nextBtn.disabled = step === 6;
+    }
+    render();
+    nextBtn.addEventListener('click', () => { if (step < 6) { step++; render(); } });
+    backBtn.addEventListener('click', () => { if (step > 0) { step--; render(); } });
+  }
 })();

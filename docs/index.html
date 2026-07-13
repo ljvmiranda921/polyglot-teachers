@@ -530,9 +530,26 @@
       <span class="para-label">Evaluation.</span> We evaluate on <a href="https://hf.co/spaces/filbench/filbench-leaderboard" target="_blank" rel="noopener noreferrer">FilBench</a> <a class="cite" href="https://arxiv.org/abs/2508.03523" target="_blank" rel="noopener noreferrer">(Miranda et al., 2025)</a>, a Filipino-centric benchmark spanning classical NLP, cultural knowledge, reading comprehension, and generation. We compare our recipe against two baselines: <strong>10K-Public</strong> (10k Tagalog pairs sampled from public data, a non-synthetic approach) and <strong>10K-GPT-4oM</strong> (10k instances synthesized by an off-the-shelf GPT-4o-mini teacher, chosen ad hoc for its perceived strength).
     </p>
 
-    <div class="figure-mount">
-      <p class="placeholder">[ interactive ablation loads here ]</p>
+    <p>
+      <span class="section-label">Experiment</span>We perform a series of synthetic data interventions using the recipe and recommendations we learned, adding each one on top of the last. Step through them to watch the FilBench score climb.
+    </p>
+    <div class="ablation">
+      <div class="ablation-fig">
+        <div class="chart-mount" id="chart-ablation"></div>
+        <div class="ablation-controls">
+          <button type="button" class="btn" id="abl-back" disabled>&larr;&ensp;Back</button>
+          <span class="ablation-step" id="abl-step">Baseline</span>
+          <button type="button" class="btn" id="abl-next">Next&ensp;&rarr;</button>
+        </div>
+      </div>
+      <aside class="ablation-explain">
+        <h4 id="abl-title"></h4>
+        <p id="abl-prose"></p>
+      </aside>
     </div>
+    <p class="caption">
+      <strong>Student model performance on a held-out language, Tagalog, across several synthetic data interventions.</strong> Given a held-out language (Tagalog) and an evaluation benchmark (FilBench), we apply data interventions based on our recommendations on creating a multilingual synthetic data recipe. The interventions are additive.
+    </p>
   </section>
 
   <section id="citation">

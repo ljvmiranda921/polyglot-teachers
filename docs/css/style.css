@@ -697,6 +697,28 @@ h3:hover .hanchor, .hanchor:focus { opacity: 1; }
 .data-details[open] > summary { border-bottom: none; }
 .data-details .table-scroll { margin-top: 1rem; }
 
+/* interactive ablation: chart + controls on the left, explanation on the right */
+.ablation { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 1.75rem; align-items: center; margin: 1.25rem 0 0.75rem; }
+.ablation-fig .chart-mount { min-height: 0; }
+.ablation-controls { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 0.4rem; }
+.ablation-step {
+  font-family: var(--font-heading); font-weight: 600; font-size: 0.85rem;
+  color: var(--muted); min-width: 8.5rem; text-align: center;
+}
+.ablation-explain { align-self: center; }
+.ablation-explain h4 {
+  font-family: var(--font-heading); font-weight: 600; font-size: 1.05rem;
+  color: var(--blue); margin: 0 0 0.5rem;
+}
+.ablation-explain p { margin: 0; }
+
+/* disabled chia buttons (Back/Next at the ends) */
+.btn:disabled, .btn:disabled:hover { opacity: 0.4; box-shadow: none; transform: none; cursor: default; }
+
+@media (max-width: 720px) {
+  .ablation { grid-template-columns: 1fr; gap: 1rem; }
+}
+
 /* recipe bullet list in the Discussion (parallel to the Tagalog interventions) */
 .recipe-list { margin: 1rem 0 1.25rem; padding-left: 1.2rem; }
 .recipe-list li { margin: 0.7rem 0; }
