@@ -589,6 +589,21 @@ h3:hover .hanchor, .hanchor:focus { opacity: 1; }
 
 .reg-table { width: auto; max-width: 480px; margin: 1.25rem 0; }
 
+/* footnote: superscript ref in the prose + a small note below the finding */
+.fn-ref a { font-size: 0.72rem; border-bottom: none; }
+.footnote {
+  margin: 1.5rem 0;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.85rem;
+  color: var(--muted);
+  scroll-margin-top: 1rem;
+}
+.footnote p { margin: 0 0 0.6rem; }
+.footnote strong { color: var(--ink); }
+.footnote sup { font-family: var(--font-mono); }
+.reg-table--mini { max-width: 360px; font-size: 0.8rem; margin: 0; }
+
 .chart-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.25rem 0 1rem; }
 /* Flat ink-bordered chips; only the selected one pops with the retro shadow
    (Average is selected by default). */

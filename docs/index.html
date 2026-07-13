@@ -327,9 +327,22 @@
       <strong>PG-Score of each teacher model.</strong> Higher is better; 0 marks an average teacher (PG-Score is z-score normalized). The top three teachers for the selected language are shown in blue. Use the chips to switch languages.
     </p>
     <p>
-      <span class="section-label">Results</span>Gemma 3 27B (0.726) and Aya Expanse 32B (0.706) emerge as the most effective teachers, both outperforming larger models like Llama 3.1 70B (0.140). Smaller models can teach well too: Gemma 3 12B and 4B rank in the top five, while the Gemma 3 family dominates overall and the Llama 3.1 family underperforms. Teacher effectiveness also varies by language: German and Spanish score highly across the board, while Arabic is hard for most teachers.
+      <span class="section-label">Results</span>Gemma 3 27B (0.726) and Aya Expanse 32B (0.706) emerge as the most effective teachers, both outperforming larger models like Llama 3.1 70B (0.140).<sup class="fn-ref"><a href="#fn-strength">&dagger;</a></sup> Smaller models can teach well too: Gemma 3 12B and 4B rank in the top five, while the Gemma 3 family dominates overall and the Llama 3.1 family underperforms. Teacher effectiveness also varies by language: German and Spanish score highly across the board, while Arabic is hard for most teachers.
     </p>
     <p class="callout">Model scale alone does not determine teacher effectiveness.</p>
+
+    <div class="footnote" id="fn-strength">
+      <p><sup>&dagger;</sup> <strong>Does &ldquo;strength&rdquo; explain this?</strong> We find no evidence that it does: a mixed-effects regression of PG-Score on a teacher&rsquo;s parameter size and its average multilingual benchmark performance leaves both predictors non-significant.</p>
+      <table class="chia reg-table reg-table--mini">
+        <thead>
+          <tr><th style="text-align:left">Predictor</th><th>&beta;</th><th>SE</th><th>p</th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="text-align:left">log(Parameter size)</td><td>0.053</td><td>0.080</td><td>0.507</td></tr>
+          <tr><td style="text-align:left">Avg. benchmark perf.</td><td>1.387</td><td>2.204</td><td>0.529</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <details class="data-details">
       <summary>See the full table</summary>
@@ -358,26 +371,10 @@
       </div>
     </details>
 
-    <!-- PARKED: "Do stronger models make better teachers?" (paper section 4.1).
-         May instead become a small aside/footnote inside "Which teacher model
-         is good?". The chart code stays in charts.js, guarded on #chart-strength
-         so it no-ops while this markup is commented out.
-
-      <h3>Do stronger models make better teachers?</h3>
-      <p><span class="section-label">Setup</span>To test whether the usual proxies for a "strong" model predict teaching ability, we fit a mixed-effects model regressing PG-Score on (a) parameter size and (b) average multilingual benchmark performance across our three tasks.</p>
-      <div class="chart-mount" id="chart-strength"></div>
-      <p class="caption"><strong>Teacher scale vs. PG-Score.</strong> Each point is a teacher, colored by model family (GPT 4o mini is excluded, as its size is undisclosed). If bigger models simply made better teachers, the points would follow the dotted line; instead the fit is nearly flat.</p>
-      <p><span class="section-label">Results</span>Neither predictor is significant (p over 0.05): a tenfold increase in parameters buys almost no PG-Score, and benchmark performance fares no better. Llama 3.1 70B, the largest open model tested, lands in the bottom half, while 4B to 32B models top the rankings.</p>
-      <table class="chia reg-table">
-        <caption><strong>Mixed-effects regression of PG-Score on model strength.</strong> Neither predictor reaches significance, so neither alone ensures teacher effectiveness.</caption>
-        <thead><tr><th style="text-align:left">Predictor</th><th>beta</th><th>SE</th><th>p</th></tr></thead>
-        <tbody>
-          <tr><td style="text-align:left">log(Parameter size)</td><td>0.053</td><td>0.080</td><td>0.507</td></tr>
-          <tr><td style="text-align:left">Avg. multilingual performance</td><td>1.387</td><td>2.204</td><td>0.529</td></tr>
-        </tbody>
-      </table>
-      <p class="callout">Neither model size nor benchmark performance predicts teacher effectiveness.</p>
-    -->
+    <!-- The "Do stronger models make better teachers?" analysis (paper section 4.1)
+         now lives as the footnote in the Results above. A fuller scatter version
+         (size vs PG-Score by family) remains available in charts.js (#chart-strength,
+         guarded) if we later want it as its own subsection. -->
 
     <h3>Which qualities of the dataset predict downstream performance?</h3>
     <!-- §4.2: PC1-PC4 chips (42.2/22.1/16.5/12.6%, cumulative 93.3%) with plain-language descriptions;
