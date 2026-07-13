@@ -674,7 +674,7 @@ h3:hover .hanchor, .hanchor:focus { opacity: 1; }
 .data-details[open] > summary { border-bottom: none; }
 .data-details .table-scroll { margin-top: 1rem; }
 
-.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 1.75rem; }
 /* highlight a single column (chia ships tr.is-highlight; this is cell-level) */
 table.chia td.is-highlight { color: var(--blue); font-weight: 500; }
 

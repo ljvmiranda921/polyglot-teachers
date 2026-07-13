@@ -228,4 +228,38 @@
       annotations: annotations.concat([{ xref: 'paper', yref: 'paper', x: 0.98, y: 0.12, text: '** p&lt;0.01&nbsp;&nbsp;* p&lt;0.05', showarrow: false, align: 'right', font: { size: 10, color: MUTED } }]),
     }, CONFIG);
   }
+
+  /* ---- Heuristic: amount of SFT examples. Student performance vs. number of
+     SFT examples (values recovered from the data_scale_effect figure). ---- */
+
+  const scaleMount = document.getElementById('chart-data-scale');
+  if (scaleMount) {
+    const x = [1000, 5000, 10000, 25000, 50000];
+    const SERIES = {
+      German: { color: '#00bdb6', y: [0.496, 0.553, 0.639, 0.642, 0.643] },
+      Arabic: { color: '#e39a5f', y: [0.441, 0.541, 0.617, 0.615, 0.628] },
+      Indonesian: { color: '#a368df', y: [0.451, 0.484, 0.557, 0.581, 0.597] },
+    };
+    const traces = Object.keys(SERIES).map((lang) => ({
+      type: 'scatter', mode: 'lines+markers', name: lang,
+      x, y: SERIES[lang].y,
+      line: { color: SERIES[lang].color, width: 2 },
+      marker: { size: 8, color: SERIES[lang].color, line: { color: INK, width: 1 } },
+      hovertemplate: lang + '<br>%{x} samples<br>perf: %{y:.3f}<extra></extra>',
+    }));
+
+    Plotly.newPlot(scaleMount, traces, {
+      margin: { l: 46, r: 12, t: 8, b: 42 },
+      height: 320, font: FONT, paper_bgcolor: '#fff', plot_bgcolor: '#fff',
+      legend: { orientation: 'h', y: -0.22, font: { size: 11 } },
+      xaxis: {
+        type: 'log', gridcolor: '#eee',
+        tickvals: [1000, 10000], ticktext: ['1k', '10k'],
+        title: { text: 'Number of SFT examples (log)', font: { size: 12 } },
+      },
+      yaxis: { gridcolor: '#eee', title: { text: 'Avg. multilingual performance', font: { size: 12 } } },
+      shapes: [{ type: 'line', x0: 10000, x1: 10000, y0: 0, y1: 1, yref: 'paper', line: { color: MUTED, width: 1.5, dash: 'dot' } }],
+      annotations: [{ x: Math.log10(10000), y: 0.46, text: 'gains flatten', showarrow: false, xanchor: 'left', font: { size: 10, color: MUTED } }],
+    }, CONFIG);
+  }
 })();
