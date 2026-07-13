@@ -72,17 +72,10 @@ sup { font-size: 0.72em; line-height: 0; position: relative; vertical-align: bas
    Use: <p><span class="section-label">Setup</span>We finetune ...</p> */
 
 .section-label {
-  display: inline-block;
-  margin-right: 0.45rem;
-  margin-bottom: 0.1rem;
-  padding: 0.1rem 0.45rem;
-  border-radius: 4px;
-  background: var(--blue);
-  color: var(--white);
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.92rem;
-  line-height: 1.35;
+  color: var(--blue);
+  font-family: var(--font-body);
+  font-weight: 500;
+  margin-right: 0.5rem;
 }
 
 /* ---------- run-in paragraph label, like LaTeX \paragraph{} ---------- */
