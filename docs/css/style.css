@@ -19,6 +19,10 @@ h3 {
   margin: 2.2rem 0 0.6rem;
 }
 
+/* Keep superscripts (footnote / sidenote / citation markers) from stretching
+   the line box, which made adjacent paragraph lines look unevenly spaced. */
+sup { font-size: 0.72em; line-height: 0; position: relative; vertical-align: baseline; top: -0.5em; }
+
 /* ---------- header ---------- */
 
 .letterhead { display: flex; align-items: center; gap: 1.25rem; margin-bottom: 2rem; }
@@ -589,20 +593,18 @@ h3:hover .hanchor, .hanchor:focus { opacity: 1; }
 
 .reg-table { width: auto; max-width: 480px; margin: 1.25rem 0; }
 
-/* footnote: superscript ref in the prose + a small note below the finding */
-.fn-ref a { font-size: 0.72rem; border-bottom: none; }
-.footnote {
-  margin: 1.5rem 0;
-  padding-top: 0.8rem;
-  border-top: 1px solid var(--rule);
-  font-size: 0.85rem;
-  color: var(--muted);
-  scroll-margin-top: 1rem;
-}
-.footnote p { margin: 0 0 0.6rem; }
-.footnote strong { color: var(--ink); }
-.footnote sup { font-family: var(--font-mono); }
+/* compact regression table inside the stat sidenote */
 .reg-table--mini { max-width: 360px; font-size: 0.8rem; margin: 0; }
+.sidenote--stat p { margin: 0 0 0.5rem; }
+.sidenote--stat strong { color: var(--ink); }
+.sidenote--stat sup { font-family: var(--font-mono); }
+.sidenote--stat .reg-table--mini {
+  width: 100%; max-width: none;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+}
+.sidenote--stat .reg-table--mini th,
+.sidenote--stat .reg-table--mini td { padding: 0.22rem 0.3rem; white-space: nowrap; }
 
 .chart-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.25rem 0 1rem; }
 /* Flat ink-bordered chips; only the selected one pops with the retro shadow
