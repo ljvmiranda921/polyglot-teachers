@@ -236,8 +236,9 @@ a.cite:hover { border-bottom: none; text-decoration-style: solid; }
   justify-content: center;
   gap: 0.6rem 0.85rem;
   text-align: center;
-  margin: 0 0 2rem;
+  margin: 1.5rem 0 1rem;
 }
+.pg-equation-note { text-align: center; margin-bottom: 0; }
 .pg-badge {
   font-family: var(--font-heading);
   font-weight: 600;

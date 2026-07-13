@@ -229,9 +229,8 @@
       </p>
     </div>
     <p>
-      To evaluate the quality of a synthetic data recipe, we compute its <span class="brand">Polyglot Score</span>. Given a teacher model, we then measure (1) the <strong>intrinsic</strong> quality of the synthetic dataset and (2) the <strong>extrinsic</strong> performance of a student model trained on that data across a diverse set of multilingual tasks.
-      Our evaluation framework is holistic, as it considers these two output artifacts. 
-      We find this to be important as synthetic datasets enter the data commons (which are reused later on), and student models are deployed in real-world applications.
+      To evaluate a synthetic data recipe, we measure two things: (1) the <strong>intrinsic</strong> quality of the synthetic dataset itself, and (2) the <strong>extrinsic</strong> performance of a student model trained on that data across a diverse set of multilingual tasks.
+      We find it important to consider both, since synthetic datasets enter the data commons and get reused, while student models are deployed in real-world applications.
     </p>
 
     <div class="metric-row">
@@ -294,6 +293,21 @@
         </div>
       </div>
     </div>
+
+    <p>
+      <span class="para-label">Polyglot Score.</span>
+      So that a teacher can be ranked at a glance, we devise the <span class="brand">Polyglot Score</span> (PG-Score), which combines both measurements into a single number:
+    </p>
+    <div class="pg-equation" role="img" aria-label="Polyglot Score equals Multilingual Data Quality plus Student Model Performance">
+      <span class="pg-badge">Polyglot Score</span>
+      <span class="pg-op">=</span>
+      <span class="pg-term">Multilingual<br>Data Quality</span>
+      <span class="pg-op">+</span>
+      <span class="pg-term">Student Model<br>Performance</span>
+    </div>
+    <p class="caption pg-equation-note">
+      Both terms are z-score normalized before summing, so <strong>0 marks an average teacher</strong> and higher means better data quality and stronger students.
+    </p>
   </section>
 
   <section id="findings">
