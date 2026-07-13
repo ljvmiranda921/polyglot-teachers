@@ -431,7 +431,7 @@
       <span class="para-label">Model family.</span>
       Each teacher belongs to a model family (Gemma, Llama, Aya, and so on), and models within a family tend to share tokenization schemes and pretraining data. We test whether this shared lineage makes a family a useful signal for pairing a teacher with a student.
     </p>
-    <div class="finding-split">
+    <div class="finding-split finding-split--fig">
       <div>
         <p><span class="section-label">Setup</span>Instead of finetuning the student from OLMo 3 7B, we repeat the evaluation with three other base models (Llama 3.1 8B, Gemma 3 4B, and Qwen 3 8B) and recompute PG-Score on German, Indonesian, and Arabic.</p>
         <p><span class="section-label">Results</span>The best teachers stay consistent across base models: Gemma 3 27B and Aya Expanse 32B remain in the top three regardless of the student. Teacher rankings correlate moderately to strongly across bases (Spearman &rho; = 0.57 to 0.87), and family-matched teacher&ndash;student pairs (e.g., a Gemma teacher with a Gemma student) achieve at least +20.5% higher PG-Score than a mismatched baseline.</p>
@@ -490,7 +490,7 @@
       <span class="para-label">Amount of SFT examples.</span>
       Generating synthetic data is not free, so we ask how many SFT examples are actually needed to reach stable student performance before the gains level off.
     </p>
-    <div class="finding-split">
+    <div class="finding-split finding-split--fig">
       <div>
         <p><span class="section-label">Setup</span>We finetune an OLMo 3 7B student on <em>n</em> SFT examples, with <em>n</em> ranging from 1k to 50k, using Gemma 3 27B as the teacher on Arabic, German, and Indonesian.</p>
         <p><span class="section-label">Results</span>Performance improves with more synthetic data, but the gains diminish beyond 10k examples. So roughly <strong>10k examples per language</strong> is enough to reach stable student performance &mdash; generating more mostly adds cost without much benefit.</p>
