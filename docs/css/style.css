@@ -242,6 +242,7 @@ a.cite:hover { border-bottom: none; text-decoration-style: solid; }
   text-align: center;
   margin: 1.5rem 0 1rem;
 }
+.pg-equation > * { flex-shrink: 0; }
 .pg-badge {
   font-family: var(--font-heading);
   font-weight: 600;
@@ -264,6 +265,16 @@ a.cite:hover { border-bottom: none; text-decoration-style: solid; }
   line-height: 1.15;
 }
 .pg-term-icon { display: inline-flex; }
+@media (max-width: 640px) {
+  .pg-equation {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 0 0.3rem;
+    scrollbar-width: thin;
+  }
+}
 
 /* ---------- metrics: intrinsic / extrinsic (PG-Score components) ----------
    Two boxes side by side, sitting under their matching terms in the equation.
