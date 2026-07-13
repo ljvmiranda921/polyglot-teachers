@@ -605,6 +605,10 @@ h3:hover .hanchor, .hanchor:focus { opacity: 1; }
 }
 .sidenote--stat .reg-table--mini th,
 .sidenote--stat .reg-table--mini td { padding: 0.22rem 0.3rem; white-space: nowrap; }
+.sidenote--stat { margin-top: -0.15rem; }
+@media (min-width: 1360px) {
+  .sidenote--stat { margin-top: -0.6rem; }
+}
 
 .chart-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.25rem 0 1rem; }
 /* Flat ink-bordered chips; only the selected one pops with the retro shadow

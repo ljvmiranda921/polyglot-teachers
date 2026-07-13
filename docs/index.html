@@ -389,8 +389,24 @@
       </figure>
     </div>
     <p>
-      <span class="section-label">Results</span>The first four components explain over <strong>93.3%</strong> of the variance in the intrinsic metrics, and those components predict student performance with <strong>R&sup2; = 0.664</strong> from a simple linear model. In other words, the qualities of the generated data carry most of the signal about how well a student will learn.
+      <span class="section-label">Results</span>The first four components explain over <strong>93.3%</strong> of the variance in the intrinsic metrics,<sup class="sidenote-marker">3</sup> and those components predict student performance with <strong>R&sup2; = 0.664</strong> from a simple linear model. In other words, the qualities of the generated data carry most of the signal about how well a student will learn.
     </p>
+    <div class="sidenote sidenote--stat">
+      <p><sup>3</sup> <strong>Variance explained by the PCA.</strong> Four principal components account for <strong>93.3%</strong> cumulative variance from the intrinsic data-quality metrics.</p>
+      <table class="chia reg-table reg-table--mini">
+        <thead>
+          <tr><th style="text-align:left">PC</th><th>Variance Expl.</th><th>Cumulative</th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="text-align:left">PC 1</td><td>42.2%</td><td>42.2%</td></tr>
+          <tr><td style="text-align:left">PC 2</td><td>22.1%</td><td>64.3%</td></tr>
+          <tr><td style="text-align:left">PC 3</td><td>16.5%</td><td>80.8%</td></tr>
+          <tr><td style="text-align:left">PC 4</td><td>12.6%</td><td>93.3%</td></tr>
+          <tr><td style="text-align:left">PC 5</td><td>3.5%</td><td>96.8%</td></tr>
+          <tr><td style="text-align:left">PC 6</td><td>3.2%</td><td>100.0%</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <h3>What&rsquo;s a heuristic for choosing a teacher model?</h3>
     <!-- §3.2: student-base chips (OLMo 3 / Gemma 3 / Qwen 3 / Llama 3) showing top-3 teacher cubes,
