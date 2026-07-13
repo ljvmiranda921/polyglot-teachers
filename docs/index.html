@@ -413,7 +413,7 @@
       In order to distill reliable heuristics for choosing a teacher model, we test different aspects such as <strong>model family</strong>, <strong>data generation method</strong>, and <strong>amount of SFT examples</strong>.
     </p>
 
-    <p>
+    <p class="subpart-lead">
       <span class="para-label">Model family.</span>
       Each teacher belongs to a model family (Gemma, Llama, Aya, and so on), and models within a family tend to share tokenization schemes and pretraining data. We test whether this shared lineage makes a family a useful signal for pairing a teacher with a student.
     </p>
@@ -451,7 +451,7 @@
       </div>
     </details>
 
-    <p>
+    <p class="subpart-lead">
       <span class="para-label">Data generation method.</span>
       The three methods make different assumptions: <em>Generate</em> depends on the quality of the few-shot seed examples, <em>Translate</em> transfers from widely-available English prompts, and <em>Respond</em> reuses existing prompts in the target language. These assumptions may favor different languages depending on how much data they already have.
     </p>
@@ -461,7 +461,7 @@
       <p class="placeholder">[ in progress ]</p>
     </div>
 
-    <p>
+    <p class="subpart-lead">
       <span class="para-label">Amount of SFT examples.</span>
       Generating synthetic data is not free, so we ask how many SFT examples are actually needed to reach stable student performance before the gains level off.
     </p>

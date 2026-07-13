@@ -87,6 +87,10 @@ sup { font-size: 0.72em; line-height: 0; position: relative; vertical-align: bas
   padding-right: 0.15rem;
 }
 
+/* sub-part groups (Model family / Data generation method / ...): extra space
+   before each so groups read as distinct, tighter space to their own figure */
+.subpart-lead { margin-top: 3rem; margin-bottom: 0.6rem; }
+
 /* ---------- inline citations ----------
    (Author, Year) links: same color as surrounding text, dotted underline as
    the only clickability cue. Use: <a class="cite" href="...">(Name, 2025)</a> */
