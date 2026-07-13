@@ -132,7 +132,7 @@
 
   const pcaMount = document.getElementById('chart-pca-loadings');
   if (pcaMount) {
-    const features = ['Distinct Prompts', 'Distinct Responses', 'Perplexity', 'Rubric Score', 'Prompt Length', 'Response Length'];
+    const features = ['Distinct<br>Prompts', 'Distinct<br>Responses', 'Perplexity', 'Rubric Score', 'Prompt Length', 'Response Length'];
     const pcs = ['PC1', 'PC2', 'PC3', 'PC4', 'PC5', 'PC6'];
     const loadings = [
       [0.073, 0.654, 0.008, 0.744, 0.012, -0.117],
@@ -147,7 +147,7 @@
     features.forEach((f, r) => pcs.forEach((p, c) => {
       const v = loadings[r][c];
       annotations.push({ x: p, y: f, text: v.toFixed(3), showarrow: false,
-        font: { size: 9, color: Math.abs(v) > 0.5 ? '#fff' : INK } });
+        font: { size: 11, color: Math.abs(v) > 0.5 ? '#fff' : INK } });
     }));
 
     Plotly.newPlot(pcaMount, [{
@@ -158,8 +158,8 @@
     }], {
       margin: { l: 92, r: 8, t: 6, b: 26 },
       height: 320, font: FONT, paper_bgcolor: '#fff', plot_bgcolor: '#fff',
-      xaxis: { side: 'bottom', tickfont: { size: 11 } },
-      yaxis: { autorange: 'reversed', tickfont: { size: 10.5 } },
+      xaxis: { side: 'bottom', tickfont: { size: 12 } },
+      yaxis: { autorange: 'reversed', tickfont: { size: 12 } },
       annotations,
     }, CONFIG);
   }
@@ -168,20 +168,21 @@
   if (pcaScatter) {
     // paper marker colors, keyed by language
     const LANG = { Arabic: '#7fd8c9', Czech: '#fd8254', German: '#cdb4e8', Spanish: '#29337a', Indonesian: '#ffb81c', Japanese: '#545e73' };
+    const MARK = { Arabic: 'circle', Czech: 'square', German: 'diamond', Spanish: 'triangle-up', Indonesian: 'cross', Japanese: 'x' };
     const pts = [{"x":0.3411,"y":0.4038,"l":"Arabic"},{"x":0.3572,"y":0.4362,"l":"Arabic"},{"x":0.3518,"y":0.4368,"l":"Arabic"},{"x":0.3174,"y":0.4089,"l":"Arabic"},{"x":0.3459,"y":0.4103,"l":"Arabic"},{"x":0.3515,"y":0.3781,"l":"Arabic"},{"x":0.3405,"y":0.4144,"l":"Arabic"},{"x":0.3279,"y":0.4118,"l":"Arabic"},{"x":0.3086,"y":0.3419,"l":"Arabic"},{"x":0.3592,"y":0.4242,"l":"Czech"},{"x":0.362,"y":0.419,"l":"Czech"},{"x":0.3629,"y":0.4279,"l":"Czech"},{"x":0.3621,"y":0.4277,"l":"Czech"},{"x":0.3562,"y":0.425,"l":"Czech"},{"x":0.3564,"y":0.4091,"l":"Czech"},{"x":0.3538,"y":0.3965,"l":"Czech"},{"x":0.3525,"y":0.3966,"l":"Czech"},{"x":0.361,"y":0.4265,"l":"Czech"},{"x":0.3276,"y":0.3,"l":"Czech"},{"x":0.3798,"y":0.4394,"l":"German"},{"x":0.3849,"y":0.4442,"l":"German"},{"x":0.3769,"y":0.4308,"l":"German"},{"x":0.3997,"y":0.46,"l":"German"},{"x":0.3971,"y":0.4594,"l":"German"},{"x":0.3968,"y":0.4639,"l":"German"},{"x":0.3825,"y":0.4561,"l":"German"},{"x":0.4,"y":0.4752,"l":"German"},{"x":0.3975,"y":0.4792,"l":"German"},{"x":0.3921,"y":0.4623,"l":"German"},{"x":0.3773,"y":0.4561,"l":"Spanish"},{"x":0.3832,"y":0.4619,"l":"Spanish"},{"x":0.3582,"y":0.4525,"l":"Spanish"},{"x":0.3825,"y":0.4623,"l":"Spanish"},{"x":0.3715,"y":0.451,"l":"Spanish"},{"x":0.3779,"y":0.4571,"l":"Spanish"},{"x":0.374,"y":0.4539,"l":"Spanish"},{"x":0.3727,"y":0.4428,"l":"Spanish"},{"x":0.3892,"y":0.4787,"l":"Spanish"},{"x":0.3858,"y":0.4645,"l":"Spanish"},{"x":0.3582,"y":0.4285,"l":"Indonesian"},{"x":0.3814,"y":0.4516,"l":"Indonesian"},{"x":0.3447,"y":0.4164,"l":"Indonesian"},{"x":0.359,"y":0.4113,"l":"Indonesian"},{"x":0.3619,"y":0.4137,"l":"Indonesian"},{"x":0.3573,"y":0.4103,"l":"Indonesian"},{"x":0.3838,"y":0.4433,"l":"Indonesian"},{"x":0.3798,"y":0.4346,"l":"Indonesian"},{"x":0.3513,"y":0.3676,"l":"Indonesian"},{"x":0.3506,"y":0.4112,"l":"Indonesian"},{"x":0.3603,"y":0.4401,"l":"Japanese"},{"x":0.3618,"y":0.4483,"l":"Japanese"},{"x":0.3714,"y":0.4537,"l":"Japanese"},{"x":0.3685,"y":0.448,"l":"Japanese"},{"x":0.3699,"y":0.4423,"l":"Japanese"},{"x":0.3583,"y":0.4443,"l":"Japanese"},{"x":0.3618,"y":0.3991,"l":"Japanese"},{"x":0.3306,"y":0.3705,"l":"Japanese"},{"x":0.3667,"y":0.4439,"l":"Japanese"}];
     const diag = { type: 'scatter', mode: 'lines', x: [0.30, 0.40], y: [0.30, 0.50], line: { color: '#545e73', width: 2, dash: 'dash' }, hoverinfo: 'skip', showlegend: false };
     const traces = Object.keys(LANG).map((lang) => {
       const p = pts.filter((d) => d.l === lang);
       return { type: 'scatter', mode: 'markers', name: lang,
         x: p.map((d) => d.x), y: p.map((d) => d.y),
-        marker: { size: 11, color: LANG[lang], line: { color: INK, width: 1 } },
+        marker: { size: 11, symbol: MARK[lang], color: LANG[lang], line: { color: INK, width: 1 } },
         hovertemplate: lang + '<br>actual: %{x:.3f}<br>predicted: %{y:.3f}<extra></extra>' };
     });
     Plotly.newPlot(pcaScatter, [diag, ...traces], {
-      margin: { l: 48, r: 10, t: 6, b: 40 }, height: 360, font: FONT,
+      margin: { l: 48, r: 10, t: 6, b: 40 }, height: 440, font: FONT,
       paper_bgcolor: '#fff', plot_bgcolor: '#fff',
       legend: { orientation: 'h', y: -0.2, font: { size: 11 } },
-      xaxis: { title: { text: 'Actual Benchmark Score', font: { size: 12 } }, gridcolor: '#eee', zeroline: false, range: [0.295, 0.405], tickvals: [0.30, 0.35, 0.40] },
+      xaxis: { title: { text: 'Actual Benchmark Score', font: { size: 12 } }, gridcolor: '#eee', zeroline: false, range: [0.295, 0.405], tickvals: [0.30, 0.35, 0.40], constrain: 'domain' },
       yaxis: { title: { text: 'Predicted Benchmark Score', font: { size: 12 } }, gridcolor: '#eee', zeroline: false, range: [0.295, 0.505], tickvals: [0.30, 0.35, 0.40, 0.45, 0.50] },
       annotations: [{ xref: 'paper', yref: 'paper', x: 0.97, y: 0.06, text: 'R<sup>2</sup> = 0.664<br>RMSE = 0.440', showarrow: false, align: 'right', bordercolor: INK, borderwidth: 1, borderpad: 4, bgcolor: '#fff', font: { size: 11 } }],
     }, CONFIG);
