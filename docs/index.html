@@ -417,11 +417,39 @@
       <span class="para-label">Model family.</span>
       Each teacher belongs to a model family (Gemma, Llama, Aya, and so on), and models within a family tend to share tokenization schemes and pretraining data. We test whether this shared lineage makes a family a useful signal for pairing a teacher with a student.
     </p>
-    <!-- §3.2: generalization_base_models.pdf (table of PG-Score across OLMo 3 / Llama 3 / Gemma 3 / Qwen 3
-         bases + Spearman rank-correlation heatmap). Takeaway: match teacher-student model families (+20.5%). -->
-    <div class="figure-mount">
-      <p class="placeholder">[ in progress ]</p>
+    <div class="finding-split">
+      <div>
+        <p><span class="section-label">Setup</span>Instead of finetuning the student from OLMo 3 7B, we repeat the evaluation with three other base models (Llama 3.1 8B, Gemma 3 4B, and Qwen 3 8B) and recompute PG-Score on German, Indonesian, and Arabic.</p>
+        <p><span class="section-label">Results</span>The best teachers stay consistent across base models: Gemma 3 27B and Aya Expanse 32B remain in the top three regardless of the student. Teacher rankings correlate moderately to strongly across bases (Spearman &rho; = 0.57 to 0.87), and family-matched teacher&ndash;student pairs (e.g., a Gemma teacher with a Gemma student) achieve at least +20.5% higher PG-Score than a mismatched baseline.</p>
+      </div>
+      <figure class="split-fig">
+        <div class="chart-mount" id="chart-family-corr"></div>
+        <figcaption class="caption"><strong>Spearman rank correlation &rho; of teacher model rankings across base models.</strong> Higher values mean two base models agree on which teachers are best; OLMo 3 and Gemma 3 agree most strongly.</figcaption>
+      </figure>
     </div>
+    <details class="data-details">
+      <summary>See the scores across base models</summary>
+      <div class="table-scroll">
+        <table class="chia">
+          <caption><strong>Average PG-Score of each teacher across four student base models.</strong> The best teacher for each base model is in <strong>bold</strong>.</caption>
+          <thead>
+            <tr><th style="text-align:left">Teacher Model</th><th>OLMo 3 7B</th><th>Gemma 3 4B</th><th>Qwen 3 8B</th><th>Llama 3 8B</th></tr>
+          </thead>
+          <tbody>
+            <tr><td style="text-align:left">GPT 4o mini</td><td>0.551</td><td><strong>1.022</strong></td><td>1.005</td><td>0.621</td></tr>
+            <tr><td style="text-align:left">Llama 3.1 70B Inst.</td><td>0.138</td><td>0.338</td><td>1.039</td><td>0.497</td></tr>
+            <tr><td style="text-align:left">Llama 3.1 8B Inst.</td><td>-0.160</td><td>-0.133</td><td>0.365</td><td>0.048</td></tr>
+            <tr><td style="text-align:left">Command A</td><td>0.459</td><td>0.725</td><td>0.974</td><td>0.737</td></tr>
+            <tr><td style="text-align:left">Aya Expanse 32B</td><td><strong>0.854</strong></td><td>0.762</td><td>1.183</td><td>0.793</td></tr>
+            <tr><td style="text-align:left">Gemma 3 27B Inst.</td><td>0.672</td><td>0.810</td><td>1.301</td><td>0.800</td></tr>
+            <tr><td style="text-align:left">Gemma 3 12B Inst.</td><td>0.481</td><td>0.666</td><td><strong>1.393</strong></td><td>0.804</td></tr>
+            <tr><td style="text-align:left">Gemma 3 4B Inst.</td><td>0.350</td><td>0.712</td><td>0.545</td><td><strong>1.062</strong></td></tr>
+            <tr><td style="text-align:left">IBM Granite 4.0</td><td>0.283</td><td>0.278</td><td>0.831</td><td>-0.001</td></tr>
+            <tr><td style="text-align:left">IBM Granite Micro</td><td>0.164</td><td>0.455</td><td>1.079</td><td>0.396</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
 
     <p>
       <span class="para-label">Data generation method.</span>
