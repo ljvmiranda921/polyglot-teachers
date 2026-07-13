@@ -132,7 +132,7 @@
 
   const pcaMount = document.getElementById('chart-pca-loadings');
   if (pcaMount) {
-    const features = ['Distinct<br>Prompts', 'Distinct<br>Responses', 'Perplexity', 'Rubric Score', 'Prompt Length', 'Response Length'];
+    const features = ['Distinct<br>Prompts', 'Distinct<br>Responses', 'Perplexity', 'Rubric<br>Score', 'Prompt<br>Length', 'Response<br>Length'];
     const pcs = ['PC1', 'PC2', 'PC3', 'PC4', 'PC5', 'PC6'];
     const loadings = [
       [0.073, 0.654, 0.008, 0.744, 0.012, -0.117],
@@ -179,7 +179,7 @@
         hovertemplate: lang + '<br>actual: %{x:.3f}<br>predicted: %{y:.3f}<extra></extra>' };
     });
     Plotly.newPlot(pcaScatter, [diag, ...traces], {
-      margin: { l: 48, r: 10, t: 6, b: 40 }, height: 440, font: FONT,
+      margin: { l: 48, r: 10, t: 6, b: 40 }, height: 360, font: FONT,
       paper_bgcolor: '#fff', plot_bgcolor: '#fff',
       legend: { orientation: 'h', y: -0.2, font: { size: 11 } },
       xaxis: { title: { text: 'Actual Benchmark Score', font: { size: 12 } }, gridcolor: '#eee', zeroline: false, range: [0.295, 0.405], tickvals: [0.30, 0.35, 0.40], constrain: 'domain' },
