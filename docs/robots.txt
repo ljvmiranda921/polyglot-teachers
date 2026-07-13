@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ljvmiranda921.github.io/polyglot-teachers/sitemap.xml

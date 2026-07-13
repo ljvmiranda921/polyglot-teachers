@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Post-Trainer's Guide for Multilingual Synthetic Data Generation</title>
+  <meta name="description" content="By generating over 1.4M synthetic examples from 10 teacher models, and training 240 student models, we study the multilingual synthetic data pipeline and distill it into a recipe.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://ljvmiranda921.github.io/polyglot-teachers/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="The Post-Trainer's Guide for Multilingual Synthetic Data Generation">
+  <meta property="og:description" content="By generating over 1.4M synthetic examples from 10 teacher models, and training 240 student models, we study the multilingual synthetic data pipeline and distill it into a recipe.">
+  <meta property="og:url" content="https://ljvmiranda921.github.io/polyglot-teachers/">
+  <meta property="og:image" content="https://ljvmiranda921.github.io/polyglot-teachers/assets/social-preview.png">
+  <meta property="og:image:width" content="1671">
+  <meta property="og:image:height" content="607">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Post-Trainer's Guide for Multilingual Synthetic Data Generation">
+  <meta name="twitter:description" content="By generating over 1.4M synthetic examples from 10 teacher models, and training 240 student models, we study the multilingual synthetic data pipeline and distill it into a recipe.">
+  <meta name="twitter:image" content="https://ljvmiranda921.github.io/polyglot-teachers/assets/social-preview.png">
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ScholarlyArticle",
+      "headline": "Polyglot Teachers: Evaluating Language Models for Multilingual Synthetic Data Generation",
+      "author": [
+        { "@type": "Person", "name": "Lester James V. Miranda" },
+        { "@type": "Person", "name": "Ivan Vulić" },
+        { "@type": "Person", "name": "Anna Korhonen" }
+      ],
+      "url": "https://ljvmiranda921.github.io/polyglot-teachers/",
+      "sameAs": "https://arxiv.org/abs/2604.11290"
+    }
+  </script>
+
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+  <link rel="apple-touch-icon" href="assets/favicon.png">
+
+  <link rel="stylesheet" href="css/chia.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="chia-page">
+
+  <div class="letterhead" aria-label="Affiliations">
+    <img src="assets/ucam-logo-colour-preferred.png" alt="University of Cambridge">
+    <img src="assets/ltl_logo2.svg" alt="Language Technology Lab">
+  </div>
+
+  <header class="site-header">
+    <h1>The Post-Trainer's Guide for Multilingual Synthetic Data Generation</h1>
+    <!-- <p class="subtitle">A companion to <a href="https://arxiv.org/abs/2604.11290">Polyglot Teachers: Evaluating Language Models for Multilingual Synthetic Data Generation</a></p> -->
+    <p class="tagline">By generating <strong>over 1.4M synthetic examples</strong> from <strong>10 teacher models</strong>, and training <strong>over 240 student models</strong>, we study the multilingual synthetic data pipeline and distill it into a recipe.</p>
+    <p class="authors">
+      <a href="https://ljvmiranda921.github.io">Lester James V. Miranda</a>, <a href="https://sites.google.com/site/ivanvulic/">Ivan Vulić</a>, <a href="https://sites.google.com/site/annakorhonen/">Anna Korhonen</a>
+      <br><span class="aff">Language Technology Lab, University of Cambridge</span>
+      <br><span class="aff">Correspondence to <a href="mailto:ljvm2@cam.ac.uk">ljvm2@cam.ac.uk</a></span>
+    </p>
+    <nav class="top-links">
+      <a class="btn" href="https://arxiv.org/abs/2604.11290" target="_blank" rel="noopener noreferrer">Paper</a>
+      <a class="btn" href="https://github.com/ljvmiranda921/multilingual-teacher-eval" target="_blank" rel="noopener noreferrer">Code</a>
+      <a class="btn" href="https://huggingface.co/collections/ljvmiranda921/polyglot-teachers" target="_blank" rel="noopener noreferrer">HuggingFace</a>
+    </nav>
+  </header>
+
+  <section id="background">
+    <p>
+      High-quality training data is often scarce for less-resourced languages, and collecting it from native speakers demands substantial human effort, creating a bottleneck for language-specific model development.
+      To alleviate this challenge, <strong>synthetic data generation</strong> has gained traction as a promising solution: a typically larger <em>teacher model</em> generates training examples, which are then used to finetune a smaller <em>student model</em> to replicate the knowledge of the teacher.
+    </p>
+    <p>
+      In this work, we study the key design decisions in the synthetic data pipeline: which <strong>teacher model</strong> to use, which <strong>data generation method</strong> to apply, and how these choices play out across languages.
+      Based on our findings, we <strong>recommend a recipe</strong> for generating multilingual synthetic data.
+    </p>
+  </section>
+
+  <details class="data-details toc">
+    <summary>Contents</summary>
+    <nav aria-label="Table of contents">
+      <ol>
+        <li><a href="#framework">Our evaluation framework</a></li>
+        <li><a href="#findings">Experiments &amp; Findings</a>
+          <ol>
+            <li><a href="#f-teachers">Which teacher model excels in multilingual data generation?</a></li>
+            <li><a href="#f-qualities">Which qualities of the dataset predict downstream performance?</a></li>
+            <li><a href="#f-heuristics">What are some heuristics for choosing a teacher model?</a></li>
+          </ol>
+        </li>
+        <li><a href="#discussion">Discussion: Towards a recipe for multilingual synthetic data generation</a></li>
+        <li><a href="#case-study">Our recipe in practice: Tagalog case study</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+        <li><a href="#citation">Citation</a></li>
+      </ol>
+    </nav>
+  </details>
+
+  <section id="framework">
+    <h2>Our evaluation framework</h2>
+    <p>
+      We study three synthetic data generation approaches commonly found in the literature.<sup class="sidenote-marker">1</sup>
+      <span class="sidenote"><sup>1</sup> We conduct a brief review of synthetic data approaches in our <a href="https://arxiv.org/abs/2604.11290" target="_blank" rel="noopener noreferrer">paper</a> (Appendix A).</span>
+    </p>
+    <div class="method-cards" id="method-cards">
+      <figure class="method-card">
+        <figcaption>
+          <h3>Generate</h3>
+          <p class="caption">Create a brand-new pair from few-shot seed examples.</p>
+        </figcaption>
+        <div class="method-chat">
+          <div class="chat-item from-seed">
+            <span class="msg-label">seed example (ja)</span>
+            <div class="msg seed">Q: 空はなぜ青いの？<br>A: 光が散乱するからです。</div>
+          </div>
+          <div class="chat-item from-seed">
+            <span class="msg-label">seed example (ja)</span>
+            <div class="msg seed">Q: 雨はどうして降るの？<br>A: 雲の水滴が重くなるからです。</div>
+          </div>
+          <div class="chat-item from-teacher">
+            <span class="msg-label">teacher &middot; new pair (ja)</span>
+            <div class="msg teacher">Q: 虹はどうやってできるの？<br>A: 光が水滴の中で屈折してできます。</div>
+            <div class="msg teacher typing"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </figure>
+      <figure class="method-card">
+        <figcaption>
+          <h3>Translate</h3>
+          <p class="caption">Translate an English prompt, then respond in the target language.</p>
+        </figcaption>
+        <div class="method-chat">
+          <div class="chat-item from-seed">
+            <span class="msg-label">seed prompt (en)</span>
+            <div class="msg seed">How do I make pancakes?</div>
+          </div>
+          <div class="chat-item from-teacher">
+            <span class="msg-label">teacher &middot; translated prompt (de)</span>
+            <div class="msg teacher">Wie mache ich Pfannkuchen?</div>
+            <div class="msg teacher typing"><span></span><span></span><span></span></div>
+          </div>
+          <div class="chat-item from-teacher">
+            <span class="msg-label">teacher &middot; response (de)</span>
+            <div class="msg teacher">Mische Mehl, Eier und Milch, dann brate den Teig goldbraun in der Pfanne.</div>
+            <div class="msg teacher typing"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </figure>
+      <figure class="method-card">
+        <figcaption>
+          <h3>Respond</h3>
+          <p class="caption">Answer an existing prompt in the target language.</p>
+        </figcaption>
+        <div class="method-chat">
+          <div class="chat-item from-seed">
+            <span class="msg-label">seed prompt (id)</span>
+            <div class="msg seed">Apa makanan khas Bandung?</div>
+          </div>
+          <div class="chat-item from-teacher">
+            <span class="msg-label">teacher &middot; response (id)</span>
+            <div class="msg teacher">Beberapa makanan khas Bandung adalah batagor, siomay, dan surabi.</div>
+            <div class="msg teacher typing"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </figure>
+    </div>
+    <p class="scroll-hint caption">Swipe to see all three methods <span class="scroll-tri">&#9656;</span></p>
+    <p>
+      The output is a set of question-answer pairs in the target language, quite similar to the conversations we have when talking to an AI assistant. These pairs are commonly used for supervised finetuning (SFT), which involves training a student model to mimic the teacher's outputs.
+    </p>
+    <p>
+      <span class="para-label">Synthetic data pipeline.</span>
+      We then formalize the post-training synthetic data generation pipeline.
+    </p>
+    <div id="pgscore-figure" class="pgscore">
+      <div class="pg-pipeline">
+        <div class="pg-node pg-anim" data-step="seed">
+          <div class="pg-vis">
+            <div class="pg-stack"><span class="sheet"></span><span class="sheet"></span><span class="sheet"></span></div>
+          </div>
+          <span class="pg-node-label">Seed dataset</span>
+        </div>
+        <div class="pg-harrow pg-anim" data-step="arrow1">
+          <span class="pg-arrow-label"></span>
+          <span class="shaft"></span>
+        </div>
+        <div class="pg-node pg-anim" data-step="teacher">
+          <div class="pg-vis">
+            <div class="pg-cube pg-cube-lg" id="pg-cube-teacher"></div>
+          </div>
+          <span class="pg-node-label em">Teacher model</span>
+        </div>
+        <div class="pg-harrow pg-anim" data-step="arrow2">
+          <span class="shaft"></span>
+        </div>
+        <div class="pg-op-col">
+          <div class="pg-vis">
+            <div class="pg-sft-box pg-anim" data-step="synth">Synthesize<span class="sub">Generate<br>Translate<br>Respond</span></div>
+          </div>
+        </div>
+        <div class="pg-harrow pg-anim" data-step="arrow2b">
+          <span class="shaft"></span>
+        </div>
+        <div class="pg-node pg-anim" data-step="chat">
+          <div class="pg-vis">
+            <div class="pg-chat-stack">
+            <div class="pg-chat">
+              <div class="msg seed"><span class="bar" style="width: 78%"></span><span class="bar" style="width: 52%"></span></div>
+              <div class="msg teacher"><span class="bar" style="width: 82%"></span><span class="bar" style="width: 64%"></span></div>
+              <div class="msg seed"><span class="bar" style="width: 58%"></span></div>
+              <div class="msg teacher"><span class="bar" style="width: 86%"></span><span class="bar" style="width: 44%"></span></div>
+            </div>
+            </div>
+          </div>
+          <span class="pg-node-label em">Synthetic dataset</span>
+        </div>
+        <div class="pg-harrow pg-anim" data-step="arrow3">
+          <span class="pg-arrow-label"></span>
+          <span class="shaft"></span>
+        </div>
+        <div class="pg-sft-col">
+          <div class="pg-vis">
+            <div class="pg-sft-box pg-anim" data-step="sft">Supervised<br>Finetuning</div>
+          </div>
+          <div class="pg-uparrow pg-anim" data-step="arrowbase"><span class="shaft"></span></div>
+          <div class="pg-node pg-anim" data-step="base">
+            <div class="pg-cube pg-cube-sm" id="pg-cube-base"></div>
+            <span class="pg-node-label">Base model</span>
+          </div>
+        </div>
+        <div class="pg-harrow pg-anim" data-step="arrow4">
+          <span class="pg-arrow-label"></span>
+          <span class="shaft"></span>
+        </div>
+        <div class="pg-node pg-anim" data-step="student">
+          <div class="pg-vis">
+            <div class="pg-cube pg-cube-sm" id="pg-cube-student"></div>
+          </div>
+          <span class="pg-node-label em">Student model</span>
+        </div>
+      </div>
+      <p class="scroll-hint caption">Swipe to see the full pipeline <span class="scroll-tri">&#9656;</span></p>
+      <p class="caption pg-caption">
+        <strong>The synthetic data pipeline.</strong>
+        Given a seed dataset, a teacher model synthesizes prompt&ndash;response pairs to form a synthetic dataset. Supervised finetuning on a base model results in a student model that learns from the teacher-generated outputs.
+      </p>
+    </div>
+    <p>
+      To evaluate a synthetic data recipe, we measure two things: (1) the <strong>intrinsic</strong> quality of the synthetic dataset itself, and (2) the <strong>extrinsic</strong> performance of a student model trained on that data across a diverse set of multilingual tasks.
+      We find it important to consider both, since synthetic datasets enter the data commons and get reused, while student models are deployed in real-world applications.
+      To do so, we introduce the <span class="brand">Polyglot Score</span> (PG-Score), which combines both aspects into a single number:
+    </p>
+    <div class="pg-equation" role="img" aria-label="Polyglot Score equals Multilingual Data Quality plus Student Model Performance">
+      <span class="pg-badge">Polyglot Score</span>
+      <span class="pg-op">=</span>
+      <span class="pg-term">
+        <span class="pg-term-icon">
+          <span class="mini-stack" aria-hidden="true">
+            <span class="mini-sheet"></span>
+            <span class="mini-chat">
+              <span class="mini-bubble seed"></span>
+              <span class="mini-bubble teacher"></span>
+              <span class="mini-bubble seed short"></span>
+            </span>
+          </span>
+        </span>
+        <span class="pg-term-text">Multilingual<br>Data Quality</span>
+      </span>
+      <span class="pg-op">+</span>
+      <span class="pg-term">
+        <span class="pg-term-icon">
+          <span class="pg-cube pg-cube-xs" id="metric-cube-student"></span>
+        </span>
+        <span class="pg-term-text">Student Model<br>Performance</span>
+      </span>
+    </div>
+    <div class="metrics-duo">
+      <div class="pg-panel panel metric-box metric-intrinsic">
+        <h4><span class="metric-tag">Intrinsic</span> Multilingual Data Quality</h4>
+        <div class="metric-choices">
+            <button type="button" class="btn metric-btn is-active" data-metric="diversity">Diversity</button>
+            <button type="button" class="btn metric-btn" data-metric="perplexity">Perplexity</button>
+            <button type="button" class="btn metric-btn" data-metric="reward">Reward score</button>
+          </div>
+          <div class="metric-detail-item is-active" data-metric="diversity">
+            <p>A corpus-level statistic that measures how varied the generated prompts and responses are.</p>
+            <p class="how"><strong>Computation:</strong> cosine distance of the prompt and response embeddings, embedded with Llama-Embed-Nemotron-8B <a class="cite" href="https://arxiv.org/abs/2511.07025" target="_blank" rel="noopener noreferrer">(Babakhin et al., 2025)</a>, the top-performing model on the MMTEB leaderboard.</p>
+          </div>
+          <div class="metric-detail-item" data-metric="perplexity">
+            <p>Measures the fluency and naturalness of the generated text: lower perplexity indicates more coherent and linguistically natural responses.</p>
+            <p class="how"><strong>Computation:</strong> the perplexity of a base model on the response, conditioned on the prompt.</p>
+          </div>
+          <div class="metric-detail-item" data-metric="reward">
+            <p>Scores the quality of each prompt&ndash;response pair based on rubrics relating to fluency, naturalness, and instruction-following.</p>
+            <p class="how"><strong>Computation:</strong> the verbalized score (1&ndash;5) of M-Prometheus 14B <a class="cite" href="https://openreview.net/forum?id=Atyk8lnIQQ" target="_blank" rel="noopener noreferrer">(Pombal et al., 2025)</a> prompted as a multilingual LLM judge, chosen for its high performance on human-aligned evaluation benchmarks.</p>
+          </div>
+      </div>
+
+      <div class="pg-panel panel metric-box metric-extrinsic">
+        <h4><span class="metric-tag">Extrinsic</span> Student Model Performance</h4>
+        <div class="metric-choices">
+          <button type="button" class="btn metric-btn is-active" data-metric="culture">Global-MMLU Lite</button>
+          <button type="button" class="btn metric-btn" data-metric="chat">M-RewardBench</button>
+          <button type="button" class="btn metric-btn" data-metric="math">M-GSM</button>
+        </div>
+        <div class="metric-detail-item is-active" data-metric="culture">
+          <p>Tests cultural and factual knowledge in the target language <a class="cite" href="https://arxiv.org/abs/2412.03304" target="_blank" rel="noopener noreferrer">(Singh et al., 2025)</a>: 400 multiple-choice questions per language (half culturally sensitive, half culturally agnostic) localized from English by native speakers.</p>
+          <p class="how"><strong>Evaluation:</strong> zero-shot multiple-choice formulation, reporting accuracy.</p>
+        </div>
+        <div class="metric-detail-item" data-metric="chat">
+          <p>Tests alignment with human preferences in conversational settings <a class="cite" href="https://arxiv.org/abs/2410.15522" target="_blank" rel="noopener noreferrer">(Gureja et al., 2025)</a>: 2.87k preference instances per language covering chat, safety, and reasoning categories.</p>
+          <p class="how"><strong>Evaluation:</strong> multiple-choice formulation, reporting weighted accuracy for each data subset and category.</p>
+        </div>
+        <div class="metric-detail-item" data-metric="math">
+          <p>Tests mathematical reasoning in the target language <a class="cite" href="https://arxiv.org/abs/2210.03057" target="_blank" rel="noopener noreferrer">(Shi et al., 2023)</a>: 250 grade-school math word problems from GSM8K <a class="cite" href="https://arxiv.org/abs/2110.14168" target="_blank" rel="noopener noreferrer">(Cobbe et al., 2021)</a>, manually translated from English by native speakers.</p>
+          <p class="how"><strong>Evaluation:</strong> generative with 5 few-shot examples, reporting exact-match accuracy.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="findings">
+    <h2>Experiments &amp; Findings</h2>
+    <p>
+      We test <strong>10 teacher models</strong> on <strong>6 typologically diverse languages</strong> (Arabic, Czech, German, Spanish, Indonesian, and Japanese), chosen for their variation in resource availability, script, and language family.
+      In total, we generate <strong>over 1.4M SFT instances</strong> and train <strong>240 student models</strong>.
+    </p>
+
+    <h3 id="f-teachers">Which teacher model excels in multilingual data generation?</h3>
+    <div class="finding-split finding-split--fig">
+      <div>
+        <p><span class="section-label">Setup</span>We select 10 state-of-the-art models that vary in scale, architecture, and training data, then evaluate them as teachers by generating 10.5k prompt&ndash;response pairs for each teacher&ndash;language pair and finetuning an OLMo 3 7B student on each.</p>
+        <p><span class="section-label">Results</span>Gemma 3 27B (0.726) and Aya Expanse 32B (0.706) emerge as the most effective teachers, both outperforming larger models like Llama 3.1 70B (0.140).<sup class="sidenote-marker">2</sup> Smaller models can teach well too: Gemma 3 12B and 4B rank in the top five, while the Gemma 3 family dominates overall and the Llama 3.1 family underperforms. Teacher effectiveness also varies by language: German and Spanish score highly across the board, while Arabic is hard for most teachers.</p>
+      </div>
+      <figure class="split-fig">
+        <div class="chart-chips" id="chart-teachers-chips">
+          <button type="button" class="btn chart-chip is-active" data-key="Average">Average</button>
+          <button type="button" class="btn chart-chip" data-key="ar">Arabic</button>
+          <button type="button" class="btn chart-chip" data-key="cs">Czech</button>
+          <button type="button" class="btn chart-chip" data-key="de">German</button>
+          <button type="button" class="btn chart-chip" data-key="es">Spanish</button>
+          <button type="button" class="btn chart-chip" data-key="id">Indonesian</button>
+          <button type="button" class="btn chart-chip" data-key="ja">Japanese</button>
+        </div>
+        <div class="chart-mount" id="chart-teachers"></div>
+        <figcaption class="caption"><strong>PG-Score of each teacher model.</strong> Higher is better; 0 marks an average teacher (PG-Score is z-score normalized). The top three teachers for the selected language are shown in blue. Use the chips to switch languages.</figcaption>
+      </figure>
+    </div>
+    <div class="sidenote sidenote--stat">
+      <p><sup>2</sup> <strong>Does &ldquo;strength&rdquo; explain this?</strong> We find no evidence that it does: a mixed-effects regression of PG-Score on a teacher&rsquo;s parameter size and average multilingual benchmark performance leaves both predictors non-significant.</p>
+      <table class="chia reg-table reg-table--mini">
+        <thead>
+          <tr><th style="text-align:left">Predictor</th><th>&beta;</th><th>SE</th><th>p</th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="text-align:left">log(size)</td><td>0.053</td><td>0.080</td><td>0.507</td></tr>
+          <tr><td style="text-align:left">benchmark</td><td>1.387</td><td>2.204</td><td>0.529</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details class="data-details">
+      <summary>See the full table</summary>
+      <div class="table-scroll">
+        <table class="chia">
+          <caption><strong>Top models with the highest PG-Score (average across six languages).</strong> We evaluate teacher models with varying size and model family on 6 typologically diverse languages. The best model is in <strong>bold</strong> and the second-best is <u>underlined</u>.</caption>
+          <thead>
+            <tr>
+              <th style="text-align:left">Teacher Model</th>
+              <th>Average</th><th>ar</th><th>cs</th><th>de</th><th>es</th><th>id</th><th>ja</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="text-align:left">Gemma 3 27B Inst.</td><td class="is-highlight"><strong>0.726</strong></td><td><strong>0.145</strong></td><td><strong>0.360</strong></td><td>1.655</td><td><strong>1.358</strong></td><td>0.214</td><td><u>0.626</u></td></tr>
+            <tr><td style="text-align:left">Aya Expanse 32B</td><td class="is-highlight"><u>0.706</u></td><td><u>-0.058</u></td><td>0.222</td><td>1.468</td><td>1.129</td><td><strong>1.153</strong></td><td>0.320</td></tr>
+            <tr><td style="text-align:left">Gemma 3 12B Inst.</td><td class="is-highlight">0.595</td><td>-0.464</td><td>0.327</td><td><u>1.756</u></td><td><u>1.228</u></td><td>0.151</td><td>0.573</td></tr>
+            <tr><td style="text-align:left">Command A</td><td class="is-highlight">0.546</td><td>-1.360</td><td>0.114</td><td>1.673</td><td>1.102</td><td><u>1.063</u></td><td><strong>0.683</strong></td></tr>
+            <tr><td style="text-align:left">Gemma 3 4B Inst.</td><td class="is-highlight">0.469</td><td>-0.488</td><td><u>0.330</u></td><td>1.644</td><td>0.929</td><td>-0.105</td><td>0.504</td></tr>
+            <tr><td style="text-align:left">GPT 4o mini</td><td class="is-highlight">0.461</td><td>-1.117</td><td>0.015</td><td><strong>1.766</strong></td><td>0.908</td><td>1.003</td><td>0.189</td></tr>
+            <tr><td style="text-align:left">IBM Granite 4.0</td><td class="is-highlight">0.312</td><td>-0.072</td><td>-0.031</td><td>1.000</td><td>0.734</td><td>-0.079</td><td>0.321</td></tr>
+            <tr><td style="text-align:left">IBM Granite Micro</td><td class="is-highlight">0.304</td><td>-0.282</td><td>0.290</td><td>1.102</td><td>0.783</td><td>-0.329</td><td>0.264</td></tr>
+            <tr><td style="text-align:left">Llama 3.1 70B Inst.</td><td class="is-highlight">0.140</td><td>-0.964</td><td>0.109</td><td>1.195</td><td>0.688</td><td>0.182</td><td>-0.373</td></tr>
+            <tr><td style="text-align:left">Llama 3.1 8B Inst.</td><td class="is-highlight">-0.356</td><td>-1.693</td><td>-0.974</td><td>0.891</td><td>0.182</td><td>0.322</td><td>-0.863</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <h3 id="f-qualities">Which qualities of the dataset predict downstream performance?</h3>
+    <p>
+      <span class="section-label">Setup</span>In order to identify which qualities of the generated data drive student performance, we run principal component analysis (PCA) on the six intrinsic data-quality metrics, then fit a linear model that uses the resulting principal components to predict downstream student performance.
+    </p>
+    <div class="chart-duo">
+      <figure>
+        <div class="chart-mount" id="chart-pca-loadings"></div>
+        <figcaption class="caption"><strong>Loading strength of intrinsic metrics on the principal components (PCs).</strong> PC1 suggests that good teachers produce diverse and high-quality responses, while PC2 focuses on prompt diversity and length. PC3 and PC4, together, indicates the importance of prompts on student performance.</figcaption>
+      </figure>
+      <figure>
+        <div class="chart-mount" id="chart-pca-scatter"></div>
+        <figcaption class="caption"><strong>Fit of a linear regression model on the PCs of the intrinsic metrics to predict student performance.</strong> Intrinsic metrics, via their PCs, can predict extrinsic student performance (R&sup2; = 0.664 and RMSE = 0.440) on multilingual benchmarks.</figcaption>
+      </figure>
+    </div>
+    <p>
+      <span class="section-label">Results</span>The first four components explain over <strong>93.3%</strong> of the variance in the intrinsic metrics,<sup class="sidenote-marker">3</sup> and those components predict student performance with <strong>R&sup2; = 0.664</strong> from a simple linear model. In other words, the qualities of the generated data carry most of the signal about how well a student will learn.
+    </p>
+    <div class="sidenote sidenote--stat">
+      <p><sup>3</sup> <strong>Variance explained by the PCA.</strong> Four principal components account for <strong>93.3%</strong> cumulative variance from the intrinsic data-quality metrics.</p>
+      <table class="chia reg-table reg-table--mini">
+        <thead>
+          <tr><th style="text-align:left">PC</th><th>Variance Expl.</th><th>Cumulative</th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="text-align:left">PC 1</td><td>42.2%</td><td>42.2%</td></tr>
+          <tr><td style="text-align:left">PC 2</td><td>22.1%</td><td>64.3%</td></tr>
+          <tr><td style="text-align:left">PC 3</td><td>16.5%</td><td>80.8%</td></tr>
+          <tr><td style="text-align:left">PC 4</td><td>12.6%</td><td>93.3%</td></tr>
+          <tr><td style="text-align:left">PC 5</td><td>3.5%</td><td>96.8%</td></tr>
+          <tr><td style="text-align:left">PC 6</td><td>3.2%</td><td>100.0%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="f-heuristics">What are some heuristics for choosing a teacher model?</h3>
+    <p>
+      In order to distill some heuristics for choosing a teacher model, we test different aspects such as <strong>model family</strong>, <strong>data generation method</strong>, and <strong>amount of SFT examples</strong>. We note that these observations are conditional on our setup&mdash;the tasks and languages we evaluate on&mdash;and may not hold in every setting.
+    </p>
+
+    <p class="subpart-lead">
+      <span class="para-label">Model family.</span>
+      Each teacher belongs to a model family (Gemma, Llama, Aya, and so on), and models within a family tend to share tokenization schemes and pretraining data. We test whether this shared lineage makes a family a useful signal for pairing a teacher with a student.
+    </p>
+    <div class="finding-split">
+      <div>
+        <p><span class="section-label">Setup</span>Instead of finetuning the student from OLMo 3 7B, we repeat the evaluation with three other base models (Llama 3.1 8B, Gemma 3 4B, and Qwen 3 8B) and recompute PG-Score on German, Indonesian, and Arabic.</p>
+        <p><span class="section-label">Results</span>The best teachers stay consistent across base models: Gemma 3 27B and Aya Expanse 32B remain in the top three regardless of the student. Teacher rankings correlate moderately to strongly across bases (Spearman &rho; = 0.57 to 0.87), and family-matched teacher&ndash;student pairs (e.g., a Gemma teacher with a Gemma student) achieve at least +20.5% higher PG-Score than a mismatched baseline.</p>
+      </div>
+      <figure class="split-fig">
+        <div class="chart-mount" id="chart-family-corr"></div>
+        <figcaption class="caption"><strong>Spearman rank correlation &rho; of teacher model rankings across base models.</strong> Higher values mean two base models agree on which teachers are best; OLMo 3 and Gemma 3 agree most strongly.</figcaption>
+      </figure>
+    </div>
+    <details class="data-details">
+      <summary>See the scores across base models</summary>
+      <div class="table-scroll">
+        <table class="chia">
+          <caption><strong>Average PG-Score of each teacher across four student base models.</strong> For each base model, the <span class="hl-key hl-1">best</span>, <span class="hl-key hl-2">second</span>, and <span class="hl-key hl-3">third</span> best teachers are highlighted.</caption>
+          <thead>
+            <tr><th style="text-align:left">Teacher Model</th><th>OLMo 3 7B</th><th>Gemma 3 4B</th><th>Qwen 3 8B</th><th>Llama 3 8B</th></tr>
+          </thead>
+          <tbody>
+            <tr><td style="text-align:left">GPT 4o mini</td><td class="hl-3">0.551</td><td class="hl-1"><strong>1.022</strong></td><td>1.005</td><td>0.621</td></tr>
+            <tr><td style="text-align:left">Llama 3.1 70B Inst.</td><td>0.138</td><td>0.338</td><td>1.039</td><td>0.497</td></tr>
+            <tr><td style="text-align:left">Llama 3.1 8B Inst.</td><td>-0.160</td><td>-0.133</td><td>0.365</td><td>0.048</td></tr>
+            <tr><td style="text-align:left">Command A</td><td>0.459</td><td>0.725</td><td>0.974</td><td>0.737</td></tr>
+            <tr><td style="text-align:left">Aya Expanse 32B</td><td class="hl-1"><strong>0.854</strong></td><td class="hl-3">0.762</td><td class="hl-3">1.183</td><td>0.793</td></tr>
+            <tr><td style="text-align:left">Gemma 3 27B Inst.</td><td class="hl-2">0.672</td><td class="hl-2">0.810</td><td class="hl-2">1.301</td><td class="hl-3">0.800</td></tr>
+            <tr><td style="text-align:left">Gemma 3 12B Inst.</td><td>0.481</td><td>0.666</td><td class="hl-1"><strong>1.393</strong></td><td class="hl-2">0.804</td></tr>
+            <tr><td style="text-align:left">Gemma 3 4B Inst.</td><td>0.350</td><td>0.712</td><td>0.545</td><td class="hl-1"><strong>1.062</strong></td></tr>
+            <tr><td style="text-align:left">IBM Granite 4.0</td><td>0.283</td><td>0.278</td><td>0.831</td><td>-0.001</td></tr>
+            <tr><td style="text-align:left">IBM Granite Micro</td><td>0.164</td><td>0.455</td><td>1.079</td><td>0.396</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <p class="subpart-lead">
+      <span class="para-label">Data generation method.</span>
+      The three methods make different assumptions: <em>Generate</em> depends on the quality of the few-shot seed examples, <em>Translate</em> transfers from widely-available English prompts, and <em>Respond</em> reuses existing prompts in the target language. These assumptions may favor different languages depending on how much data they already have.
+    </p>
+    <p><span class="section-label">Setup</span>For each method in isolation, we generate 10k samples per teacher&ndash;language pair, finetune an OLMo 3 7B student, and compute PG-Score. We test three teachers spanning high to low PG-Score (Gemma 3 27B, Aya Expanse 32B, Llama 3.1 70B) across German, Indonesian, and Arabic.</p>
+    <div class="table-scroll">
+      <table class="chia">
+        <caption><strong>PG-Score across the three data generation methods.</strong> For each teacher and language, the best method is <span class="hl-key hl-1">highlighted</span>.</caption>
+        <thead>
+          <tr><th rowspan="2" style="text-align:left">Teacher Model</th><th colspan="3">Arabic (ar)</th><th colspan="3">German (de)</th><th colspan="3">Indonesian (id)</th></tr>
+          <tr><th>Gen.</th><th>Tr.</th><th>Resp.</th><th>Gen.</th><th>Tr.</th><th>Resp.</th><th>Gen.</th><th>Tr.</th><th>Resp.</th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="text-align:left">Gemma 3 27B Inst.</td><td>0.032</td><td>0.276</td><td class="hl-1"><strong>0.802</strong></td><td class="hl-1"><strong>2.140</strong></td><td>2.086</td><td>1.212</td><td>1.189</td><td class="hl-1"><strong>1.196</strong></td><td>0.046</td></tr>
+          <tr><td style="text-align:left">Aya Expanse 32B</td><td>-0.276</td><td class="hl-1"><strong>0.148</strong></td><td>-1.349</td><td class="hl-1"><strong>1.473</strong></td><td>1.255</td><td>1.451</td><td>0.039</td><td>0.733</td><td class="hl-1"><strong>1.606</strong></td></tr>
+          <tr><td style="text-align:left">Llama 3.1 70B Inst.</td><td>-0.867</td><td>-1.025</td><td class="hl-1"><strong>-0.215</strong></td><td class="hl-1"><strong>1.391</strong></td><td>0.459</td><td>1.187</td><td>-0.146</td><td>0.089</td><td class="hl-1"><strong>0.155</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><span class="section-label">Results</span>For a high-resource language like German, the <em>Generate</em> method yields the highest PG-Score, while for less-resourced languages like Arabic and Indonesian, the <em>Respond</em> or <em>Translate</em> methods are more effective. <em>Generate</em> leans on the few-shot seed examples, which are typically of higher quality in high-resource languages.</p>
+
+    <p class="subpart-lead">
+      <span class="para-label">Amount of SFT examples.</span>
+      Generating synthetic data is not free, so we ask how many SFT examples are actually needed to reach stable student performance before the gains level off.
+    </p>
+    <div class="finding-split finding-split--fig">
+      <div>
+        <p><span class="section-label">Setup</span>We finetune an OLMo 3 7B student on <em>n</em> SFT examples, with <em>n</em> ranging from 1k to 50k, using Gemma 3 27B as the teacher on Arabic, German, and Indonesian.</p>
+        <p><span class="section-label">Results</span>Performance improves with more synthetic data, but the gains diminish beyond 10k examples. So roughly <strong>10k examples per language</strong> is enough to reach stable student performance &mdash; generating more mostly adds cost without much benefit.</p>
+      </div>
+      <figure class="split-fig">
+        <div class="chart-mount" id="chart-data-scale"></div>
+        <figcaption class="caption"><strong>Effect of synthetic data scale on student model performance.</strong> Performance improves with more synthetic data, but gains diminish beyond 10k examples.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="discussion">
+    <h2>Discussion: Towards a recipe for multilingual synthetic data generation</h2>
+    <p>
+      Our results provide actionable insights for selecting and effectively using teacher models in multilingual synthetic data generation. We distill them into a recipe of four decisions:
+    </p>
+    <ul class="recipe-list">
+      <li><strong>Teacher model.</strong> Model scale does not significantly predict teacher effectiveness. What matters instead is the quality of the generated data: prompt diversity, response fluency, and length collectively capture over 93% of the variance in intrinsic data quality and predict student performance, offering practitioners a cheaper alternative to full student training runs for screening teacher candidates.</li>
+      <li><strong>Data generation method.</strong> There are language-dependent considerations for data generation. For high-resource languages like German, where seed data quality is high, the <em>Generate</em> method performs best. For less-resourced languages like Arabic and Indonesian, methods that leverage existing prompts (<em>Respond</em>) or transfer from English (<em>Translate</em>) can yield substantial gains over a uniform mix of methods. For truly low-resource languages, we recommend combining synthetic data generation with targeted data collection.</li>
+      <li><strong>Synthetic data scale.</strong> Around 10k synthetic examples per language is sufficient to achieve strong student performance, and generating more mostly adds cost &mdash; though saturation points may depend on task diversity.</li>
+      <li><strong>Student base model.</strong> When the optimal teacher is unknown, matching model families offers a reliable heuristic for teacher selection. Gemma teachers paired with Gemma students, and Llama teachers with Llama students, outperform a mismatched baseline by at least 20%.</li>
+    </ul>
+    <p>
+      Next, we put this recipe into practice on a held-out language, applying the same four decisions.
+    </p>
+  </section>
+
+  <section id="case-study">
+    <h2>Our recipe in practice: Tagalog case study</h2>
+    <p>
+      <span class="section-label">Setup</span>To put the recipe to the test, we apply it to a held-out language that was not part of our evaluation: <strong>Tagalog</strong>, a mid-resource language and the standardized form of Filipino, the national language of the Philippines.
+    </p>
+    <ul class="setup-list">
+      <li><strong>Data:</strong> We collect Filipino seed data from publicly available SFT datasets such as WildChat and the Aya Collection, and include English data from T&uuml;lu 3 for the <em>Translate</em> method.</li>
+      <li><strong>Evaluation:</strong> We evaluate on <a href="https://hf.co/spaces/filbench/filbench-leaderboard" target="_blank" rel="noopener noreferrer">FilBench</a> <a class="cite" href="https://aclanthology.org/2025.emnlp-main.127/" target="_blank" rel="noopener noreferrer">(Miranda et al., 2025)</a>, a Filipino-centric benchmark spanning classical NLP, cultural knowledge, reading comprehension, and generation.</li>
+      <li><strong>Baselines:</strong> We compare our recipe against <strong>10K-Public</strong> (10k Tagalog pairs sampled from public data, a non-synthetic approach) and <strong>10K-GPT-4oM</strong> (10k instances synthesized by an off-the-shelf GPT-4o-mini teacher, chosen ad hoc for its perceived strength).</li>
+    </ul>
+
+    <p>
+      <span class="section-label">Experiment</span>We perform a series of synthetic data interventions using the recipe and recommendations we learned, adding each one on top of the last. Step through them to watch the FilBench score climb.
+    </p>
+    <div class="ablation">
+      <div class="ablation-fig">
+        <div class="chart-mount" id="chart-ablation"></div>
+        <div class="ablation-controls">
+          <button type="button" class="btn" id="abl-back" disabled>&larr;&ensp;Back</button>
+          <span class="ablation-step" id="abl-step">Baseline</span>
+          <button type="button" class="btn" id="abl-next">Next&ensp;&rarr;</button>
+        </div>
+      </div>
+      <aside class="ablation-explain">
+        <h4 id="abl-title"></h4>
+        <p id="abl-prose"></p>
+      </aside>
+    </div>
+    <p class="caption">
+      <strong>Student model performance on a held-out language, Tagalog, across several synthetic data interventions.</strong> Given a held-out language (Tagalog) and an evaluation benchmark (FilBench), we apply data interventions based on our recommendations on creating a multilingual synthetic data recipe. The interventions are additive.
+    </p>
+  </section>
+
+  <section id="conclusion">
+    <h2>Conclusion</h2>
+    <p>
+      We conduct a comprehensive evaluation of state-of-the-art LMs as multilingual teachers for synthetic data generation by assessing both intrinsic data quality and extrinsic student model performance. We find several properties that contribute to teacher effectiveness outside of model size or benchmark performance, such as prompt&ndash;response diversity, fluency, and language representation. Finally, we outline practical recommendations for creating a multilingual synthetic data generation recipe. We hope our findings guide future work on developing inclusive language technologies through high-quality synthetic data.
+    </p>
+  </section>
+
+  <section id="citation">
+    <h2>Citation</h2>
+    <div class="bibtex-wrap">
+      <pre class="panel bibtex"><code id="bibtex-code">@misc{miranda2026polyglotteachersevaluatinglanguage,
+  title={{P}olyglot {T}eachers: {E}valuating {L}anguage {M}odels for {M}ultilingual {S}ynthetic {D}ata {G}eneration},
+  author={Lester James V. Miranda and Ivan Vuli\'{c} and Anna Korhonen},
+  year={2026},
+  eprint={2604.11290},
+  archivePrefix={arXiv},
+  primaryClass={cs.CL},
+  url={https://arxiv.org/abs/2604.11290},
+}
+</code></pre>
+      <button type="button" class="btn copy-btn" data-copy-target="#bibtex-code" aria-label="Copy citation to clipboard">Copy</button>
+    </div>
+  </section>
+
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+  <script src="js/charts.js" defer></script>
+  <script src="js/main.js"></script>
+  <script src="js/methods.js"></script>
+  <script src="js/metrics.js"></script>
+  <script src="js/pgscore.js" type="module"></script>
+</main>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cube material test — Polyglot Score figure</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="css/chia.css">
+  <style>
+    .cube-row { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 2rem; }
+    .cube-row figure { margin: 0; }
+    .cube-mount { width: 240px; height: 240px; }
+    .cube-mount canvas { display: block; }
+    .cube-row figcaption { max-width: 240px; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+<main class="chia-page">
+  <h1 style="font-size: 1.8rem;">Cube material test</h1>
+  <p class="caption">Throwaway page for judging the "liquid chrome" material before building the Polyglot Score figure. All cubes share the same chia-tinted environment (white &rarr; cream &rarr; pink &rarr; blue) and differ only in material parameters.</p>
+  <div class="cube-row">
+    <figure>
+      <div class="cube-mount" data-variant="ink"></div>
+      <figcaption class="caption"><strong>A. Ink chrome.</strong> Near-black metal, full iridescence. Closest to the video's end state.</figcaption>
+    </figure>
+    <figure>
+      <div class="cube-mount" data-variant="pearl"></div>
+      <figcaption class="caption"><strong>B. Pearl.</strong> Cream base, softer metal. Pearlescent, reads lighter on the white page.</figcaption>
+    </figure>
+    <figure>
+      <div class="cube-mount" data-variant="blue"></div>
+      <figcaption class="caption"><strong>C. Brand blue.</strong> Chia blue base under the clearcoat. Most on-theme, least like the video.</figcaption>
+    </figure>
+    <figure>
+      <div class="cube-mount" data-variant="coating"></div>
+      <figcaption class="caption"><strong>D. Coating loop.</strong> The student-cube animation: matte ink &rarr; coated in the teacher's finish, then resets.</figcaption>
+    </figure>
+  </div>
+</main>
+<script type="module">
+import * as THREE from 'https://esm.sh/three@0.168.0';
+import { RoundedBoxGeometry } from 'https://esm.sh/three@0.168.0/examples/jsm/geometries/RoundedBoxGeometry.js';
+
+// Chia-tinted equirect environment: vertical gradient with a couple of
+// bright streaks so the clearcoat has something to reflect.
+function makeEnvCanvas() {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 256;
+  const g = c.getContext('2d');
+  const grad = g.createLinearGradient(0, 0, 0, 256);
+  grad.addColorStop(0.00, '#ffffff');
+  grad.addColorStop(0.25, '#f8ecda');
+  grad.addColorStop(0.50, '#f2c4e4');
+  grad.addColorStop(0.75, '#96abff');
+  grad.addColorStop(1.00, '#254eff');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 512, 256);
+  g.fillStyle = 'rgba(255,255,255,0.95)';
+  g.fillRect(0, 42, 512, 12);
+  g.fillRect(0, 148, 512, 7);
+  return c;
+}
+
+const MATTE = { color: 0x1a1a1a, metalness: 0.0, roughness: 0.92, iridescence: 0.0, clearcoat: 0.0 };
+const VARIANTS = {
+  ink:   { color: 0x14161f, metalness: 1.00, roughness: 0.12, iridescence: 1, clearcoat: 1 },
+  pearl: { color: 0xf8ecda, metalness: 0.60, roughness: 0.16, iridescence: 1, clearcoat: 1 },
+  blue:  { color: 0x254eff, metalness: 0.85, roughness: 0.18, iridescence: 1, clearcoat: 1 },
+};
+
+function applyParams(mat, p) {
+  mat.color.setHex(p.color);
+  mat.metalness = p.metalness;
+  mat.roughness = p.roughness;
+  mat.iridescence = p.iridescence;
+  mat.clearcoat = p.clearcoat;
+}
+
+function lerpParams(mat, a, b, k) {
+  mat.color.lerpColors(new THREE.Color(a.color), new THREE.Color(b.color), k);
+  mat.metalness = a.metalness + (b.metalness - a.metalness) * k;
+  mat.roughness = a.roughness + (b.roughness - a.roughness) * k;
+  mat.iridescence = a.iridescence + (b.iridescence - a.iridescence) * k;
+  mat.clearcoat = a.clearcoat + (b.clearcoat - a.clearcoat) * k;
+}
+
+const smooth = (x) => x * x * (3 - 2 * x);
+const envCanvas = makeEnvCanvas();
+
+document.querySelectorAll('.cube-mount').forEach((mount) => {
+  const variant = mount.dataset.variant;
+  const size = mount.clientWidth;
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(size, size);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  mount.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 20);
+  camera.position.set(0, 1.1, 4.6);
+  camera.lookAt(0, 0, 0);
+
+  const envTex = new THREE.CanvasTexture(envCanvas);
+  envTex.mapping = THREE.EquirectangularReflectionMapping;
+  envTex.colorSpace = THREE.SRGBColorSpace;
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromEquirectangular(envTex).texture;
+  envTex.dispose();
+
+  const light = new THREE.DirectionalLight(0xffffff, 1.4);
+  light.position.set(2.5, 4, 3);
+  scene.add(light);
+
+  const material = new THREE.MeshPhysicalMaterial({
+    iridescenceIOR: 1.6,
+    iridescenceThicknessRange: [120, 480],
+    envMapIntensity: 1.25,
+    clearcoatRoughness: 0.08,
+  });
+  applyParams(material, variant === 'coating' ? MATTE : VARIANTS[variant]);
+
+  const cube = new THREE.Mesh(new RoundedBoxGeometry(1.7, 1.7, 1.7, 5, 0.09), material);
+  scene.add(cube);
+
+  renderer.setAnimationLoop((tMs) => {
+    const t = tMs / 1000;
+    cube.rotation.y = t * 0.45;
+    cube.rotation.x = 0.42 + Math.sin(t * 0.6) * 0.05;
+    if (variant === 'coating') {
+      // 8s cycle: hold matte 1s, coat over 3s, hold coated 3s, snap back.
+      const cyc = t % 8;
+      const k = cyc < 1 ? 0 : cyc < 4 ? (cyc - 1) / 3 : cyc < 7 ? 1 : (8 - cyc);
+      lerpParams(material, MATTE, VARIANTS.ink, smooth(Math.min(k, 1)));
+    }
+    renderer.render(scene, camera);
+  });
+});
+</script>
+</body>
+</html>
