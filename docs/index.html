@@ -392,9 +392,9 @@
 
     <details class="data-details">
       <summary>See the full table</summary>
+      <p class="caption"><strong>Table 1. Top models with the highest PG-Score (average across six languages).</strong> We evaluate teacher models with varying size and model family on 6 typologically diverse languages. The best model is in <strong>bold</strong> and the second-best is <u>underlined</u>.</p>
       <div class="table-scroll">
         <table class="chia">
-          <caption><strong>Table 1. Top models with the highest PG-Score (average across six languages).</strong> We evaluate teacher models with varying size and model family on 6 typologically diverse languages. The best model is in <strong>bold</strong> and the second-best is <u>underlined</u>.</caption>
           <thead>
             <tr>
               <th style="text-align:left">Teacher Model</th>
@@ -472,9 +472,9 @@
     </div>
     <details class="data-details">
       <summary>See the scores across base models</summary>
+      <p class="caption"><strong>Table 2. Average PG-Score of each teacher across four student base models.</strong> For each base model, the <span class="hl-key hl-1">best</span>, <span class="hl-key hl-2">second</span>, and <span class="hl-key hl-3">third</span> best teachers are highlighted.</p>
       <div class="table-scroll">
         <table class="chia">
-          <caption><strong>Table 2. Average PG-Score of each teacher across four student base models.</strong> For each base model, the <span class="hl-key hl-1">best</span>, <span class="hl-key hl-2">second</span>, and <span class="hl-key hl-3">third</span> best teachers are highlighted.</caption>
           <thead>
             <tr><th style="text-align:left">Teacher Model</th><th>OLMo 3 7B</th><th>Gemma 3 4B</th><th>Qwen 3 8B</th><th>Llama 3 8B</th></tr>
           </thead>
@@ -499,9 +499,9 @@
       The three methods make different assumptions: <em>Generate</em> depends on the quality of the few-shot seed examples, <em>Translate</em> transfers from widely-available English prompts, and <em>Respond</em> reuses existing prompts in the target language. These assumptions may favor different languages depending on how much data they already have.
     </p>
     <p><span class="section-label">Setup</span>For each method in isolation, we generate 10k samples per teacher&ndash;language pair, finetune an OLMo 3 7B student, and compute PG-Score. We test three teachers spanning high to low PG-Score (Gemma 3 27B, Aya Expanse 32B, Llama 3.1 70B) across German, Indonesian, and Arabic.</p>
+    <p class="caption"><strong>Table 3. PG-Score across the three data generation methods.</strong> We <span class="hl-key hl-1">highlight</span> the best method for each teacher and language.</p>
     <div class="table-scroll">
       <table class="chia">
-        <caption><strong>Table 3. PG-Score across the three data generation methods.</strong> We <span class="hl-key hl-1">highlight</span> the best method for each teacher and language.</caption>
         <thead>
           <tr><th rowspan="2" style="text-align:left">Teacher Model</th><th colspan="3">Arabic (ar)</th><th colspan="3">German (de)</th><th colspan="3">Indonesian (id)</th></tr>
           <tr><th>Gen.</th><th>Tr.</th><th>Resp.</th><th>Gen.</th><th>Tr.</th><th>Resp.</th><th>Gen.</th><th>Tr.</th><th>Resp.</th></tr>

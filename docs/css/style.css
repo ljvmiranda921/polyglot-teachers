@@ -730,7 +730,7 @@ h3:hover .hanchor, .hanchor:focus { opacity: 1; }
 .toc a { color: var(--ink); border-bottom: none; }
 .toc a:hover { color: var(--blue); }
 
-.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 1.75rem; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0.5rem 0 1.75rem; }
 /* highlight a single column (chia ships tr.is-highlight; this is cell-level) */
 table.chia td.is-highlight { color: var(--blue); font-weight: 500; }
 
