@@ -25,9 +25,10 @@ plt.rcParams.update({
 
 INK, SLATE = "#1a1a1a", "#545e73"
 # same per-language colors + marker shapes as the website scatter
+# chia categorical palette
 STYLE = {
-    "Arabic": ("#7fd8c9", "o"), "Czech": ("#fd8254", "s"), "German": ("#cdb4e8", "D"),
-    "Spanish": ("#29337a", "^"), "Indonesian": ("#ffb81c", "P"), "Japanese": ("#545e73", "X"),
+    "Arabic": ("#254EFF", "o"), "Czech": ("#C96A2E", "s"), "German": ("#A368DF", "D"),
+    "Spanish": ("#4DB78C", "^"), "Indonesian": ("#CD3572", "P"), "Japanese": ("#546072", "X"),
 }
 
 pts = json.loads(Path("analysis/_tempdata/pca_points.json").read_text())

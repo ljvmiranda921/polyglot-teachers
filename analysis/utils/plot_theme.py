@@ -27,11 +27,11 @@ PLOT_PARAMS = {
 }
 
 COLORS = {
-    # Core palette
-    "cambridge_blue": "#8EE8D8",
-    "light_blue": "#D1F9F1",
-    "warm_blue": "#00BDB6",
-    "dark_blue": "#133844",
+    # Core palette (recolored teal -> chia blue)
+    "cambridge_blue": "#9DB4FF",
+    "light_blue": "#DCE3FF",
+    "warm_blue": "#254EFF",
+    "dark_blue": "#1A1A1A",
     # Secondary palette - Crest
     "light_crest": "#FFE2C8",
     "warm_crest": "#FFC392",
