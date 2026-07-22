@@ -34,7 +34,7 @@ pts = json.loads(Path("analysis/_tempdata/pca_points.json").read_text())
 
 fig, ax = plt.subplots(figsize=(6.2, 6.2))
 # box-diagonal reference line (matches the website)
-ax.plot([0.30, 0.40], [0.30, 0.50], "--", color=SLATE, lw=1.8, zorder=1)
+ax.plot([0.30, 0.40], [0.30, 0.50], "--", color=INK, lw=1.6, zorder=1)
 for lang, (color, marker) in STYLE.items():
     xs = [p["x"] for p in pts if p["l"] == lang]
     ys = [p["y"] for p in pts if p["l"] == lang]

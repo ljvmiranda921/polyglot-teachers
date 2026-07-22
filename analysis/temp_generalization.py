@@ -1,63 +1,65 @@
-"""TEMP (delete later): rebuild generalization_base_models Spearman heatmap
-in the website's style. Values are the exact ones from the paper figure.
-Chia blue sequential colormap + Helvetica.
+"""TEMP (delete later): base_model correlation heatmap. Copied verbatim from
+analysis/base_model_effect.py:plot_correlation_heatmap, values hardcoded from
+the paper figure, colormap swapped to chia blue.
 """
 from pathlib import Path
 
 import numpy as np
-import matplotlib
-matplotlib.use("Agg")
+import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
-plt.rcParams.update({
-    "font.family": "sans-serif",
-    "font.sans-serif": ["Helvetica", "Arial", "DejaVu Sans"],
-    "font.size": 13, "text.usetex": False, "axes.edgecolor": "#1a1a1a",
-})
-INK = "#1a1a1a"
-N = np.nan
+from analysis.utils.plot_theme import PLOT_PARAMS, OUTPUT_DIR
 
-# y top->bottom, x left->right (lower-triangular, as in the paper)
-ylab = ["Llama 3 8B", "Qwen 3 8B", "Gemma 3 4B", "OLMo 3 7B"]
-xlab = ["OLMo 3 7B", "Gemma 3 4B", "Qwen 3 8B", "Llama 3 8B"]
-M = np.array([
+plt.rcParams.update(PLOT_PARAMS)
+
+order = ["OLMo 3 7B", "Gemma 3 4B", "Qwen 3 8B", "Llama 3 8B"]
+corr = pd.DataFrame([
+    [1.00, 0.87, 0.60, 0.63],
+    [0.87, 1.00, 0.65, 0.68],
+    [0.60, 0.65, 1.00, 0.57],
     [0.63, 0.68, 0.57, 1.00],
-    [0.60, 0.65, 1.00, N],
-    [0.87, 1.00, N, N],
-    [1.00, N, N, N],
-])
-ann = [
-    ["0.63", "0.68*", "0.57", "1.00"],
-    ["0.60", "0.65", "1.00", ""],
-    ["0.87**", "1.00", "", ""],
-    ["1.00", "", "", ""],
-]
+], index=order, columns=order)
+pval = pd.DataFrame([
+    [0.0, 0.005, 0.20, 0.20],
+    [0.005, 0.0, 0.20, 0.03],
+    [0.20, 0.20, 0.0, 0.20],
+    [0.20, 0.03, 0.20, 0.0],
+], index=order, columns=order)
 
-cmap = LinearSegmentedColormap.from_list("chia_seq", ["#eef1ff", "#254eff"])
-cmap.set_bad("white")
-
-fig, ax = plt.subplots(figsize=(6.2, 5.8))
-ax.imshow(np.ma.masked_invalid(M), cmap=cmap, vmin=0.5, vmax=1.0, aspect="equal")
+base_models = order
+annot = corr.copy().astype(str)
 for i in range(4):
     for j in range(4):
-        if ann[i][j]:
-            ax.text(j, i, ann[i][j], ha="center", va="center", fontsize=15.5,
-                    color="white" if M[i, j] > 0.8 else INK)
+        v, p = corr.iloc[i, j], pval.iloc[i, j]
+        if i == j:
+            annot.iloc[i, j] = f"{v:.2f}"
+        elif p < 0.01:
+            annot.iloc[i, j] = f"{v:.2f}**"
+        elif p < 0.05:
+            annot.iloc[i, j] = f"{v:.2f}*"
+        else:
+            annot.iloc[i, j] = f"{v:.2f}"
 
-ax.set_xticks(range(4)); ax.set_xticklabels(xlab, rotation=45, ha="left", fontsize=13.5)
-ax.xaxis.set_ticks_position("top")
-ax.set_yticks(range(4)); ax.set_yticklabels(ylab, fontsize=13.5)
-ax.set_xticks(np.arange(-.5, 4, 1), minor=True)
-ax.set_yticks(np.arange(-.5, 4, 1), minor=True)
-ax.grid(which="minor", color="white", lw=2.5)
-ax.tick_params(which="minor", length=0)
-for s in ax.spines.values():
-    s.set_visible(False)
-ax.text(0.98, 0.16, "**  p < 0.01\n*   p < 0.05", transform=ax.transAxes,
-        ha="right", va="top", fontsize=12.5, color="#5a554f")
+mask = np.triu(np.ones_like(corr, dtype=bool), k=1)
+# chia blue sequential (was white -> light_blue -> cambridge_blue teal)
+cmap = LinearSegmentedColormap.from_list("chia_corr", ["#FFFFFF", "#CDD6FF", "#254EFF"])
 
+fig, ax = plt.subplots(figsize=(8, 8))
+sns.heatmap(corr, mask=mask, annot=annot, fmt="", cmap=cmap, vmin=0, vmax=1,
+            square=True, cbar=False, ax=ax, xticklabels=base_models,
+            yticklabels=base_models, annot_kws={"fontsize": 24})
+ax.invert_yaxis()
+ax.xaxis.tick_top()
+ax.set_xlabel(""); ax.set_ylabel("")
+ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="left", va="bottom")
+ax.set_yticklabels(ax.get_yticklabels(), rotation=0, ha="right", va="center")
+ax.text(0.95, 0.35, "** :$p < 0.01$\n* :$p < 0.05$", transform=ax.transAxes,
+        fontsize=25, ha="right", va="top")
+
+plt.tight_layout()
 Path("plot_outputs").mkdir(exist_ok=True)
-fig.savefig("plot_outputs/generalization_base_models.pdf", bbox_inches="tight")
-fig.savefig("/tmp/prev_generalization.png", dpi=150, bbox_inches="tight")
+plt.savefig("plot_outputs/generalization_base_models.pdf", format="pdf", bbox_inches="tight")
+plt.savefig("/tmp/prev_generalization.png", dpi=130, bbox_inches="tight")
 print("wrote plot_outputs/generalization_base_models.pdf")
