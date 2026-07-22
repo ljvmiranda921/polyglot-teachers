@@ -33,7 +33,7 @@ df = pd.DataFrame({"filbench_score": [47.2, 47.7, 48.2, 49.5, 49.7, 51.4, 53.0]}
 fig, ax = plt.subplots(figsize=(11, 5))
 x = np.arange(len(df))
 colors = ["#f8ecda" if i <= 1 else BLUE for i in range(len(df))]
-hatches = ["///" if i <= 1 else "" for i in range(len(df))]
+hatches = ["" for _ in range(len(df))]
 bars = ax.bar(x, df["filbench_score"], color=colors, width=0.7, edgecolor="black", linewidth=1.5)
 for bar, h in zip(bars, hatches):
     bar.set_hatch(h)
