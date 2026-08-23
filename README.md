@@ -2,7 +2,7 @@
 
 <!-- # Polyglot Teachers: Evaluating LLMs for Multilingual Synt. Data Generation  -->
 
-# Polyglot Teachers: Evaluating Language Models for Multilingual Synthetic Data Generation (EMNLP '26)
+# Polyglot Teachers: Evaluating Language Models for Multilingual Synthetic Data Generation
 
  [[📄 Paper](https://arxiv.org/abs/2604.11290)] [[🤗 HuggingFace Collection](https://huggingface.co/collections/ljvmiranda921/polyglot-teachers)] [[🌐 Website](https://ljvmiranda921.github.io/polyglot-teachers/)]
 
@@ -22,6 +22,13 @@ Specifically, we perform a comprehensive analysis of several language models and
 <br/>
 <i>Overview of the Polyglot Score and how it fits into the distillation workflow.</i>
 </p>
+
+## News
+
+- [2026-08-20] Polyglot Teachers has been accepted to the main track of EMNLP! See you in Budapest!
+- [2026-07-14] Check out our new [website](https://ljvmiranda921.github.io/polyglot-teachers/) containing our findings.
+- [2026-07-07] We added new human evaluation experiment results in the latest preprint.
+- [2026-04-13] Introducing Polyglot Teachers, a research on multilingual synthetic data generation.
 
 ## Setup & Installation
 
