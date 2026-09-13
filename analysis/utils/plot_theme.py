@@ -13,9 +13,6 @@ PLOT_PARAMS = {
     "legend.fontsize": FONT_SIZES.get("medium"),
     "figure.titlesize": FONT_SIZES.get("medium"),
     "text.usetex": True,
-    # Render all LaTeX text (and math) in Helvetica, the metric-identical
-    # twin of Arial. pdflatex ships no true Arial, so helvet is the standard
-    # substitute and keeps the existing \textsc, \%, ~~ markup working.
     "text.latex.preamble": "\n".join(
         [
             r"\usepackage{helvet}",
