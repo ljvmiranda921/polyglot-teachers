@@ -4,7 +4,7 @@
 
 # Polyglot Teachers: Evaluating Language Models for Multilingual Synthetic Data Generation
 
- [[📄 Paper](https://arxiv.org/abs/2604.11290)] [[🤗 HuggingFace Collection](https://huggingface.co/collections/ljvmiranda921/polyglot-teachers)] [[🌐 Website](https://ljvmiranda921.github.io/polyglot-teachers/)]
+ [[📄 Paper](https://aclanthology.org/2026.emnlp-main.440/)] [[🤗 HuggingFace Collection](https://huggingface.co/collections/ljvmiranda921/polyglot-teachers)] [[🌐 Website](https://ljvmiranda921.github.io/polyglot-teachers/)]
 
 Supervised finetuning (SFT) has been a dominant approach in building multilingual language models (LMs).
 Central to its success is the availability of high-quality multilingual datasets.
@@ -70,13 +70,23 @@ This work was performed using joint resources provided by the [Cambridge Service
 ## Citation
 
 ```
-@misc{miranda2026polyglotteachersevaluatinglanguage,
-      title={Polyglot Teachers: Evaluating Language Models for Multilingual Synthetic Data Generation}, 
-      author={Lester James V. Miranda and Ivan Vulić and Anna Korhonen},
-      year={2026},
-      eprint={2604.11290},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2604.11290}, 
+@inproceedings{miranda-etal-2026-polyglot,
+    title = "Polyglot Teachers: Evaluating Language Models for Multilingual Synthetic Data Generation",
+    author = "Miranda, Lester James Validad  and
+      Vuli{\'c}, Ivan  and
+      Korhonen, Anna",
+    editor = "Lee, Hung-Yi  and
+      Dev, Sunipa  and
+      Li, Jessy  and
+      Elliott, Desmond",
+    booktitle = "Proceedings of the 2026 Conference on Empirical Methods in Natural Language Processing",
+    month = oct,
+    year = "2026",
+    address = "Budapest, Hungary",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2026.emnlp-main.440/",
+    pages = "10116--10144",
+    ISBN = "979-8-89176-459-0",
+    abstract = "Synthesizing supervised finetuning (SFT) data from language models (LMs) to teach smaller models multilingual tasks has become increasingly common. However, teacher model selection is often ad hoc, typically defaulting to the largest available option, even though such models may have significant capability gaps in non-English languages. This practice can result in poor-quality synthetic data and suboptimal student downstream performance. In this work, we systematically characterize what makes an effective multilingual teacher. We combine intrinsic measures of data quality with extrinsic student model performance in a metric we call Polyglot Score. We evaluate 10 LMs across 6 typologically diverse languages, generating over 1.4M SFT examples and training 240 student models. Our analyses reveal that model scale alone does not significantly predict teacher effectiveness: the most effective teachers we identify are consistently smaller than the largest models evaluated, and their ranking is stable across student base model families. Instead, data qualities such as prompt diversity, length, and response fluency capture 93.3{\%} of the variance in intrinsic data quality and predict student performance. Finally, we provide practical recommendations, including matching the model families of teacher-student pairs and generating responses to existing prompts or translating them from English, which can yield improvements for less-resourced languages. We hope that our work advances data-centric research in multilingual synthetic data and LM development."
 }
 ```
