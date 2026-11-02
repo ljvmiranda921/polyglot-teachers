@@ -61,8 +61,8 @@ def main():
 
     fig, ax = plt.subplots(figsize=(5, 6))
     cmap = LinearSegmentedColormap.from_list(
-        "cambridge_correlation",
-        [COLORS["light_blue"], COLORS["white"], COLORS["cambridge_blue"]],
+        "chia_corr",
+        ["#FFFFFF", "#CDD6FF", "#254EFF"],
     )
     rankings_df = pd.DataFrame(0, index=ALPHA_VALUES, columns=ALPHA_VALUES)
     pvalues_df = pd.DataFrame(1.0, index=ALPHA_VALUES, columns=ALPHA_VALUES)
